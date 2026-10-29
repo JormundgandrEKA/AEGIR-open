@@ -469,7 +469,7 @@ class TestDemo(Base):
         self.assertIn("DEMO DATA", st["notice"])
         self.assertNotIn("provisional", st["cases"][0])
         s.save({"case_id": st["cases"][0]["case_id"], "answers": {"real_change": "no"}, "timing": {}})
-        self.assertTrue((self.tmp / "data" / "demo" / "tester" / "labels.jsonl").is_file())
+        self.assertTrue((self.tmp / self.ctx.cfg.get("demo_output_dir", "data/demo") / "tester" / "labels.jsonl").is_file())
         self.assertFalse((self.tmp / "data" / "labels" / "tester").exists())    # never mixed with real labels
 
 

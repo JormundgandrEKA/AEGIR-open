@@ -27,8 +27,10 @@ class Session:
         self.ctx, self.labeller = ctx, safe_name(labeller)
         self.batch = json.loads(batch_path.read_text(encoding="utf-8"))
         self.cases = {c["case_id"]: c for c in self.batch["cases"]}
-        # demo sessions are kept apart (data/demo/<name>/) so they never mix with real labels in data/labels/
-        base = ctx.root / "data" / "demo" if self.batch.get("name") == "ran-demo" else labels_dir(ctx)
+        # demo sessions are kept apart so they never mix with real labels in data/labels/;
+        # where they go is the "demo_output_dir" setting (default data/demo)
+        base = (ctx.root / ctx.cfg.get("demo_output_dir", "data/demo") if self.batch.get("name") == "ran-demo"
+                else labels_dir(ctx))
         self.dir = base / self.labeller
         (self.dir / "sessions").mkdir(parents=True, exist_ok=True)
         self.labels_file = self.dir / "labels.jsonl"

@@ -42,5 +42,6 @@
       60,
       120
     ]
-  }
+  },
+  "demo_output_dir": "data/demo"
 }

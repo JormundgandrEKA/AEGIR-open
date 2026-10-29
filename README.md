@@ -146,7 +146,8 @@ config/             settings, licence grades, named queries, ncbi.example.json
 demo/               16 real ClinicalTrials.gov cases for trying the labelling app, with ATTRIBUTION.md
 build/              build.ps1, ran.spec: builds a portable RAN.exe (Windows, needs PyInstaller via requirements-build.txt)
 docs/               STATUS.md and the diagrams
-data/  state/       created when you run things; ignored by git
+data/               what RAN fetches and records (ignored by git; data/README.md explains it); demo sessions go to data/demo/
+state/              rate-limit state, created when you run things (ignored by git)
 ```
 
 To build the portable executable on Windows: `powershell -ExecutionPolicy Bypass -File build\build.ps1`. It places `RAN.exe` in the
