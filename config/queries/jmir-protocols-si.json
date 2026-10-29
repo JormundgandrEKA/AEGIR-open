@@ -1,0 +1,6 @@
+{
+ "id": "jmir-protocols-si",
+ "source": "pubmed",
+ "term": "\"JMIR Res Protoc\"[ta] AND clinicaltrials.gov[si]",
+ "note": "JMIR Research Protocols with a ClinicalTrials.gov ID (T18)"
+}

@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="t d">
+  <title id="t">RÁN: how it works</title>
+  <desc id="d">Five stages: public sources, a rate-limited fetch layer, an append-only store, derived flags and grades, and batches with a labelling app. Cowork design reads the files at the end.</desc>
+  <style>
+    text{font-family:"Segoe UI",Arial,sans-serif;fill:#111}
+    .mono{font-family:Consolas,"DejaVu Sans Mono",monospace}
+    .h{font-size:13px;font-weight:700;letter-spacing:.06em}
+    .b{font-size:13px}
+    .s{font-size:12px;fill:#444}
+    .box{fill:#fff;stroke:#111;stroke-width:1.2}
+    .head{fill:#111}
+    .headt{fill:#fff;font-size:13px;font-weight:700;letter-spacing:.06em}
+    .arrow{stroke:#111;stroke-width:1.6;fill:none;marker-end:url(#a)}
+    .acc{fill:#0040ff}
+    .chip{fill:#f3f3f3;stroke:#111;stroke-width:1}
+    .band{fill:#f3f3f3;stroke:#111;stroke-width:1.2}
+  </style>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#111"/></marker></defs>
+  <rect width="1200" height="600" fill="#fff"/>
+  <text x="20" y="32" font-size="22" font-weight="700">RÁN: how it works</text>
+  <text x="20" y="52" class="s">Registry and Article Net. Fetch public data, keep it unchanged and traceable, flag what changed, help a human label it.</text>
+
+  <!-- column heads -->
+  <g>
+    <rect x="20" y="72" width="190" height="26" class="head"/><text x="30" y="90" class="headt">1 SOURCES</text>
+    <rect x="250" y="72" width="200" height="26" class="head"/><text x="260" y="90" class="headt">2 FETCH LAYER</text>
+    <rect x="490" y="72" width="200" height="26" class="head"/><text x="500" y="90" class="headt">3 STORE</text>
+    <rect x="730" y="72" width="210" height="26" class="head"/><text x="740" y="90" class="headt">4 DERIVE</text>
+    <rect x="980" y="72" width="200" height="26" class="head"/><text x="990" y="90" class="headt">5 LABEL</text>
+  </g>
+
+  <!-- 1 sources -->
+  <g>
+    <rect x="20" y="98" width="190" height="318" class="box"/>
+    <text x="30" y="122" class="b" font-weight="600">ClinicalTrials.gov</text><text x="30" y="139" class="s">API v2: search, records</text>
+    <text x="30" y="170" class="b" font-weight="600">Registry history</text><text x="30" y="187" class="s">version indexes and versions,</text><text x="30" y="203" class="s">collected in your browser</text>
+    <text x="30" y="234" class="b" font-weight="600">PubMed</text><text x="30" y="251" class="s">E-utilities: search, articles</text>
+    <text x="30" y="282" class="b" font-weight="600">PMC</text><text x="30" y="299" class="s">licence per article, full text</text>
+    <text x="30" y="330" class="b" font-weight="600">Europe PMC</text><text x="30" y="347" class="s">licence, one PMID per request</text>
+    <text x="30" y="395" class="s">Public, free, graded A+ to F</text>
+  </g>
+  <path class="arrow" d="M210 257H246"/>
+
+  <!-- 2 fetch layer -->
+  <g>
+    <rect x="250" y="98" width="200" height="318" class="box"/>
+    <text x="260" y="122" class="b">Rate limits kept across</text><text x="260" y="139" class="b">processes (state/rate.json)</text>
+    <text x="260" y="168" class="b">Request budget per command</text><text x="260" y="185" class="s">default 500; --dry-run first</text>
+    <text x="260" y="214" class="b">NCBI weekday-daytime guard</text>
+    <text x="260" y="243" class="b">Retry and back-off</text><text x="260" y="260" class="s">429, 5xx, truncated reads</text>
+    <text x="260" y="289" class="b">API key and email redacted</text><text x="260" y="306" class="s">from every URL, log, output</text>
+    <text x="260" y="335" class="b">Fetched text is data,</text><text x="260" y="352" class="b">never instructions</text>
+    <text x="260" y="395" class="s">One JSON summary per command</text>
+  </g>
+  <path class="arrow" d="M450 257H486"/>
+
+  <!-- 3 store -->
+  <g>
+    <rect x="490" y="98" width="200" height="318" class="box"/>
+    <text x="500" y="122" class="b" font-weight="600">data/raw/…</text><text x="500" y="139" class="s">files as received, dated</text>
+    <text x="500" y="168" class="b" font-weight="600">.meta.json sidecar</text><text x="500" y="185" class="s">url, time, sha256, grade,</text><text x="500" y="201" class="s">how collected</text>
+    <text x="500" y="230" class="b" font-weight="600">catalogue/*.jsonl</text><text x="500" y="247" class="s">append-only; latest line wins</text>
+    <text x="500" y="276" class="b" font-weight="600">derived/</text><text x="500" y="293" class="s">tables, flags, audits</text>
+    <text x="500" y="322" class="b" font-weight="600">labels/</text><text x="500" y="339" class="s">per labeller, never shared</text>
+    <rect x="500" y="356" width="180" height="46" class="chip"/>
+    <text x="508" y="374" class="s">No deletes, no overwrites,</text><text x="508" y="391" class="s">no SQLite, no git in data/</text>
+  </g>
+  <path class="arrow" d="M690 257H726"/>
+
+  <!-- 4 derive -->
+  <g>
+    <rect x="730" y="98" width="210" height="318" class="box"/>
+    <text x="740" y="122" class="b" font-weight="600">Label flags (T12 rule)</text><text x="740" y="139" class="s">index only: 159 pos, 208 neg</text>
+    <text x="740" y="168" class="b" font-weight="600">Content flags v2</text><text x="740" y="185" class="s">amend.py reads the real text</text><text x="740" y="201" class="s">per version vs baseline</text>
+    <rect x="740" y="210" width="190" height="62" class="chip"/>
+    <text x="748" y="228" class="s">criterion added / removed,</text><text x="748" y="244" class="s">threshold, age/sex, outcome</text><text x="748" y="260" class="s">elements, enrolment, arms</text>
+    <text x="740" y="296" class="b" font-weight="600">Licence grades</text><text x="740" y="313" class="s">CC BY = B ... custom = F</text>
+    <text x="740" y="342" class="b" font-weight="600">Links, tally, efficiency</text>
+    <text x="740" y="395" class="s">Rule-based. No language model.</text>
+  </g>
+  <path class="arrow" d="M940 257H976"/>
+
+  <!-- 5 label -->
+  <g>
+    <rect x="980" y="98" width="200" height="318" class="box"/>
+    <text x="990" y="122" class="b" font-weight="600">Batch builder</text><text x="990" y="139" class="s">50 positives + matched</text><text x="990" y="155" class="s">negatives, shuffled</text>
+    <text x="990" y="184" class="s">10% hide the provisional label</text>
+    <text x="990" y="214" class="b" font-weight="600">Labelling app</text><text x="990" y="231" class="s">127.0.0.1 only, keyboard-first</text>
+    <text x="990" y="257" class="s">• every changed field shown</text><text x="990" y="273" class="s">• definitions beside options</text><text x="990" y="289" class="s">• provisional label, revealed</text><text x="990" y="305" class="s">  on request, with findings</text><text x="990" y="321" class="s">• always-on notepad, drafts</text>
+    <text x="990" y="355" class="b" font-weight="600">Writes</text><text x="990" y="372" class="s mono">gold-label/0.1 + timing</text>
+    <text x="990" y="395" class="s">One labeller now; two to confirm</text>
+  </g>
+
+  <!-- bottom: flow to Cowork -->
+  <path class="arrow" d="M1080 416V458"/>
+  <rect x="20" y="460" width="1160" height="64" class="band"/>
+  <text x="34" y="484" class="b" font-weight="700">COWORK (design) reads the files:</text>
+  <text x="272" y="484" class="b mono">labels.jsonl · sessions/*.jsonl · notepad.jsonl · content_flags*.json · batch_audit*.json · tally · efficiency</text>
+  <text x="34" y="508" class="s">…and sends back decisions, new named queries, and rule changes. Anything for the gold set must come from a named query in config/queries/.</text>
+  <path class="arrow" d="M240 524V550" style="stroke-dasharray:4 3"/>
+  <text x="252" y="560" class="s">decisions loop back to step 1 and step 4</text>
+
+  <!-- chips -->
+  <g>
+    <rect x="20" y="574" width="170" height="20" class="chip"/><text x="28" y="588" class="s">Standard library only</text>
+    <rect x="200" y="574" width="190" height="20" class="chip"/><text x="208" y="588" class="s">RAN.exe is portable</text>
+    <rect x="400" y="574" width="260" height="20" class="chip"/><text x="408" y="588" class="s">Every fetched file has provenance</text>
+    <rect x="670" y="574" width="250" height="20" class="chip"/><text x="678" y="588" class="s">No language model in the tool</text>
+  </g>
+</svg>

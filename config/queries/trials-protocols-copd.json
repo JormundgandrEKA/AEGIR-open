@@ -1,0 +1,6 @@
+{
+ "id": "trials-protocols-copd",
+ "source": "pubmed",
+ "term": "\"Trials\"[ta] AND protocol[ti] AND clinicaltrials.gov[si] AND \"pulmonary disease, chronic obstructive\"[mh]",
+ "note": "COPD protocol papers in Trials; joins the COPD pilot (T18)"
+}

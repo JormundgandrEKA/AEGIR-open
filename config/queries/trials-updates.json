@@ -1,0 +1,6 @@
+{
+ "id": "trials-updates",
+ "source": "pubmed",
+ "term": "\"Trials\"[ta] AND update[ti] AND protocol[ti]",
+ "note": "Trials Update articles: post-publication amendments with reasons (T18)"
+}

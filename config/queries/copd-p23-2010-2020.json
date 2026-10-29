@@ -1,0 +1,5 @@
+{"id": "copd-p23-2010-2020", "source": "ctgov",
+ "params": {"query.cond": "COPD",
+            "filter.overallStatus": "COMPLETED|TERMINATED",
+            "filter.advanced": "AREA[StudyType]INTERVENTIONAL AND (AREA[Phase]PHASE2 OR AREA[Phase]PHASE3) AND AREA[StartDate]RANGE[2010-01-01,2020-12-31]"},
+ "note": "COPD pilot, T12"}

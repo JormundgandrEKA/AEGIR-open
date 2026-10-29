@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PubmedArticleSet><PubmedArticle><MedlineCitation><PMID>11111111</PMID><Article>
+<Journal><JournalIssue><PubDate><Year>2024</Year></PubDate></JournalIssue><Title>Trials</Title><ISOAbbreviation>Trials</ISOAbbreviation></Journal>
+<ArticleTitle>Study protocol for a randomised trial of X in COPD.</ArticleTitle>
+<Abstract><AbstractText>Registered as NCT09999999 and also see NCT08888888.</AbstractText></Abstract>
+<PublicationTypeList><PublicationType UI="D016428">Journal Article</PublicationType></PublicationTypeList>
+<DataBankList><DataBank><DataBankName>ClinicalTrials.gov</DataBankName><AccessionNumberList><AccessionNumber>NCT09999999</AccessionNumber></AccessionNumberList></DataBank></DataBankList>
+</Article></MedlineCitation>
+<PubmedData><ArticleIdList><ArticleId IdType="pubmed">11111111</ArticleId><ArticleId IdType="pmc">PMC7777777</ArticleId><ArticleId IdType="doi">10.1186/x</ArticleId></ArticleIdList></PubmedData></PubmedArticle></PubmedArticleSet>

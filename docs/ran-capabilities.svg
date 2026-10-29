@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="t d">
+<title id="t">RÁN: capabilities, current and to be built</title>
+<desc id="d">Three columns: capabilities built and used on real data, built but not yet proven, and still to build.</desc>
+<style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#111}.b{font-size:13.5px;font-weight:600}.s{font-size:12px;fill:#444}.h{font-size:13px;font-weight:700;letter-spacing:.06em;fill:#fff}.k{font-size:12px}</style>
+<rect width="1200" height="640" fill="#fff"/>
+<text x="20" y="32" font-size="22" font-weight="700">RÁN: what exists and what is next</text>
+<text x="20" y="52" class="s">State on 28 Oct 2026. "Used on real data" means run on the COPD pool or on live NCBI, EPMC or labelling sessions, not just tests.</text>
+<rect x="20" y="72" width="360" height="26" fill="#0b6b2e"/><text x="30" y="90" class="h">BUILT AND USED ON REAL DATA</text>
+<rect x="20" y="98" width="360" height="446" fill="#fff" stroke="#0b6b2e" stroke-width="1.4"/>
+<rect x="30" y="112" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="123" class="b">ClinicalTrials.gov search and records</text><text x="50" y="138" class="s">COPD pool: 433 trials</text>
+<rect x="30" y="148" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="159" class="b">History import, version store</text><text x="50" y="174" class="s">834 browser files, 152 trials with versions</text>
+<rect x="30" y="184" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="195" class="b">Label flags (T12 rule)</text><text x="50" y="210" class="s">reproduces 159 positive / 208 negative</text>
+<rect x="30" y="220" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="231" class="b">Content flags v2 + amend.py</text><text x="50" y="246" class="s">stress-tested: 0-3% false alarms</text>
+<rect x="30" y="256" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="267" class="b">PubMed search and fetch, PMC licence, grades</text><text x="50" y="282" class="s">372 licences checked, B to D-</text>
+<rect x="30" y="292" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="303" class="b">Batch builder and audit</text><text x="50" y="318" class="s">11 randomised batches audited</text>
+<rect x="30" y="328" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="339" class="b">Labelling app (127.0.0.1, keyboard)</text><text x="50" y="354" class="s">31 labels from 1 labeller</text>
+<rect x="30" y="364" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="375" class="b">Definitions on screen, notepad, drafts</text><text x="50" y="390" class="s">timing and event logs written</text>
+<rect x="30" y="400" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="411" class="b">status, tally, efficiency report</text><text x="50" y="426" class="s">run on real data</text>
+<rect x="30" y="436" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="447" class="b">Portable RAN.exe, launcher</text><text x="50" y="462" class="s">opens and serves the app</text>
+<rect x="30" y="472" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="483" class="b">Rate limits, budget, key redaction</text><text x="50" y="498" class="s">700+ requests logged, 0 failed</text>
+<rect x="30" y="508" width="12" height="12" fill="#0b6b2e"/>
+<text x="50" y="519" class="b">Unit tests: 39 pass; stress test</text><text x="50" y="534" class="s">about 4,500 edits per seed</text>
+<rect x="420" y="72" width="360" height="26" fill="#9a6700"/><text x="430" y="90" class="h">BUILT, NOT YET PROVEN</text>
+<rect x="420" y="98" width="360" height="338" fill="#fff" stroke="#9a6700" stroke-width="1.4"/>
+<rect x="430" y="112" width="12" height="12" fill="#9a6700"/>
+<text x="450" y="123" class="b">Europe PMC licence at scale</text><text x="450" y="138" class="s">only 2 PMIDs fetched live</text>
+<rect x="430" y="148" width="12" height="12" fill="#9a6700"/>
+<text x="450" y="159" class="b">Track 2 article fetch at scale</text><text x="450" y="174" class="s">5 searches done; 96 of 7,361 fetched</text>
+<rect x="430" y="184" width="12" height="12" fill="#9a6700"/>
+<text x="450" y="195" class="b">link from-registry / from-pubmed</text><text x="450" y="210" class="s">0 links stored so far</text>
+<rect x="430" y="220" width="12" height="12" fill="#9a6700"/>
+<text x="450" y="231" class="b">PMC full text behind the grade gate</text><text x="450" y="246" class="s">not run live</text>
+<rect x="430" y="256" width="12" height="12" fill="#9a6700"/>
+<text x="450" y="267" class="b">attribution, snapshot</text><text x="450" y="282" class="s">snapshot omits study files</text>
+<rect x="430" y="292" width="12" height="12" fill="#9a6700"/>
+<text x="450" y="303" class="b">ctgov history by script</text><text x="450" y="318" class="s">403 by design; import path used</text>
+<rect x="430" y="328" width="12" height="12" fill="#9a6700"/>
+<text x="450" y="339" class="b">amend.py beyond COPD / outcomes</text><text x="450" y="354" class="s">few real outcome labels</text>
+<rect x="430" y="364" width="12" height="12" fill="#9a6700"/>
+<text x="450" y="375" class="b">Rules checked by an expert</text><text x="450" y="390" class="s">none yet; my reading of the standards</text>
+<rect x="430" y="400" width="12" height="12" fill="#9a6700"/>
+<text x="450" y="411" class="b">Linux and Mac runs</text><text x="450" y="426" class="s">only Windows exercised this session</text>
+<rect x="820" y="72" width="360" height="26" fill="#b00020"/><text x="830" y="90" class="h">TO BUILD</text>
+<rect x="820" y="98" width="360" height="374" fill="#fff" stroke="#b00020" stroke-width="1.4"/>
+<rect x="830" y="112" width="12" height="12" fill="#b00020"/>
+<text x="850" y="123" class="b">Second labeller, kappa, disagreements</text><text x="850" y="138" class="s">tally counts confirmed only</text>
+<rect x="830" y="148" width="12" height="12" fill="#b00020"/>
+<text x="850" y="159" class="b">Adjudication screen (Forseti)</text><text x="850" y="174" class="s">for split labels</text>
+<rect x="830" y="184" width="12" height="12" fill="#b00020"/>
+<text x="850" y="195" class="b">Clean negatives (about 100 more files)</text><text x="850" y="210" class="s">browser collection needed</text>
+<rect x="830" y="220" width="12" height="12" fill="#b00020"/>
+<text x="850" y="231" class="b">Review the two small Track 2 sets</text><text x="850" y="246" class="s">trials-updates and trials-protocols-copd</text>
+<rect x="830" y="256" width="12" height="12" fill="#b00020"/>
+<text x="850" y="267" class="b">Expert calibration set</text><text x="850" y="282" class="s">clinician reviews about 30 findings</text>
+<rect x="830" y="292" width="12" height="12" fill="#b00020"/>
+<text x="850" y="303" class="b">Anchoring report</text><text x="850" y="318" class="s">provisional shown vs hidden</text>
+<rect x="830" y="328" width="12" height="12" fill="#b00020"/>
+<text x="850" y="339" class="b">Gold-set export with licence gate</text><text x="850" y="354" class="s">redistributable only</text>
+<rect x="830" y="364" width="12" height="12" fill="#b00020"/>
+<text x="850" y="375" class="b">Second therapeutic area</text><text x="850" y="390" class="s">after track-2 yield</text>
+<rect x="830" y="400" width="12" height="12" fill="#b00020"/>
+<text x="850" y="411" class="b">Signed exe, Mac/Linux builds</text><text x="850" y="426" class="s">SmartScreen warnings</text>
+<rect x="830" y="436" width="12" height="12" fill="#b00020"/>
+<text x="850" y="447" class="b">EU CTIS source</text><text x="850" y="462" class="s">graded later</text>
+<text x="20" y="582" class="b">Feature completeness against the original design plan</text>
+<text x="20" y="600" class="k">Fetch and store</text>
+<rect x="20" y="608" width="180" height="10" fill="#eee" stroke="#111" stroke-width="0.8"/><rect x="20" y="608" width="166" height="10" fill="#0040ff"/>
+<text x="176" y="600" class="k" text-anchor="end"></text>
+<text x="200" y="600" class="k" text-anchor="end">92%</text>
+<text x="215" y="600" class="k">Derive and flags</text>
+<rect x="215" y="608" width="180" height="10" fill="#eee" stroke="#111" stroke-width="0.8"/><rect x="215" y="608" width="153" height="10" fill="#0040ff"/>
+<text x="371" y="600" class="k" text-anchor="end"></text>
+<text x="395" y="600" class="k" text-anchor="end">85%</text>
+<text x="410" y="600" class="k">Labelling tool</text>
+<rect x="410" y="608" width="180" height="10" fill="#eee" stroke="#111" stroke-width="0.8"/><rect x="410" y="608" width="144" height="10" fill="#0040ff"/>
+<text x="566" y="600" class="k" text-anchor="end"></text>
+<text x="590" y="600" class="k" text-anchor="end">80%</text>
+<text x="605" y="600" class="k">Reports and QA</text>
+<rect x="605" y="608" width="180" height="10" fill="#eee" stroke="#111" stroke-width="0.8"/><rect x="605" y="608" width="126" height="10" fill="#0040ff"/>
+<text x="761" y="600" class="k" text-anchor="end"></text>
+<text x="785" y="600" class="k" text-anchor="end">70%</text>
+<text x="800" y="600" class="k">Gold-set export</text>
+<rect x="800" y="608" width="180" height="10" fill="#eee" stroke="#111" stroke-width="0.8"/><rect x="800" y="608" width="54" height="10" fill="#0040ff"/>
+<text x="956" y="600" class="k" text-anchor="end"></text>
+<text x="980" y="600" class="k" text-anchor="end">30%</text>
+<text x="995" y="600" class="k">Second labeller flow</text>
+<rect x="995" y="608" width="180" height="10" fill="#eee" stroke="#111" stroke-width="0.8"/><rect x="995" y="608" width="27" height="10" fill="#0040ff"/>
+<text x="1151" y="600" class="k" text-anchor="end"></text>
+<text x="1175" y="600" class="k" text-anchor="end">15%</text>
+<text x="20" y="634" class="s">Percentages are my judgement of design items built and exercised, not a measured score.</text>
+</svg>

@@ -1,0 +1,3 @@
+{"id": "track2-protocols-ccby-journals", "source": "pubmed",
+ "term": "(\"Trials\"[ta] OR \"JMIR Res Protoc\"[ta]) AND protocol[ti] AND clinicaltrials.gov[si]",
+ "note": "Track 2 seed: protocol papers with a registry ID. Licence still checked per article."}

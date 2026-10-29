@@ -1,0 +1,6 @@
+{
+ "id": "trials-protocols-si",
+ "source": "pubmed",
+ "term": "\"Trials\"[ta] AND protocol[ti] AND clinicaltrials.gov[si]",
+ "note": "Trials protocol papers with a ClinicalTrials.gov ID (T18)"
+}

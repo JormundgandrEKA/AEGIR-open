@@ -1,0 +1,6 @@
+{
+ "id": "jmir-protocols-text",
+ "source": "pubmed",
+ "term": "\"JMIR Res Protoc\"[ta] AND (NCT0[tiab] OR \"clinicaltrials.gov\"[tiab])",
+ "note": "JMIR Research Protocols naming a registry ID in title or abstract; overlaps jmir-protocols-si (T18)"
+}
