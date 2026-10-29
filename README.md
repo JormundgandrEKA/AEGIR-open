@@ -33,7 +33,7 @@ labelling app without fetching anything. Source, date, modifications and terms a
 shows them in a banner. The data are a dated snapshot, not current.
 
 - **Windows, no Python or build needed:** download `RAN.exe` from the repository's **Releases** page and double-click it. Enter a name; with
-  no batches of your own it opens the demo. Your labels and notepad are written to a `data/` folder beside the exe. The exe is unsigned, so
+  no batches of your own it opens the demo. Your labels and notepad are written to `data/demo/<name>/` beside the exe (demo labels are kept apart from real ones in `data/labels/`). The exe is unsigned, so
   Windows SmartScreen may warn ("More info", then "Run anyway"); you can check its SHA-256 against the value in the release notes.
 - **From source (any system with Python 3.10+):**
   ```bash

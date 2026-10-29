@@ -23,6 +23,8 @@ modifications be described (done above). It states that some data may be subject
 international copyright outside the United States, so check the original record and its sponsor before reusing text from it.
 This does not imply endorsement by the registry or NLM. Full terms: https://clinicaltrials.gov/about-site/terms-conditions
 
+**Where your labels go.** Labels, notes and drafts from demo sessions are written to `data/demo/<name>/`, separate from real labels in `data/labels/`.
+
 **Cases.**
 
 | Case | Trial | Compared |

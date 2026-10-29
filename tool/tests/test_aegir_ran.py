@@ -468,6 +468,9 @@ class TestDemo(Base):
         self.assertEqual(len(st["cases"]), 16)
         self.assertIn("DEMO DATA", st["notice"])
         self.assertNotIn("provisional", st["cases"][0])
+        s.save({"case_id": st["cases"][0]["case_id"], "answers": {"real_change": "no"}, "timing": {}})
+        self.assertTrue((self.tmp / "data" / "demo" / "tester" / "labels.jsonl").is_file())
+        self.assertFalse((self.tmp / "data" / "labels" / "tester").exists())    # never mixed with real labels
 
 
 if __name__ == "__main__":
