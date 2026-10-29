@@ -1,0 +1,3669 @@
+{
+ "schema": "label-batch/0.2",
+ "name": "ran-demo",
+ "seed": 28,
+ "built": "2026-10-29T00:00:00Z",
+ "source": "demo subset of the COPD pool (ClinicalTrials.gov)",
+ "notes": [],
+ "notice": "DEMO DATA. Source: ClinicalTrials.gov (U.S. National Library of Medicine). Registry data dated 28 Oct 2026 (version histories saved the same day); this is a snapshot and is not current. Modifications: 16 trials selected, contact and investigator names removed, text converted from HTML or markdown to plain text, differences highlighted by RAN. Some text may be subject to third-party copyright. Terms: clinicaltrials.gov/about-site/terms-conditions",
+ "counts": {
+  "cases": 16,
+  "positives": 8,
+  "negatives": 8,
+  "hidden_provisional": 1
+ },
+ "cases": [
+  {
+   "nct_id": "NCT01610037",
+   "title": "Comparison of Long-term Safety of the Combination Product QVA149A Against Placebo and Standard of Care Treatment in Chronic Obstructive Pulmonary Disease Patients With Moderate to Severe Airflow Limitation",
+   "phase": "PHASE3",
+   "sponsor_class": "INDUSTRY",
+   "start": "2012-10",
+   "primary_completion": "2015-02",
+   "why_stopped": null,
+   "focus": "design",
+   "question": "Between version 2 (2012-08-15) and version 3 (2012-11-30): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 2,
+    "date": "2012-08-15"
+   },
+   "b": {
+    "version": 3,
+    "date": "2012-11-30",
+    "labels": [
+     "Study Status",
+     "Conditions",
+     "Arms and Interventions",
+     "Outcome Measures",
+     "Eligibility",
+     "Contacts/Locations"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Male or female adults aged \u226540 yrs\n\u2022 Smoking history of at least 10 pack years\n\u2022 Diagnosis of Chronic Obstructive Pulmonary Disease (COPD) (moderate to severe airflow limitation as classified by the Global Initiative for Chronic Obstructive Lung Disease (GOLD) Guidelines, 2011)\n\u2022 Post-bronchodilator Forced Expiratory Volume in 1 Second (FEV1)< 80% and \u2265 30% of the predicted normal value and post-bronchodilator FEV1/FVC (forced vital capacity) <70%\n\u2022 Modified Medical Research Council questionnaire grade of 2 or higher\n\nExclusion Criteria:\n\n\u2022 Patients who have had a respiratory tract infection within 4 weeks prior to "
+       ],
+       [
+        "del",
+        "visit"
+       ],
+       [
+        "eq",
+        " 1\n\u2022 Patients with concomitant pulmonary disease\n\u2022 Patients with a history of asthma\n\u2022 Any patient with lung cancer or a history of lung cancer\n\u2022 Patients with a history of certain cardiovascular co-morbid conditions\n\u2022 Patients with a known history and diagnosis of alpha-1 antitrypsin deficiency\n\u2022 Patients in the active phase of a supervised pulmonary rehabilitation program\n\u2022 Patients contraindicated for inhaled anticholinergic agents and \u03b22 agonists\n\u2022 Other protocol-defined inclusion/exclusion criteria may apply"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Male or female adults aged \u226540 yrs\n\u2022 Smoking history of at least 10 pack years\n\u2022 Diagnosis of Chronic Obstructive Pulmonary Disease (COPD) (moderate to severe airflow limitation as classified by the Global Initiative for Chronic Obstructive Lung Disease (GOLD) Guidelines, 2011)\n\u2022 Post-bronchodilator Forced Expiratory Volume in 1 Second (FEV1)< 80% and \u2265 30% of the predicted normal value and post-bronchodilator FEV1/FVC (forced vital capacity) <70%\n\u2022 Modified Medical Research Council questionnaire grade of 2 or higher\n\nExclusion Criteria:\n\n\u2022 Patients who have had a respiratory tract infection within 4 weeks prior to "
+       ],
+       [
+        "ins",
+        "Visit"
+       ],
+       [
+        "eq",
+        " 1\n\u2022 Patients with concomitant pulmonary disease\n\u2022 Patients with a history of asthma\n\u2022 Any patient with lung cancer or a history of lung cancer\n\u2022 Patients with a history of certain cardiovascular co-morbid conditions\n\u2022 Patients with a known history and diagnosis of alpha-1 antitrypsin deficiency\n\u2022 Patients in the active phase of a supervised pulmonary rehabilitation program\n\u2022 Patients contraindicated for inhaled anticholinergic agents and \u03b22 agonists\n\u2022 Other protocol-defined inclusion/exclusion criteria may apply"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 "
+       ],
+       [
+        "del",
+        "Overall"
+       ],
+       [
+        "eq",
+        " serious adverse event rate  (time frame: 56 weeks)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 "
+       ],
+       [
+        "ins",
+        "overall"
+       ],
+       [
+        "eq",
+        " serious adverse event rate  (time frame: 56 weeks)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 QVA149 \u2014 EXPERIMENTAL\n\u2022 Tiotropium \u2014 ACTIVE_COMPARATOR\n\u2022 "
+       ],
+       [
+        "del",
+        "Placebo"
+       ],
+       [
+        "eq",
+        " \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 QVA149\n\u2022 DRUG \u2014 Tiotropium\n\u2022 DRUG \u2014 "
+       ],
+       [
+        "del",
+        "Placebo"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 QVA149 \u2014 EXPERIMENTAL\n\u2022 Tiotropium \u2014 ACTIVE_COMPARATOR\n\u2022 "
+       ],
+       [
+        "ins",
+        "placebo"
+       ],
+       [
+        "eq",
+        " \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 QVA149\n\u2022 DRUG \u2014 Tiotropium\n\u2022 DRUG \u2014 "
+       ],
+       [
+        "ins",
+        "placebo"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "",
+     "after": "",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "1224 (estimated)",
+     "after": "1224 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT01610037",
+    "history": "https://clinicaltrials.gov/study/NCT01610037?tab=history"
+   },
+   "evidence_quote": "",
+   "provisional": {
+    "label": "negative",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "no meaningful change",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n0 substantive and 2 non-substantive finding(s):\n1. minor \u00b7 Format / symbols / units only [exclusion]: \"Patients who have had a respiratory tract infection within 4 weeks prior to visit 1\" \u2192 \"Patients who have had a respiratory tract infection within 4 weeks prior to Visit 1\"\n2. minor \u00b7 Outcome wording: \"Overall serious adverse event rate\" \u2192 \"overall serious adverse event rate\" (format_only)\nSuggested types: wording_format \u00b7 severity: none.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "wording_format"
+    ],
+    "suggested_severity": "none",
+    "kinds": [
+     "format_only",
+     "outcome_wording"
+    ],
+    "n_substantive": 0
+   },
+   "_design": {
+    "truth": "negative",
+    "baseline_post_start": false,
+    "kinds": [
+     "format_only",
+     "outcome_wording"
+    ],
+    "n_substantive": 0,
+    "suggested_types": [
+     "wording_format"
+    ],
+    "suggested_severity": "none",
+    "match_level": 2
+   },
+   "case_id": "c01",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT02109406",
+   "title": "Efficacy and Safety Study of Two Dose Levels of AZD2115 in Subjects With Moderate to Severe COPD",
+   "phase": "PHASE2",
+   "sponsor_class": "INDUSTRY",
+   "start": "2014-05",
+   "primary_completion": "2014-09",
+   "why_stopped": null,
+   "focus": "design",
+   "question": "Between version 0 (2014-04-04) and version 3 (2014-07-16): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2014-04-04"
+   },
+   "b": {
+    "version": 3,
+    "date": "2014-07-16",
+    "labels": [
+     "Study Status",
+     "Study Description",
+     "Arms and Interventions",
+     "Outcome Measures"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Chronic Obstructive Pulmonary Disease Diagnosis: Subjects with an established clinical history of COPD for more than 1 year at Screening, according to the COPD GOLD guidelines.\n\u2022 Current or former smokers with a history of \u226510 pack years of cigarette smoking.\n\u2022 Post-bronchodilator FEV1/FVC ratio of <70%.\n\u2022 Pre-bronchodilator FEV1 must be <80% predicted\n\u2022 Women of non-child bearing potential (ie., physiologically incapable of becoming pregnant, including any female who is 2 years post-menopausal); or women of child bearing potential, has a negative serum pregnancy test at Screening and agrees to acceptable contraceptive methods for the duration of the study.\n\nExclusion Criteria:\n\n\u2022 Pregnancy: Women who are pregnant or lactating.\n\u2022 Significant diseases other than COPD, ie., disease or condition which, in the opinion of the Investigator, may put the subject at risk because of participation in the study or may influence either the results of the study or the subject's ability to participate in the study.\n\u2022 Primary diagnosis of asthma.\n\u2022 Alpha-1 antitrypsin deficiency as the cause of COPD\n\u2022 Other active pulmonary disease such as active tuberculosis, lung cancer, bronchiectasis, sarcoidosis, idiopathic interstitial pulmonary fibrosis, primary pulmonary hypertension, or uncontrolled sleep apnea.\n\u2022 Poorly controlled COPD (hospitalization due to poorly controlled COPD within 3 months of Screening or requiring treatment with corticosteroids or antibiotics in the 6 week interval prior to Screening or during Screening.\n\u2022 Unstable ischemic heart disease, left ventricular failure, or documented myocardial infarction within 12 months of Randomization.\n\u2022 Clinically significant abnormal ECG."
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Chronic Obstructive Pulmonary Disease Diagnosis: Subjects with an established clinical history of COPD for more than 1 year at Screening, according to the COPD GOLD guidelines.\n\u2022 Current or former smokers with a history of \u226510 pack years of cigarette smoking.\n\u2022 Post-bronchodilator FEV1/FVC ratio of <70%.\n\u2022 Pre-bronchodilator FEV1 must be <80% predicted\n\u2022 Women of non-child bearing potential (ie., physiologically incapable of becoming pregnant, including any female who is 2 years post-menopausal); or women of child bearing potential, has a negative serum pregnancy test at Screening and agrees to acceptable contraceptive methods for the duration of the study.\n\nExclusion Criteria:\n\n\u2022 Pregnancy: Women who are pregnant or lactating.\n\u2022 Significant diseases other than COPD, ie., disease or condition which, in the opinion of the Investigator, may put the subject at risk because of participation in the study or may influence either the results of the study or the subject's ability to participate in the study.\n\u2022 Primary diagnosis of asthma.\n\u2022 Alpha-1 antitrypsin deficiency as the cause of COPD\n\u2022 Other active pulmonary disease such as active tuberculosis, lung cancer, bronchiectasis, sarcoidosis, idiopathic interstitial pulmonary fibrosis, primary pulmonary hypertension, or uncontrolled sleep apnea.\n\u2022 Poorly controlled COPD (hospitalization due to poorly controlled COPD within 3 months of Screening or requiring treatment with corticosteroids or antibiotics in the 6 week interval prior to Screening or during Screening.\n\u2022 Unstable ischemic heart disease, left ventricular failure, or documented myocardial infarction within 12 months of Randomization.\n\u2022 Clinically significant abnormal ECG."
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 Forced expiratory volume in 1 second (FEV1) area under the curve from 0 to 12 hours (AUC0-12) relative to baseline  (time frame: 14 Days)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 Forced expiratory volume in 1 second (FEV1) area under the curve from 0 to 12 hours (AUC0-12) relative to baseline  (time frame: 14 Days)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 AZD2115 Dose 1 \u2014 EXPERIMENTAL\n\u2022 AZD 2115 Dose 2 \u2014 EXPERIMENTAL\n\u2022 Placebo MDI \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 AZD2115 Dose 1\n\u2022 DRUG \u2014 AZD 2115, Dose 2\n\u2022 DRUG \u2014 Placebo MDI"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 AZD2115 Dose 1 \u2014 EXPERIMENTAL\n\u2022 AZD 2115 Dose 2 \u2014 EXPERIMENTAL\n\u2022 Placebo MDI \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 AZD2115 Dose 1\n\u2022 DRUG \u2014 AZD 2115, Dose 2\n\u2022 DRUG \u2014 Placebo MDI"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "80 Years",
+     "after": "80 Years",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "30 (estimated)",
+     "after": "30 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT02109406",
+    "history": "https://clinicaltrials.gov/study/NCT02109406?tab=history"
+   },
+   "evidence_quote": "",
+   "provisional": {
+    "label": "negative",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "no meaningful change",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\nIdentical after normalising case, spacing, punctuation, markup, symbols and units. No change.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [],
+    "suggested_severity": "none",
+    "kinds": [],
+    "n_substantive": 0
+   },
+   "_design": {
+    "truth": "negative",
+    "baseline_post_start": false,
+    "kinds": [],
+    "n_substantive": 0,
+    "suggested_types": [],
+    "suggested_severity": "none",
+    "match_level": 3
+   },
+   "case_id": "c02",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT01697696",
+   "title": "Long Term Safety Study of NVA237 vs QAB149 in COPD Patients",
+   "phase": "PHASE3",
+   "sponsor_class": "INDUSTRY",
+   "start": "2012-10",
+   "primary_completion": "2014-11",
+   "why_stopped": null,
+   "focus": "design",
+   "question": "Between version 0 (2012-09-28) and version 1 (2012-12-06): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2012-09-28"
+   },
+   "b": {
+    "version": 1,
+    "date": "2012-12-06",
+    "labels": [
+     "Study Identification",
+     "Study Status",
+     "Oversight",
+     "Outcome Measures",
+     "Contacts/Locations"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n1. Male or female patients with COPD according to GOLD 2011 who have signed informed consent.\n2. Patients with airflow limitation of 30-80% post-bronchodilator FEV1 at run-in.\n3. Current or ex-smokers with a smoking history of at least 10 pack years\n4. Patients with a mMRC score of at least 2 at run-in.\n\nExclusion Criteria:\n\n1. Patients contraindicated for muscarinic antagonist agents and beta-2 agonists\n2. Patients with a history of malignancy of any organ system, treated or untreated, within the last five years\n3. Patients with narrow-angle glaucoma, BPH or bladder-neck obstruction or moderate-severe renal impairment or urinary retention\n4. Patients who had a COPD exacerbation within 6 weeks prior to screening.\n5. Patients requiring long term oxygen therapy prescribed for more than 12 hr per day.\n6. Patients with a history of asthma.\n7. Patients with an onset of respiratory symptoms, including COPD diagnosis, prior to 40 years of age.\n8. Patients with a blood eosinophil count of greater than 600 mm/3 during run-in\n9. Patients with concomitant pulmonary disease\n10. Patients with a history of certain cardiovascular co-morbid conditions\n11. Patients with a diagnosis of alpha-1 anti-trypsin deficiency\n12. Patients with active pulmonary tuberculosis\n13. Patients in the active phase of a pulmonary rehabilitation programme\n14. Other protocol-defined inclusion / exclusion criteria may apply"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n1. Male or female patients with COPD according to GOLD 2011 who have signed informed consent.\n2. Patients with airflow limitation of 30-80% post-bronchodilator FEV1 at run-in.\n3. Current or ex-smokers with a smoking history of at least 10 pack years\n4. Patients with a mMRC score of at least 2 at run-in.\n\nExclusion Criteria:\n\n1. Patients contraindicated for muscarinic antagonist agents and beta-2 agonists\n2. Patients with a history of malignancy of any organ system, treated or untreated, within the last five years\n3. Patients with narrow-angle glaucoma, BPH or bladder-neck obstruction or moderate-severe renal impairment or urinary retention\n4. Patients who had a COPD exacerbation within 6 weeks prior to screening.\n5. Patients requiring long term oxygen therapy prescribed for more than 12 hr per day.\n6. Patients with a history of asthma.\n7. Patients with an onset of respiratory symptoms, including COPD diagnosis, prior to 40 years of age.\n8. Patients with a blood eosinophil count of greater than 600 mm/3 during run-in\n9. Patients with concomitant pulmonary disease\n10. Patients with a history of certain cardiovascular co-morbid conditions\n11. Patients with a diagnosis of alpha-1 anti-trypsin deficiency\n12. Patients with active pulmonary tuberculosis\n13. Patients in the active phase of a pulmonary rehabilitation programme\n14. Other protocol-defined inclusion / exclusion criteria may apply"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 Overall adverse event reporting rate  (time frame: 52 weeks)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 Overall adverse event reporting rate  (time frame: 52 weeks)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 NVA237 dose 1 \u2014 EXPERIMENTAL\n\u2022 Long-acting beta 2-agonist (LABA) \u2014 ACTIVE_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 NVA237\n\u2022 DRUG \u2014 Long-acting beta 2-agonist (LABA)\n\u2022 DRUG \u2014 Placebo"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 NVA237 dose 1 \u2014 EXPERIMENTAL\n\u2022 Long-acting beta 2-agonist (LABA) \u2014 ACTIVE_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 NVA237\n\u2022 DRUG \u2014 Long-acting beta 2-agonist (LABA)\n\u2022 DRUG \u2014 Placebo"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "",
+     "after": "",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "500 (estimated)",
+     "after": "500 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT01697696",
+    "history": "https://clinicaltrials.gov/study/NCT01697696?tab=history"
+   },
+   "evidence_quote": "",
+   "provisional": {
+    "label": "negative",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "no meaningful change",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\nIdentical after normalising case, spacing, punctuation, markup, symbols and units. No change.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [],
+    "suggested_severity": "none",
+    "kinds": [],
+    "n_substantive": 0
+   },
+   "_design": {
+    "truth": "negative",
+    "baseline_post_start": false,
+    "kinds": [],
+    "n_substantive": 0,
+    "suggested_types": [],
+    "suggested_severity": "none",
+    "match_level": 3
+   },
+   "case_id": "c03",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT02594722",
+   "title": "Metabolism and Oxygen Consumption During Functional Electrical Stimulation Cycling in COPD",
+   "phase": "PHASE3",
+   "sponsor_class": "OTHER",
+   "start": "2016-04",
+   "primary_completion": "2017-04",
+   "why_stopped": null,
+   "focus": "design",
+   "question": "Between version 1 (2015-11-02) and version 3 (2016-09-23): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 1,
+    "date": "2015-11-02"
+   },
+   "b": {
+    "version": 3,
+    "date": "2016-09-23",
+    "labels": [
+     "Study Status",
+     "Arms and Interventions",
+     "Eligibility"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 COPD (Stade II, III or IV)\n\u2022 "
+       ],
+       [
+        "del",
+        "Infrom"
+       ],
+       [
+        "eq",
+        " consent\n\nExclusion Criteria:\n\n\u2022 Pulmonary rehabilitation contraindication\n\u2022 Patient with Pacemaker\n\u2022 Patient in acute exacerbation\n\u2022 Patient with neurologic comorbidity\n\u2022 Anemiae"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 COPD (Stade II, III or IV)\n\u2022 "
+       ],
+       [
+        "ins",
+        "Inform"
+       ],
+       [
+        "eq",
+        " consent\n\nExclusion Criteria:\n\n\u2022 Pulmonary rehabilitation contraindication\n\u2022 Patient with Pacemaker\n\u2022 Patient in acute exacerbation\n\u2022 Patient with neurologic comorbidity\n\u2022 Anemiae"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 oxygen uptake (VO2)  (time frame: during 30 minutes exercise)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 oxygen uptake (VO2)  (time frame: during 30 minutes exercise)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 One single arm group \u2014 EXPERIMENTAL\nInterventions:\n\u2022 DEVICE \u2014 FES-cycling\n\u2022 DEVICE \u2014 Classic cycloergometer"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 One single arm group \u2014 EXPERIMENTAL\nInterventions:\n\u2022 DEVICE \u2014 FES-cycling\n\u2022 DEVICE \u2014 Classic cycloergometer"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "18 Years",
+     "after": "18 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "",
+     "after": "",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "25 (estimated)",
+     "after": "25 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT02594722",
+    "history": "https://clinicaltrials.gov/study/NCT02594722?tab=history"
+   },
+   "evidence_quote": "",
+   "provisional": {
+    "label": "negative",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "no meaningful change",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n0 substantive and 1 non-substantive finding(s):\n1. minor \u00b7 Spelling / grammar [inclusion]: \"Infrom consent\" \u2192 \"Inform consent\"\nSuggested types: wording_spelling \u00b7 severity: none.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "wording_spelling"
+    ],
+    "suggested_severity": "none",
+    "kinds": [
+     "wording_spelling"
+    ],
+    "n_substantive": 0
+   },
+   "_design": {
+    "truth": "negative",
+    "baseline_post_start": false,
+    "kinds": [
+     "wording_spelling"
+    ],
+    "n_substantive": 0,
+    "suggested_types": [
+     "wording_spelling"
+    ],
+    "suggested_severity": "none",
+    "match_level": 0
+   },
+   "case_id": "c04",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT04069312",
+   "title": "Roflumilast or Azithromycin to Prevent COPD Exacerbations Trial",
+   "phase": "PHASE3",
+   "sponsor_class": "OTHER",
+   "start": "2020-02-11",
+   "primary_completion": "2026-03-01",
+   "why_stopped": null,
+   "focus": "eligibility",
+   "question": "Between version 2 (2020-02-07) and version 15 (2025-12-10): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 2,
+    "date": "2020-02-07"
+   },
+   "b": {
+    "version": 15,
+    "date": "2025-12-10",
+    "labels": [
+     "Study Status",
+     "Outcome Measures",
+     "Contacts/Locations"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Patient and treating clinician considering treatment intensification with roflumilast or azithromycin to reduce the risk of COPD exacerbations\n\u2022 Age \u2265 40 years\n\u2022 Current or past smoker of at least 10 pack-years\n\u2022 Diagnosis "
+       ],
+       [
+        "eq",
+        "of severe COPD and associated chronic bronchitis\n\u2022 Hospitalized with a diagnosis of COPD exacerbation"
+       ],
+       [
+        "eq",
+        " in the past 12 months\n\u2022 Current medications include inhaled Long Acting Muscarinic Antagonist (LAMA), Long Acting Beta Agonist (LABA) /LAMA, or Inhaled Corticosteroids (ICS) "
+       ],
+       [
+        "del",
+        "/LABA"
+       ],
+       [
+        "eq",
+        "\n\u2022 English or Spanish speaking"
+       ],
+       [
+        "eq",
+        "\n\nExclusion Criteria:\n\n\u2022 Unable or declines to provide informed consent;\n\u2022 Declines to provide social security "
+       ],
+       [
+        "del",
+        "number or"
+       ],
+       [
+        "eq",
+        " health insurance claims number"
+       ],
+       [
+        "eq",
+        " (as applicable)\n\u2022 History of intolerance to azithromycin or roflumilast that the patient or patient's treating clinician considers sufficiently serious to avoid either treatment option;\n\u2022 Current treatment with long-term (more than 30 days) "
+       ],
+       [
+        "del",
+        "roflumilast"
+       ],
+       [
+        "eq",
+        " or "
+       ],
+       [
+        "del",
+        "azithromycin"
+       ],
+       [
+        "eq",
+        " (previous treatment with 1 or more doses of "
+       ],
+       [
+        "del",
+        "azithromycin"
+       ],
+       [
+        "eq",
+        " or "
+       ],
+       [
+        "del",
+        "roflumilast"
+       ],
+       [
+        "eq",
+        " is not an exclusion criterion, as long as the patient and clinician are seeking treatment intensification options and would be willing to use azithromycin or roflumilast, as per randomized treatment assignment.)\n\u2022 Known hypersensitivity to azithromycin, erythromycin, any macrolide or ketolide antibiotic;\n\u2022 History of cholestatic jaundice/hepatic dysfunction associated with prior use of azithromycin\n\u2022 Moderate to severe liver impairment (Child-Pugh B or C)\n\u2022 Current pregnancy\n\u2022 Any other clinician-determined exclusion as per the clinician's clinical practice"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Patient and treating clinician considering treatment intensification with roflumilast or azithromycin to reduce the risk of COPD exacerbations\n\u2022 Age \u2265 40 years\n\u2022 Current or past smoker of at least 10 pack-years\n\u2022 Diagnosis "
+       ],
+       [
+        "ins",
+        "by treating physician "
+       ],
+       [
+        "eq",
+        "of severe COPD and associated chronic bronchitis\n\u2022 Hospitalized with a diagnosis of COPD exacerbation"
+       ],
+       [
+        "ins",
+        " or respiratory complications due to COVID 19"
+       ],
+       [
+        "eq",
+        " in the past 12 months\n\u2022 Current medications include inhaled Long Acting Muscarinic Antagonist (LAMA), Long Acting Beta Agonist (LABA) /LAMA, or Inhaled Corticosteroids (ICS) "
+       ],
+       [
+        "ins",
+        "/LABA(note patients prescribed or using SABA, SAMA, or SABA/SAMA on a scheduled basis (e.g., every 6 hours) are eligible since the patient is receiving functional controller therapy);"
+       ],
+       [
+        "eq",
+        "\n\u2022 English or Spanish speaking"
+       ],
+       [
+        "ins",
+        "\n\u2022 Willing and able to provide a contact telephone number."
+       ],
+       [
+        "eq",
+        "\n\nExclusion Criteria:\n\n\u2022 Unable or declines to provide informed consent;\n\u2022 Declines to provide social security "
+       ],
+       [
+        "ins",
+        "number,"
+       ],
+       [
+        "eq",
+        " health insurance claims number"
+       ],
+       [
+        "ins",
+        " or Tax Payer ID"
+       ],
+       [
+        "eq",
+        " (as applicable)\n\u2022 History of intolerance to azithromycin or roflumilast that the patient or patient's treating clinician considers sufficiently serious to avoid either treatment option;\n\u2022 Current treatment with long-term (more than 30 days) "
+       ],
+       [
+        "ins",
+        "roflumilast, azithromycin"
+       ],
+       [
+        "eq",
+        " or "
+       ],
+       [
+        "ins",
+        "ensifentrine"
+       ],
+       [
+        "eq",
+        " (previous treatment with 1 or more doses of "
+       ],
+       [
+        "ins",
+        "azithromycin, roflumilast"
+       ],
+       [
+        "eq",
+        " or "
+       ],
+       [
+        "ins",
+        "ensifentrine"
+       ],
+       [
+        "eq",
+        " is not an exclusion criterion, as long as the patient and clinician are seeking treatment intensification options and would be willing to use azithromycin or roflumilast, as per randomized treatment assignment.)\n\u2022 Known hypersensitivity to azithromycin, erythromycin, any macrolide or ketolide antibiotic;\n\u2022 History of cholestatic jaundice/hepatic dysfunction associated with prior use of azithromycin\n\u2022 Moderate to severe liver impairment (Child-Pugh B or C)\n\u2022 Current pregnancy\n\u2022 Any other clinician-determined exclusion as per the clinician's clinical practice"
+       ],
+       [
+        "ins",
+        "\n\u2022 The clinicians will be provided the FDA-approved prescribing information for roflumilast and azithromycin.\nThe prescribing information includes a list of warnings and precautions that identifies the potential for adverse effects and is intended to support clinical decision-making that takes into account the risks and benefits of roflumilast and azithromycin for each patient"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 Number of All-cause hospitalizations  (time frame: Up to "
+       ],
+       [
+        "del",
+        "36"
+       ],
+       [
+        "eq",
+        " months)\n\u2022 Number of All-cause deaths  (time frame: Up to "
+       ],
+       [
+        "del",
+        "36"
+       ],
+       [
+        "eq",
+        " months)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 Number of All-cause hospitalizations  (time frame: Up to "
+       ],
+       [
+        "ins",
+        "72"
+       ],
+       [
+        "eq",
+        " months)\n\u2022 Number of All-cause deaths  (time frame: Up to "
+       ],
+       [
+        "ins",
+        "72"
+       ],
+       [
+        "eq",
+        " months)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 Roflumilast arm \u2014 ACTIVE_COMPARATOR\n\u2022 Azithromycin arm \u2014 ACTIVE_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 Roflumilast\n\u2022 DRUG \u2014 Azithromycin"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 Roflumilast arm \u2014 ACTIVE_COMPARATOR\n\u2022 Azithromycin arm \u2014 ACTIVE_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 Roflumilast\n\u2022 DRUG \u2014 Azithromycin"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "",
+     "after": "",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "3200 (estimated)",
+     "after": "1032 (actual)",
+     "changed": true
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT04069312",
+    "history": "https://clinicaltrials.gov/study/NCT04069312?tab=history"
+   },
+   "evidence_quote": "reworded: Current treatment with long-term (more than 30 days) roflumilast or azithromycin (previous treatment with 1 or more doses of azithromycin or roflumil\u2026 -> Current treatment with long-term (more than 30 days) roflumilast, azithromycin or ensifentrine (previous treatment with 1 or more doses ",
+   "provisional": {
+    "label": "positive",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "9 substantive change(s)",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n9 substantive and 3 non-substantive finding(s):\n1. SUBSTANTIVE \u00b7 Criterion reworded (content words differ) [exclusion], clarified: \"Current treatment with long-term (more than 30 days) roflumilast or azithromycin (previous treatment with 1 or more doses of azithromycin or roflumil\u2026\" \u2192 \"Current treatment with long-term (more than 30 days) roflumilast, azithromycin or ensifentrine (previous treatment with 1 or more doses of azithromyc\u2026\" (6 content word(s) differ; check whether the meaning changed)\n2. SUBSTANTIVE \u00b7 Qualifier changed [exclusion]: \"Declines to provide social security number or health insurance claims number (as applicable)\" \u2192 \"Declines to provide social security number, health insurance claims number or Tax Payer ID (as applicable)\" (meaning-bearing word(s) changed: or)\n3. SUBSTANTIVE \u00b7 Threshold changed [inclusion]: \"Hospitalized with a diagnosis of COPD exacerbation in the past 12 months\" \u2192 \"Hospitalized with a diagnosis of COPD exacerbation or respiratory complications due to COVID 19 in the past 12 months\" (12 \u2192 19, 12)\n4. SUBSTANTIVE \u00b7 Criterion added [inclusion], narrowed: \"Current medications include inhaled LAMA, LABA /LAMA, or Inhaled Corticosteroids (ICS) /LABA(note patients prescribed or using SABA, SAMA, or SABA/SA\u2026\"\n5. SUBSTANTIVE \u00b7 Criterion added [inclusion], narrowed: \"Willing and able to provide a contact telephone number.\"\n6. SUBSTANTIVE \u00b7 Criterion added [exclusion], narrowed: \"The clinicians will be provided the FDA-approved prescribing information for roflumilast and azithromycin.\"\n7. SUBSTANTIVE \u00b7 Criterion added [exclusion], narrowed: \"The prescribing information includes a list of warnings and precautions that identifies the potential for adverse effects and is intended to support \u2026\"\n8. SUBSTANTIVE \u00b7 Outcome time point changed: \"Up to 36 months\" \u2192 \"Up to 72 months\" (time point differs)\n9. SUBSTANTIVE \u00b7 Outcome time point changed: \"Up to 36 months\" \u2192 \"Up to 72 months\" (time point differs)\n10. minor \u00b7 Wording variant [inclusion]: \"Diagnosis of severe COPD and associated chronic bronchitis\" \u2192 \"Diagnosis by treating physician of severe COPD and associated chronic bronchitis\" (2 content word(s) differ; check whether the meaning changed)\n11. minor \u00b7 Actual enrolment recorded: \"3200 (estimated)\" \u2192 \"1032 (actual)\" (68% difference from the plan; not an amendment of the target)\n12. minor \u00b7 Restructured (1 item(s) split, merged or moved without changing content)\nCheck yourself: 2 content word(s) differ; check whether the meaning changed.\nSuggested types: elig_clarified, wording_rephrase, elig_narrowed, outcome_timepoint \u00b7 severity: major.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "elig_clarified",
+     "wording_rephrase",
+     "elig_narrowed",
+     "outcome_timepoint"
+    ],
+    "suggested_severity": "major",
+    "kinds": [
+     "actual_enrolment_recorded",
+     "criterion_added",
+     "outcome_timepoint_changed",
+     "qualifier_changed",
+     "restructured",
+     "reworded",
+     "threshold_changed",
+     "wording_variant"
+    ],
+    "n_substantive": 9
+   },
+   "_design": {
+    "truth": "positive",
+    "baseline_post_start": false,
+    "kinds": [
+     "actual_enrolment_recorded",
+     "criterion_added",
+     "outcome_timepoint_changed",
+     "qualifier_changed",
+     "restructured",
+     "reworded",
+     "threshold_changed",
+     "wording_variant"
+    ],
+    "n_substantive": 9,
+    "suggested_types": [
+     "elig_clarified",
+     "wording_rephrase",
+     "elig_narrowed",
+     "outcome_timepoint"
+    ],
+    "suggested_severity": "major"
+   },
+   "case_id": "c05",
+   "provisional_mode": "hidden_by_design"
+  },
+  {
+   "nct_id": "NCT03085485",
+   "title": "The Topic Trial - Study to Determine the Safety and Efficacy of Ivacaftor",
+   "phase": "PHASE2",
+   "sponsor_class": "OTHER",
+   "start": "2017-03-16",
+   "primary_completion": "2022-09-30",
+   "why_stopped": null,
+   "focus": "eligibility",
+   "question": "Between version 0 (2017-03-14) and version 4 (2018-08-20): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2017-03-14"
+   },
+   "b": {
+    "version": 4,
+    "date": "2018-08-20",
+    "labels": [
+     "Study Status",
+     "Eligibility"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Male or Female age 40-80\n\u2022 A Clinical diagnosis of COPD as defined by GOLD\n\u2022 At Least a 10 pack year smoking history\n\u2022 Exhibit symptoms of chronic bronchitis as defined by the Medical Research Council\n\u2022 FEV1% predicted \u2265 35% and \u226470% Post Bronchodilator\n\u2022 Clinically stable in the last 4 weeks with no evidence of COPD exacerbation\n\u2022 Weight of 40 kg-120 kg\n\u2022 Willingness to use at least one form of acceptable birth control including abstinence, condom with spermicide, or hormonal contraceptives from time of signing ICF through study follow up visit\n\u2022 Willing to monitor blood glucose if known history of diabetes mellitus requiring insulin or medical therapy\n\u2022 Element of CFTR Dysfunction, as defined by Sweat Chloride > 30 mEq/L)\n\nExclusion Criteria:\n\n\u2022 Current Diagnosis of Asthma\n\u2022 Known Diagnosis of Cystic Fibrosis\n\u2022 "
+       ],
+       [
+        "del",
+        "Daytime"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "use"
+       ],
+       [
+        "eq",
+        " of Oxygen "
+       ],
+       [
+        "del",
+        "Therapy"
+       ],
+       [
+        "eq",
+        "\n\u2022 Documented history of drug abuse within the last year\n\u2022 Subjects should not have a pulmonary exacerbation or changes in therapy for pulmonary disease within 28 days before receiving the first dose of study drug.\n\u2022 Cirrhosis or elevated liver transaminases > 3X ULN\n\u2022 GFR < 50 estimated by Cockroft-Gault\n\u2022 Any illness or abnormal lab finding that, in the opinion of the investigator might confound the results of the study or pose an additional risk in administering study drug to the subject.\n\u2022 Pregnant or Breastfeeding\n\u2022 Subjects taking moderate or strong inhibitors or inducers of CYP3A4, including certain herbal medications and grapefruit juice.\n(Excluded medications and foods including the drugs and foods listed in the IRB HSP application.)\n\u2022 Uncontrolled Diabetes\n\u2022 Recent (e.g 1year) arterial thrombotic events (peripheral arterial disease, thrombotic stroke)\n\u2022 Clinically significant arrhythmias requiring anti-arrhythmic agent(s) or conduction abnormalities that in the opinion of the investigator that affect patient safety such as the abnormalities listed below (patients with stable coronary artery disease are eligible) : (1) Angina symptoms (2) History of MI (3) Revascularization procedure in the last year prior to screening (4) Clinically significant congestive heart failure (known LVEF <= 45%, cor pulmonale, diastolic heart failure, etc)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Male or Female age 40-80\n\u2022 A Clinical diagnosis of COPD as defined by GOLD\n\u2022 At Least a 10 pack year smoking history\n\u2022 Exhibit symptoms of chronic bronchitis as defined by the Medical Research Council\n\u2022 FEV1% predicted \u2265 35% and \u226470% Post Bronchodilator\n\u2022 Clinically stable in the last 4 weeks with no evidence of COPD exacerbation\n\u2022 Weight of 40 kg-120 kg\n\u2022 Willingness to use at least one form of acceptable birth control including abstinence, condom with spermicide, or hormonal contraceptives from time of signing ICF through study follow up visit\n\u2022 Willing to monitor blood glucose if known history of diabetes mellitus requiring insulin or medical therapy\n\u2022 Element of CFTR Dysfunction, as defined by Sweat Chloride > 30 mEq/L)\n\nExclusion Criteria:\n\n\u2022 Current Diagnosis of Asthma\n\u2022 Known Diagnosis of Cystic Fibrosis\n\u2022 "
+       ],
+       [
+        "ins",
+        "Use"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "of Continuous Oxygen Therapy of greater than 2 liters per minute - patients on 2 liters"
+       ],
+       [
+        "eq",
+        " of Oxygen "
+       ],
+       [
+        "ins",
+        "or less will be excluded if they have been hospitalized for COPD in the prior year or had more than 2 exacerbations requiring steroids and/or antibiotics in the prior year."
+       ],
+       [
+        "eq",
+        "\n\u2022 Documented history of drug abuse within the last year\n\u2022 Subjects should not have a pulmonary exacerbation or changes in therapy for pulmonary disease within 28 days before receiving the first dose of study drug.\n\u2022 Cirrhosis or elevated liver transaminases > 3X ULN\n\u2022 GFR < 50 estimated by Cockroft-Gault\n\u2022 Any illness or abnormal lab finding that, in the opinion of the investigator might confound the results of the study or pose an additional risk in administering study drug to the subject.\n\u2022 Pregnant or Breastfeeding\n\u2022 Subjects taking moderate or strong inhibitors or inducers of CYP3A4, including certain herbal medications and grapefruit juice.\n(Excluded medications and foods including the drugs and foods listed in the IRB HSP application.)\n\u2022 Uncontrolled Diabetes\n\u2022 Recent (e.g 1year) arterial thrombotic events (peripheral arterial disease, thrombotic stroke)\n\u2022 Clinically significant arrhythmias requiring anti-arrhythmic agent(s) or conduction abnormalities that in the opinion of the investigator that affect patient safety such as the abnormalities listed below (patients with stable coronary artery disease are eligible) : (1) Angina symptoms (2) History of MI (3) Revascularization procedure in the last year prior to screening (4) Clinically significant congestive heart failure (known LVEF <= 45%, cor pulmonale, diastolic heart failure, etc)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 Safety of ivacaftor - number of participants with adverse events  (time frame: From Screening to Day 98)\n\u2022 Safety of ivacaftor - number of participants with abnormal serum chemistry  (time frame: From Screening to Day 98)\n\u2022 Safety of ivacaftor - number of participants with abnormal hematology  (time frame: From Screening to Day 98)\n\u2022 Safety of ivacaftor - number of participants with abnormal ECG  (time frame: From Screening to Day 98)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 Safety of ivacaftor - number of participants with adverse events  (time frame: From Screening to Day 98)\n\u2022 Safety of ivacaftor - number of participants with abnormal serum chemistry  (time frame: From Screening to Day 98)\n\u2022 Safety of ivacaftor - number of participants with abnormal hematology  (time frame: From Screening to Day 98)\n\u2022 Safety of ivacaftor - number of participants with abnormal ECG  (time frame: From Screening to Day 98)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 Ivacaftor \u2014 ACTIVE_COMPARATOR\n\u2022 Placebo \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 Ivacaftor 150 MG\n\u2022 DRUG \u2014 Placebo"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 Ivacaftor \u2014 ACTIVE_COMPARATOR\n\u2022 Placebo \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 Ivacaftor 150 MG\n\u2022 DRUG \u2014 Placebo"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "80 Years",
+     "after": "80 Years",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "40 (estimated)",
+     "after": "40 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT03085485",
+    "history": "https://clinicaltrials.gov/study/NCT03085485?tab=history"
+   },
+   "evidence_quote": "criterion_removed: Daytime use of Oxygen Therapy ->  | criterion_added:  -> Use of Continuous Oxygen Therapy of greater than 2 liters per minute - patients on 2 liters of Oxygen or less will be excluded if they have been hosp\u2026",
+   "provisional": {
+    "label": "positive",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "2 substantive change(s)",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n2 substantive and 0 non-substantive finding(s):\n1. SUBSTANTIVE \u00b7 Criterion removed [exclusion], broadened: \"Daytime use of Oxygen Therapy\"\n2. SUBSTANTIVE \u00b7 Criterion added [exclusion], narrowed: \"Use of Continuous Oxygen Therapy of greater than 2 liters per minute - patients on 2 liters of Oxygen or less will be excluded if they have been hosp\u2026\"\nSuggested types: elig_broadened, elig_narrowed \u00b7 severity: major.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "elig_broadened",
+     "elig_narrowed"
+    ],
+    "suggested_severity": "major",
+    "kinds": [
+     "criterion_added",
+     "criterion_removed"
+    ],
+    "n_substantive": 2
+   },
+   "_design": {
+    "truth": "positive",
+    "baseline_post_start": false,
+    "kinds": [
+     "criterion_added",
+     "criterion_removed"
+    ],
+    "n_substantive": 2,
+    "suggested_types": [
+     "elig_broadened",
+     "elig_narrowed"
+    ],
+    "suggested_severity": "major"
+   },
+   "case_id": "c06",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT03457103",
+   "title": "Capnometry-Assisted Breathing Training for COPD",
+   "phase": "PHASE2",
+   "sponsor_class": "OTHER",
+   "start": "2015-06-16",
+   "primary_completion": "2019-08-02",
+   "why_stopped": null,
+   "focus": "eligibility",
+   "question": "Between version 0 (2018-03-01) and version 1 (2019-04-03): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2018-03-01"
+   },
+   "b": {
+    "version": 1,
+    "date": "2019-04-03",
+    "labels": [
+     "Study Status",
+     "Oversight",
+     "Arms and Interventions",
+     "Eligibility",
+     "Contacts/Locations"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 "
+       ],
+       [
+        "eq",
+        "COPD"
+       ],
+       [
+        "eq",
+        " as defined by FEV1/FVC of < 0.70 on "
+       ],
+       [
+        "del",
+        "a"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "flow"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "volume"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "loop,"
+       ],
+       [
+        "eq",
+        " or as shown on a chest "
+       ],
+       [
+        "del",
+        "CT;"
+       ],
+       [
+        "eq",
+        "\n\u2022"
+       ],
+       [
+        "eq",
+        " medically cleared to participate in NYULMC's "
+       ],
+       [
+        "eq",
+        "pulmonary rehabilitation "
+       ],
+       [
+        "del",
+        "program;"
+       ],
+       [
+        "eq",
+        "\n\u2022 English speaking."
+       ],
+       [
+        "eq",
+        "\n\nExclusion Criteria:\n\n\u2022 "
+       ],
+       [
+        "del",
+        "require"
+       ],
+       [
+        "eq",
+        " 24-hour supplemental "
+       ],
+       [
+        "del",
+        "oxygen;"
+       ],
+       [
+        "eq",
+        "\n\u2022"
+       ],
+       [
+        "eq",
+        " cognitive impairment as measured by \u226423/30 on the Mini Mental State Examination "
+       ],
+       [
+        "del",
+        "(MMSE)83;"
+       ],
+       [
+        "eq",
+        "\n\u2022"
+       ],
+       [
+        "eq",
+        " lung cancer "
+       ],
+       [
+        "del",
+        "treated"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "in"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "the"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "past"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "5"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "years;"
+       ],
+       [
+        "eq",
+        "\n\u2022"
+       ],
+       [
+        "eq",
+        " morbid obesity (BMI > "
+       ],
+       [
+        "del",
+        "40);"
+       ],
+       [
+        "eq",
+        "\n\u2022 "
+       ],
+       [
+        "del",
+        "current"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "smoking;"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "and"
+       ],
+       [
+        "eq",
+        "\n\u2022"
+       ],
+       [
+        "eq",
+        " unstable cardiac disease defined by a history of a myocardial infarction in the past 3 "
+       ],
+       [
+        "del",
+        "months.\nPatients who require hospitalization for an exacerbation or are unable to resume their PR program within 2 weeks following an exacerbation will be withdrawn from the trial."
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 "
+       ],
+       [
+        "ins",
+        "over 40 years of age\n\u2022 has "
+       ],
+       [
+        "eq",
+        "COPD"
+       ],
+       [
+        "ins",
+        " documented in their electronic medical record,"
+       ],
+       [
+        "eq",
+        " as defined by FEV1/FVC of < 0.70 on "
+       ],
+       [
+        "ins",
+        "pulmonary"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "function"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "testing"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "(spirometry),"
+       ],
+       [
+        "eq",
+        " or as shown on a chest "
+       ],
+       [
+        "ins",
+        "CT"
+       ],
+       [
+        "eq",
+        "\n\u2022"
+       ],
+       [
+        "ins",
+        " Can maintain oxygen saturation (SaO2) \u2265 90% on room air at rest\n\u2022 Is"
+       ],
+       [
+        "eq",
+        " medically cleared to participate in NYULMC's "
+       ],
+       [
+        "ins",
+        "outpatient "
+       ],
+       [
+        "eq",
+        "pulmonary rehabilitation "
+       ],
+       [
+        "ins",
+        "program"
+       ],
+       [
+        "eq",
+        "\n\u2022 English speaking."
+       ],
+       [
+        "ins",
+        "\nPregnant patients will not be enrolled in the study"
+       ],
+       [
+        "eq",
+        "\n\nExclusion Criteria:\n\n\u2022 "
+       ],
+       [
+        "ins",
+        "Requires"
+       ],
+       [
+        "eq",
+        " 24-hour supplemental "
+       ],
+       [
+        "ins",
+        "oxygen"
+       ],
+       [
+        "eq",
+        "\n\u2022"
+       ],
+       [
+        "ins",
+        " Has"
+       ],
+       [
+        "eq",
+        " cognitive impairment as measured by \u226423/30 on the Mini Mental State Examination "
+       ],
+       [
+        "ins",
+        "(MMSE)"
+       ],
+       [
+        "eq",
+        "\n\u2022"
+       ],
+       [
+        "ins",
+        " Is actively being treated for"
+       ],
+       [
+        "eq",
+        " lung cancer "
+       ],
+       [
+        "ins",
+        "(E.g."
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "with"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "chemotherapy"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "or"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "upcoming"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "surgery)"
+       ],
+       [
+        "eq",
+        "\n\u2022"
+       ],
+       [
+        "ins",
+        " Has"
+       ],
+       [
+        "eq",
+        " morbid obesity (BMI > "
+       ],
+       [
+        "ins",
+        "40)"
+       ],
+       [
+        "eq",
+        "\n\u2022 "
+       ],
+       [
+        "ins",
+        "Is"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "currently"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "smoking"
+       ],
+       [
+        "eq",
+        "\n\u2022"
+       ],
+       [
+        "ins",
+        " Has"
+       ],
+       [
+        "eq",
+        " unstable cardiac disease defined by a history of a myocardial infarction in the past 3 "
+       ],
+       [
+        "ins",
+        "months"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 peak VO2(ml/kg/minand % predicted based on age) to measure exercise capacity Pre-Treatment  (time frame: Day 1)\n\u2022 peak VO2(ml/kg/minand % predicted based on age) to measure exercise capacity Post-Treatment  (time frame: Week 10)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 peak VO2(ml/kg/minand % predicted based on age) to measure exercise capacity Pre-Treatment  (time frame: Day 1)\n\u2022 peak VO2(ml/kg/minand % predicted based on age) to measure exercise capacity Post-Treatment  (time frame: Week 10)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 CATCH Group \u2014 EXPERIMENTAL\n\u2022 Control Group \u2014 ACTIVE_COMPARATOR\nInterventions:\n\u2022 "
+       ],
+       [
+        "del",
+        "BEHAVIORAL"
+       ],
+       [
+        "eq",
+        " \u2014 Capnometry-Assisted Training for COPD to Slow the Breath (CATCH)\n\u2022 "
+       ],
+       [
+        "del",
+        "BEHAVIORAL"
+       ],
+       [
+        "eq",
+        " \u2014 Pulmonary Rehabilitation (PR)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 CATCH Group \u2014 EXPERIMENTAL\n\u2022 Control Group \u2014 ACTIVE_COMPARATOR\nInterventions:\n\u2022 "
+       ],
+       [
+        "ins",
+        "DEVICE"
+       ],
+       [
+        "eq",
+        " \u2014 Capnometry-Assisted Training for COPD to Slow the Breath (CATCH)\n\u2022 "
+       ],
+       [
+        "ins",
+        "DEVICE"
+       ],
+       [
+        "eq",
+        " \u2014 Pulmonary Rehabilitation (PR)"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "",
+     "after": "",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "30 (estimated)",
+     "after": "30 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT03457103",
+    "history": "https://clinicaltrials.gov/study/NCT03457103?tab=history"
+   },
+   "evidence_quote": "qualifier_changed: current smoking; and -> Is currently smoking | qualifier_changed: COPD as defined by FEV1/FVC of < 0.70 on a flow volume loop, or as shown on a chest CT; -> has COPD documented in their electronic medical record, as defined by FEV1/FVC of < 0.70 on pulmonary function testing (spir",
+   "provisional": {
+    "label": "positive",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "9 substantive change(s)",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n9 substantive and 5 non-substantive finding(s):\n1. SUBSTANTIVE \u00b7 Qualifier changed [exclusion]: \"current smoking; and\" \u2192 \"Is currently smoking\" (meaning-bearing word(s) changed: and, current)\n2. SUBSTANTIVE \u00b7 Qualifier changed [inclusion]: \"COPD as defined by FEV1/FVC of < 0.70 on a flow volume loop, or as shown on a chest CT;\" \u2192 \"has COPD documented in their electronic medical record, as defined by FEV1/FVC of < 0.70 on pulmonary function testing (spirometry), or as shown on a\u2026\" (meaning-bearing word(s) changed: documented)\n3. SUBSTANTIVE \u00b7 Criterion removed [exclusion], broadened: \"lung cancer treated in the past 5 years;\"\n4. SUBSTANTIVE \u00b7 Criterion removed [exclusion], broadened: \"Patients who require hospitalization for an exacerbation or are unable to resume their PR program within 2 weeks following an exacerbation will be wi\u2026\"\n5. SUBSTANTIVE \u00b7 Criterion added [inclusion], narrowed: \"over 40 years of age\"\n6. SUBSTANTIVE \u00b7 Criterion added [inclusion], narrowed: \"Can maintain oxygen saturation (SaO2) \u2265 90% on room air at rest\"\n7. SUBSTANTIVE \u00b7 Criterion added [inclusion], narrowed: \"Pregnant patients will not be enrolled in the study\"\n8. SUBSTANTIVE \u00b7 Criterion added [exclusion], narrowed: \"Is actively being treated for lung cancer (E.g. with chemotherapy or upcoming surgery)\"\n9. SUBSTANTIVE \u00b7 Arms / interventions changed: \"behavioral\" \u2192 \"device\" (interventions)\n10. minor \u00b7 Format / symbols / units only [exclusion]: \"require 24-hour supplemental oxygen;\" \u2192 \"Requires 24-hour supplemental oxygen\"\n11. minor \u00b7 Wording variant [exclusion]: \"unstable cardiac disease defined by a history of a myocardial infarction in the past 3 months.\" \u2192 \"Has unstable cardiac disease defined by a history of a myocardial infarction in the past 3 months\" (1 content word(s) differ; check whether the meaning changed)\n12. minor \u00b7 Wording variant [exclusion]: \"cognitive impairment as measured by \u226423/30 on the MMSE83;\" \u2192 \"Has cognitive impairment as measured by \u226423/30 on the MMSE\" (1 content word(s) differ; check whether the meaning changed)\n+2 more not listed\nCheck yourself: 1 content word(s) differ; check whether the meaning changed.\nSuggested types: wording_format, wording_rephrase, elig_clarified, elig_broadened, elig_narrowed, design_arms \u00b7 severity: major.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "wording_format",
+     "wording_rephrase",
+     "elig_clarified",
+     "elig_broadened",
+     "elig_narrowed",
+     "design_arms"
+    ],
+    "suggested_severity": "major",
+    "kinds": [
+     "criterion_added",
+     "criterion_removed",
+     "design_changed",
+     "format_only",
+     "qualifier_changed",
+     "wording_variant"
+    ],
+    "n_substantive": 9
+   },
+   "_design": {
+    "truth": "positive",
+    "baseline_post_start": true,
+    "kinds": [
+     "criterion_added",
+     "criterion_removed",
+     "design_changed",
+     "format_only",
+     "qualifier_changed",
+     "wording_variant"
+    ],
+    "n_substantive": 9,
+    "suggested_types": [
+     "wording_format",
+     "wording_rephrase",
+     "elig_clarified",
+     "elig_broadened",
+     "elig_narrowed",
+     "design_arms"
+    ],
+    "suggested_severity": "major"
+   },
+   "case_id": "c07",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT02205242",
+   "title": "BACE Trial Substudy 1 - PROactive Substudy",
+   "phase": "PHASE3",
+   "sponsor_class": "OTHER",
+   "start": "2014-09",
+   "primary_completion": "2018-04",
+   "why_stopped": null,
+   "focus": "design",
+   "question": "Between version 0 (2014-07-30) and version 3 (2017-03-28): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2014-07-30"
+   },
+   "b": {
+    "version": 3,
+    "date": "2017-03-28",
+    "labels": [
+     "Study Identification",
+     "Study Status",
+     "Study Description",
+     "Arms and Interventions",
+     "Outcome Measures",
+     "Contacts/Locations",
+     "IPDSharing"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Established diagnosis of COPD by medical doctor (based on clinical history OR pulmonary function test)\n\u2022 Smoking history of at least 10 pack-years (10 pack-years are defined as 20 cigarettes a day for 10 years, or 10 cigarettes a day for 20 years, etc.)\n\u2022 Current hospitalization for potential infectious AECOPD treated with standard therapy\n\u2022 History of at least one exacerbation during the last year (prior to the current hospital admission) for which systemic steroids and/or antibiotics were taken\n\u2022 ECG at admission\n\nExclusion Criteria:\n\n\u2022 Mechanical or non-invasive ventilation at moment of randomization (D1)\n\u2022 Long QT interval on ECG (QTc > 450msec for males or > 470msec for females)\n\u2022 History of life-threatening arrhythmias\n\u2022 Myocardial infarction (NSTEMI or STEMI) less than 6 weeks before start of study drug\n\u2022 Unstable angina pectoris or acute myocardial infarction (NSTEMI or STEMI) at admission\n\u2022 Drugs with high risk for long QT interval and torsade de pointes (amiodarone, flecainide, procainamide, sotalol, droperidol, haldol, citalopram, other macrolides)\n\u2022 Documented uncorrected severe hypokalemia (K+ < 3.0 mmol/L) or hypomagnesemia (Mg2+ < 0.5 mmol/L)\n\u2022 Chronic systemic steroids (> 4 mg methylprednisolone /day for \u2265 2 months)\n\u2022 Actual use of macrolides for at least 2 weeks\n\u2022 Allergy to macrolides\n\u2022 Active cancer treatment\n\u2022 Life expectancy < 3 months\n\u2022 Pregnant or breast-feeding subjects.\nWoman of childbearing potential must have a pregnancy test performed and a negative result must be documented before start of treatment"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Established diagnosis of COPD by medical doctor (based on clinical history OR pulmonary function test)\n\u2022 Smoking history of at least 10 pack-years (10 pack-years are defined as 20 cigarettes a day for 10 years, or 10 cigarettes a day for 20 years, etc.)\n\u2022 Current hospitalization for potential infectious AECOPD treated with standard therapy\n\u2022 History of at least one exacerbation during the last year (prior to the current hospital admission) for which systemic steroids and/or antibiotics were taken\n\u2022 ECG at admission\n\nExclusion Criteria:\n\n\u2022 Mechanical or non-invasive ventilation at moment of randomization (D1)\n\u2022 Long QT interval on ECG (QTc > 450msec for males or > 470msec for females)\n\u2022 History of life-threatening arrhythmias\n\u2022 Myocardial infarction (NSTEMI or STEMI) less than 6 weeks before start of study drug\n\u2022 Unstable angina pectoris or acute myocardial infarction (NSTEMI or STEMI) at admission\n\u2022 Drugs with high risk for long QT interval and torsade de pointes (amiodarone, flecainide, procainamide, sotalol, droperidol, haldol, citalopram, other macrolides)\n\u2022 Documented uncorrected severe hypokalemia (K+ < 3.0 mmol/L) or hypomagnesemia (Mg2+ < 0.5 mmol/L)\n\u2022 Chronic systemic steroids (> 4 mg methylprednisolone /day for \u2265 2 months)\n\u2022 Actual use of macrolides for at least 2 weeks\n\u2022 Allergy to macrolides\n\u2022 Active cancer treatment\n\u2022 Life expectancy < 3 months\n\u2022 Pregnant or breast-feeding subjects.\nWoman of childbearing potential must have a pregnancy test performed and a negative result must be documented before start of treatment"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 Difference in Physical Activity"
+       ],
+       [
+        "eq",
+        " registered by the Dynaport\u00ae during 7 days between discharge from hospital (0 months) and 3 months after randomisation  (time frame: At discharge from hospital (0 months) and 3 months after start study drug intake)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 Difference in Physical Activity"
+       ],
+       [
+        "ins",
+        " (total amount of steps)"
+       ],
+       [
+        "eq",
+        " registered by the Dynaport\u00ae during 7 days between discharge from hospital (0 months) and 3 months after randomisation  (time frame: At discharge from hospital (0 months) and 3 months after start study drug intake)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 Azithromycin \u2014 EXPERIMENTAL\n\u2022 Placebo \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 Azithromycin\n\u2022 DEVICE \u2014 Dynaport\u00ae\n\u2022 DRUG \u2014 Placebo"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 Azithromycin \u2014 EXPERIMENTAL\n\u2022 Placebo \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 Azithromycin\n\u2022 DEVICE \u2014 Dynaport\u00ae\n\u2022 DRUG \u2014 Placebo"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "18 Years",
+     "after": "18 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "",
+     "after": "",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "60 (estimated)",
+     "after": "60 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT02205242",
+    "history": "https://clinicaltrials.gov/study/NCT02205242?tab=history"
+   },
+   "evidence_quote": "",
+   "provisional": {
+    "label": "negative",
+    "confidence": "medium",
+    "source": "rule-based change analysis",
+    "summary": "no meaningful change",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n0 substantive and 1 non-substantive finding(s):\n1. minor \u00b7 Outcome wording: \"Difference in Physical Activity registered by the Dynaport\u00ae during 7 days between discharge from hospital (0 months) and 3 months after randomisation\" \u2192 \"Difference in Physical Activity (total amount of steps) registered by the Dynaport\u00ae during 7 days between discharge from hospital (0 months) and 3 mo\u2026\" (detail added or removed; check whether the variable itself changed)\nCheck yourself: detail added or removed; check whether the variable itself changed.\nSuggested types: wording_rephrase \u00b7 severity: none.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "wording_rephrase"
+    ],
+    "suggested_severity": "none",
+    "kinds": [
+     "outcome_wording"
+    ],
+    "n_substantive": 0
+   },
+   "_design": {
+    "truth": "negative",
+    "baseline_post_start": false,
+    "kinds": [
+     "outcome_wording"
+    ],
+    "n_substantive": 0,
+    "suggested_types": [
+     "wording_rephrase"
+    ],
+    "suggested_severity": "none",
+    "match_level": 0
+   },
+   "case_id": "c08",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT01376245",
+   "title": "A 24-week Study of Fluticasone Furoate/Vilanterol Inhalation Powder in Subjects of Asian Ancestry With COPD",
+   "phase": "PHASE3",
+   "sponsor_class": "INDUSTRY",
+   "start": "2011-04",
+   "primary_completion": "2012-09",
+   "why_stopped": null,
+   "focus": "design",
+   "question": "Between version 0 (2011-06-16) and version 1 (2011-06-23): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2011-06-16"
+   },
+   "b": {
+    "version": 1,
+    "date": "2011-06-23",
+    "labels": [
+     "Study Identification",
+     "Study Status",
+     "Outcome Measures",
+     "Contacts/Locations"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 COPD diagnosis define by ATS(American Thoracic Society)/ ERS (European Respiratory Society)\n\u2022 Subjects of Asian ancestry\n\u2022 Valid informed consent\n\u2022 Current or former smoker\n\u2022 > or = 2 on the modified Medical Research Council Dyspnea Scale at Screening\n\nExclusion Criteria:\n\n\u2022 Pregnancy\n\u2022 A current diagnosis of asthma\n\u2022 alpha1-antitrypsin deficiency as the underlying cause for COPD\n\u2022 Other active, respiratory disorders\n\u2022 Have lung volume reduction surgery within 12 months prior to Screening\n\u2022 A chest X-ray or CT (Computerised Tomography) scan reveals evidence of clinical significant abnormalities not believed to be due to the presence of COPD\n\u2022 Poorly controlled COPD: acute worsening of COPD managed by corticosteroids, antibiotics, or treatments prescribed by a physician 6 weeks prior to Screening, or requires hospitalisation due to poorly controlled COPD 12 weeks prior to Screening\n\u2022 Lower respiratory tract infection requires antibiotics within 4 weeks prior to Screening\n\u2022 Other disease or abnormalities, in the opinion of the investigator, would put the safety of the subject at risk during the study or would affect safety or efficacy analysis if the disease/condition exacerbated during the study\n\u2022 Subject with carcinoma that has not been in complete remission for at least 5 years, carcinoma in situ of the cervix, squamous cell carcinoma and basal cell carcinoma of the skin would not be excluded if the subject has been considered cured within 5 years since diagnosis.\n\u2022 Subject has a history of hypersensitivity to any of the study medications or components of the inhalation powder.\nSubject has a history of severe milk protein allergy that, in the opinion of the investigator, contraindicates the subject's participation will also be excluded.\n\u2022 Subjects with a known or suspected history of alcohol or drug abuse within the last 2 years prior to Screening\n\u2022 Subjects who are medically unable to withhold albuterol, ipratropium for 4 hrs and/or theophylline for 12 hrs prior to spirometry testing.\n\u2022 Subjects use a list of prohibited medications specified in the study protocol, including but not limited to traditional or herbal medications for the treatment of COPD\n\u2022 Subject requires long-term oxygen therapy or nocturnal oxygen therapy for greater than 12 hours a day\n\u2022 Pulmonary rehabilitation: subjects who are in the maintenance phase are not excluded.\n\u2022 Non-compliance\n\u2022 Questionable validity of the Informed Consent\n\u2022 Prior use of study medication or other investigational drugs\n\u2022 Affiliation with investigator site"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 COPD diagnosis define by ATS(American Thoracic Society)/ ERS (European Respiratory Society)\n\u2022 Subjects of Asian ancestry\n\u2022 Valid informed consent\n\u2022 Current or former smoker\n\u2022 > or = 2 on the modified Medical Research Council Dyspnea Scale at Screening\n\nExclusion Criteria:\n\n\u2022 Pregnancy\n\u2022 A current diagnosis of asthma\n\u2022 alpha1-antitrypsin deficiency as the underlying cause for COPD\n\u2022 Other active, respiratory disorders\n\u2022 Have lung volume reduction surgery within 12 months prior to Screening\n\u2022 A chest X-ray or CT (Computerised Tomography) scan reveals evidence of clinical significant abnormalities not believed to be due to the presence of COPD\n\u2022 Poorly controlled COPD: acute worsening of COPD managed by corticosteroids, antibiotics, or treatments prescribed by a physician 6 weeks prior to Screening, or requires hospitalisation due to poorly controlled COPD 12 weeks prior to Screening\n\u2022 Lower respiratory tract infection requires antibiotics within 4 weeks prior to Screening\n\u2022 Other disease or abnormalities, in the opinion of the investigator, would put the safety of the subject at risk during the study or would affect safety or efficacy analysis if the disease/condition exacerbated during the study\n\u2022 Subject with carcinoma that has not been in complete remission for at least 5 years, carcinoma in situ of the cervix, squamous cell carcinoma and basal cell carcinoma of the skin would not be excluded if the subject has been considered cured within 5 years since diagnosis.\n\u2022 Subject has a history of hypersensitivity to any of the study medications or components of the inhalation powder.\nSubject has a history of severe milk protein allergy that, in the opinion of the investigator, contraindicates the subject's participation will also be excluded.\n\u2022 Subjects with a known or suspected history of alcohol or drug abuse within the last 2 years prior to Screening\n\u2022 Subjects who are medically unable to withhold albuterol, ipratropium for 4 hrs and/or theophylline for 12 hrs prior to spirometry testing.\n\u2022 Subjects use a list of prohibited medications specified in the study protocol, including but not limited to traditional or herbal medications for the treatment of COPD\n\u2022 Subject requires long-term oxygen therapy or nocturnal oxygen therapy for greater than 12 hours a day\n\u2022 Pulmonary rehabilitation: subjects who are in the maintenance phase are not excluded.\n\u2022 Non-compliance\n\u2022 Questionable validity of the Informed Consent\n\u2022 Prior use of study medication or other investigational drugs\n\u2022 Affiliation with investigator site"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 Change from baseline in clinic visit pre-dose trough FEV1 (forced expiratory "
+       ],
+       [
+        "del",
+        "volumn"
+       ],
+       [
+        "eq",
+        " in one second) (in Litres) at the end of the 24-week treatment period  (time frame: Baseline and 24 weeks)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 Change from baseline in clinic visit pre-dose trough FEV1 (forced expiratory "
+       ],
+       [
+        "ins",
+        "volume"
+       ],
+       [
+        "eq",
+        " in one second) (in Litres) at the end of the 24-week treatment period  (time frame: Baseline and 24 weeks)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 fluticasone furoate/vilanterol \u2014 EXPERIMENTAL\n\u2022 placebo \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 fluticasone furoate/vilanterol\n\u2022 DRUG \u2014 Placebo"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 fluticasone furoate/vilanterol \u2014 EXPERIMENTAL\n\u2022 placebo \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 fluticasone furoate/vilanterol\n\u2022 DRUG \u2014 Placebo"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "",
+     "after": "",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "624 (estimated)",
+     "after": "624 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT01376245",
+    "history": "https://clinicaltrials.gov/study/NCT01376245?tab=history"
+   },
+   "evidence_quote": "",
+   "provisional": {
+    "label": "negative",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "no meaningful change",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n0 substantive and 1 non-substantive finding(s):\n1. minor \u00b7 Outcome wording: \"Change from baseline in clinic visit pre-dose trough FEV1 (forced expiratory volumn in one second) (in Litres) at the end of the 24-week treatment pe\u2026\" \u2192 \"Change from baseline in clinic visit pre-dose trough FEV1 (forced expiratory volume in one second) (in Litres) at the end of the 24-week treatment pe\u2026\" (wording_spelling)\nSuggested types: wording_spelling \u00b7 severity: none.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "wording_spelling"
+    ],
+    "suggested_severity": "none",
+    "kinds": [
+     "outcome_wording"
+    ],
+    "n_substantive": 0
+   },
+   "_design": {
+    "truth": "negative",
+    "baseline_post_start": true,
+    "kinds": [
+     "outcome_wording"
+    ],
+    "n_substantive": 0,
+    "suggested_types": [
+     "wording_spelling"
+    ],
+    "suggested_severity": "none",
+    "match_level": 1
+   },
+   "case_id": "c09",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT01842360",
+   "title": "Evaluation of the Efficacy and Safety of MV130 in Chronic Obstructive Pulmonary Disease (COPD)",
+   "phase": "PHASE2|PHASE3",
+   "sponsor_class": "INDUSTRY",
+   "start": "2013-05-06",
+   "primary_completion": "2019-07-29",
+   "why_stopped": null,
+   "focus": "outcome",
+   "question": "Between version 0 (2013-04-24) and version 6 (2018-03-21): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2013-04-24"
+   },
+   "b": {
+    "version": 6,
+    "date": "2018-03-21",
+    "labels": [
+     "Study Status",
+     "Study Design",
+     "Outcome Measures",
+     "Contacts/Locations"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Written informed consent.\n\u2022 Both gender\n\u2022 Age between 35 and 85.\n\u2022 Must be able to follow the treatment regimen\n\u2022 Diagnosis of moderate COPD according to GOLD criteria\n\u2022 Consumption of 10 or more packs of cigarettes/year\n\u2022 Fertile women of must use an approved contraceptive method\n\nExclusion Criteria:\n\n\u2022 Pregnant women, breastfeeding\n\u2022 Subject who has participated in a study or clinical trial with an investigational product in the last 3 months before inclusion\n\u2022 Subject with severe COPD\n\u2022 Subject with a history of hypersensitivity to any component of the vaccine\n\u2022 Subject outside of age range\n\u2022 Subject diagnosed with asthma\n\u2022 Subject who has had an exacerbation 4 weeks before starting the trial.\n\u2022\n\nSubject that have needed corticosteroids in the last 4 weeks before starting the trial\n\n  \u2022 Subject diagnosed with Primary or Secondary Immunodeficiency Subjects with chronic lymphoproliferative disease\n  \u2022 Subjects with chronic infectious disease\n  \u2022 Subject with chronic heart disease, arrhythmias, or episodes of arrhythmia secondary to the administration of bronchodilators.\n  \u2022 Subject diagnosed with COPD and chronic colonization by Pseudomonas aeruginosa"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Written informed consent.\n\u2022 Both gender\n\u2022 Age between 35 and 85.\n\u2022 Must be able to follow the treatment regimen\n\u2022 Diagnosis of moderate COPD according to GOLD criteria\n\u2022 Consumption of 10 or more packs of cigarettes/year\n\u2022 Fertile women of must use an approved contraceptive method\n\nExclusion Criteria:\n\n\u2022 Pregnant women, breastfeeding\n\u2022 Subject who has participated in a study or clinical trial with an investigational product in the last 3 months before inclusion\n\u2022 Subject with severe COPD\n\u2022 Subject with a history of hypersensitivity to any component of the vaccine\n\u2022 Subject outside of age range\n\u2022 Subject diagnosed with asthma\n\u2022 Subject who has had an exacerbation 4 weeks before starting the trial.\n\u2022\n\nSubject that have needed corticosteroids in the last 4 weeks before starting the trial\n\n  \u2022 Subject diagnosed with Primary or Secondary Immunodeficiency Subjects with chronic lymphoproliferative disease\n  \u2022 Subjects with chronic infectious disease\n  \u2022 Subject with chronic heart disease, arrhythmias, or episodes of arrhythmia secondary to the administration of bronchodilators.\n  \u2022 Subject diagnosed with COPD and chronic colonization by Pseudomonas aeruginosa"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022"
+       ],
+       [
+        "del",
+        " Decrease in the number of COP exacerbations. Decrease in the number of COP exacerbations."
+       ],
+       [
+        "eq",
+        " Decrease in the number of COP exacerbations.  (time frame: 18 months)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022"
+       ],
+       [
+        "eq",
+        " Decrease in the number of COP exacerbations.  (time frame: 18 months)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 MV130 \u2014 EXPERIMENTAL\n\u2022 Placebo \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 BIOLOGICAL \u2014 Placebo\n\u2022 BIOLOGICAL \u2014 MV130"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 MV130 \u2014 EXPERIMENTAL\n\u2022 Placebo \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 BIOLOGICAL \u2014 Placebo\n\u2022 BIOLOGICAL \u2014 MV130"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "35 Years",
+     "after": "35 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "85 Years",
+     "after": "85 Years",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "180 (estimated)",
+     "after": "180 (actual)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT01842360",
+    "history": "https://clinicaltrials.gov/study/NCT01842360?tab=history"
+   },
+   "evidence_quote": "outcome_removed: Decrease in the number of COP exacerbations. Decrease in the number of COP exacerbations. Decrease in the number of COP exacerbations. ->  | outcome_added:  -> Decrease in the number of COP exacerbations.",
+   "provisional": {
+    "label": "positive",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "2 substantive change(s)",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n2 substantive and 0 non-substantive finding(s):\n1. SUBSTANTIVE \u00b7 Primary outcome removed: \"Decrease in the number of COP exacerbations. Decrease in the number of COP exacerbations. Decrease in the number of COP exacerbations.\"\n2. SUBSTANTIVE \u00b7 Primary outcome added: \"Decrease in the number of COP exacerbations.\"\nSuggested types: outcome_added_removed \u00b7 severity: major.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "outcome_added_removed"
+    ],
+    "suggested_severity": "major",
+    "kinds": [
+     "outcome_added",
+     "outcome_removed"
+    ],
+    "n_substantive": 2
+   },
+   "_design": {
+    "truth": "positive",
+    "baseline_post_start": false,
+    "kinds": [
+     "outcome_added",
+     "outcome_removed"
+    ],
+    "n_substantive": 2,
+    "suggested_types": [
+     "outcome_added_removed"
+    ],
+    "suggested_severity": "major"
+   },
+   "case_id": "c10",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT01040793",
+   "title": "Effect of Treatment BI 1744 CL (5 and 10 mcg) Versus Placebo on Exercise Endurance Time During Constant Work Rate Cycle Ergometry II",
+   "phase": "PHASE3",
+   "sponsor_class": "INDUSTRY",
+   "start": "2010-01",
+   "primary_completion": "2011-04",
+   "why_stopped": null,
+   "focus": "design",
+   "question": "Between version 0 (2009-12-29) and version 11 (2010-12-15): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2009-12-29"
+   },
+   "b": {
+    "version": 11,
+    "date": "2010-12-15",
+    "labels": [
+     "Study Identification",
+     "Study Status",
+     "Eligibility"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion "
+       ],
+       [
+        "del",
+        "Criteria:"
+       ],
+       [
+        "eq",
+        "\n\n1. Signed informed consent prior to participation.\n2. Diagnosis of chronic obstructive pulmonary disease and post-bronchodilator FEV1(Forced Expiratory Volume in 1 sec) <80% of predicted normal and post-bronchodilator FEV1(Forced Expiratory Volume in 1 sec)/FVC of < 70% at Visit 1.\n3. Male or female between 40 and 75 years of age.\n4. Current or ex-smokers with smoking history of more than 10-pack years.\n5. Able to perform technically acceptable pulmonary function tests, multiple exercise tests and able to maintain records.\n6. Able to inhale medication in a competent manner from a metered-dose inhaler and Respimat inhaler.\n\nExclusion "
+       ],
+       [
+        "del",
+        "Criteria:"
+       ],
+       [
+        "eq",
+        "\n\n1. Patients with clinically relevant abnormal baseline haematology, blood chemistry, or urinalysis; all patients with an SGOT >x2 ULN, SGPT >x2 ULN, bilirubin >x2 ULN or creatinine >x2 ULN.\n2. Patients with a history of asthma and/or total blood eosinophil count of 600 cells/mm3.\n3. Patients with thyrotoxicosis, paroxysmal tachycardia (>100 beats per minute).\n4. Patients with a history of myocardial infarction within 1 year of screening visit, unstable or life-threatening cardiac arrhythmia, hospitalization for heart failure within the past year, known active tuberculosis, a malignancy for which patient has undergone resection, radiation therapy or chemotherapy within last five years, life-threatening pulmonary obstruction, cystic fibrosis, clinically evident bronchiectasis, significant alcohol or drug abuse or contraindications to exercise.\n5. Patients who have undergone thoracotomy with pulmonary resection.\n6. Patients being treated with oral beta-adrenergics or oral corticosteroid medication at unstable doses (i.e., less than six weeks on a stable dose) or at doses in excess of the equivalent of 10 mg of prednisone per day or 20 mg every other day.\n7. Patients who regularly use daytime oxygen for more than one hour per day.\n8. Patients who have completed a pulmonary rehabilitation program in the six weeks prior to the screening visit or patients who are currently in a pulmonary rehabilitation program.\n9. Patients who have a limitation of exercise performance as a result of factors other than fatigue or exertional dyspnea.\n10. Pregnant or nursing women.\n11. Women of childbearing potential not using two effective methods of birth control (one barrier and one non-barrier)."
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion "
+       ],
+       [
+        "ins",
+        "criteria"
+       ],
+       [
+        "eq",
+        "\n\n1. Signed informed consent prior to participation.\n2. Diagnosis of chronic obstructive pulmonary disease and post-bronchodilator FEV1(Forced Expiratory Volume in 1 sec) <80% of predicted normal and post-bronchodilator FEV1(Forced Expiratory Volume in 1 sec)/FVC of < 70% at Visit 1.\n3. Male or female between 40 and 75 years of age.\n4. Current or ex-smokers with smoking history of more than 10-pack years.\n5. Able to perform technically acceptable pulmonary function tests, multiple exercise tests and able to maintain records.\n6. Able to inhale medication in a competent manner from a metered-dose inhaler and Respimat inhaler.\n\nExclusion "
+       ],
+       [
+        "ins",
+        "criteria"
+       ],
+       [
+        "eq",
+        "\n\n1. Patients with clinically relevant abnormal baseline haematology, blood chemistry, or urinalysis; all patients with an SGOT >x2 ULN, SGPT >x2 ULN, bilirubin >x2 ULN or creatinine >x2 ULN.\n2. Patients with a history of asthma and/or total blood eosinophil count of 600 cells/mm3.\n3. Patients with thyrotoxicosis, paroxysmal tachycardia (>100 beats per minute).\n4. Patients with a history of myocardial infarction within 1 year of screening visit, unstable or life-threatening cardiac arrhythmia, hospitalization for heart failure within the past year, known active tuberculosis, a malignancy for which patient has undergone resection, radiation therapy or chemotherapy within last five years, life-threatening pulmonary obstruction, cystic fibrosis, clinically evident bronchiectasis, significant alcohol or drug abuse or contraindications to exercise.\n5. Patients who have undergone thoracotomy with pulmonary resection.\n6. Patients being treated with oral beta-adrenergics or oral corticosteroid medication at unstable doses (i.e., less than six weeks on a stable dose) or at doses in excess of the equivalent of 10 mg of prednisone per day or 20 mg every other day.\n7. Patients who regularly use daytime oxygen for more than one hour per day.\n8. Patients who have completed a pulmonary rehabilitation program in the six weeks prior to the screening visit or patients who are currently in a pulmonary rehabilitation program.\n9. Patients who have a limitation of exercise performance as a result of factors other than fatigue or exertional dyspnea.\n10. Pregnant or nursing women.\n11. Women of childbearing potential not using two effective methods of birth control (one barrier and one non-barrier)."
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 Endurance time during constant work rate cycle ergometry to symptom limitation at 75% of Maximum Work Capacity after 6 weeks of treatment (Day 43).  (time frame: "
+       ],
+       [
+        "del",
+        "6weeks)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 Endurance time during constant work rate cycle ergometry to symptom limitation at 75% of Maximum Work Capacity after 6 weeks of treatment (Day 43).  (time frame: "
+       ],
+       [
+        "ins",
+        "6 weeks)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Interventions:\n\u2022 DRUG \u2014 "
+       ],
+       [
+        "del",
+        "BI"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "1744"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "CL 10 mcg once daily"
+       ],
+       [
+        "eq",
+        "\n\u2022 DRUG \u2014 "
+       ],
+       [
+        "del",
+        "BI"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "1744"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "CL 5 mcg once daily"
+       ],
+       [
+        "eq",
+        "\n\u2022 DRUG \u2014 "
+       ],
+       [
+        "del",
+        "PBO"
+       ]
+      ],
+      "after": [
+       [
+        "ins",
+        "Arm groups:\n\u2022 Olodaterol (BI 1744) Low \u2014 EXPERIMENTAL\n\u2022 Olodaterol (BI 1744) High \u2014 EXPERIMENTAL\n\u2022 Placebo \u2014 PLACEBO_COMPARATOR\n"
+       ],
+       [
+        "eq",
+        "Interventions:\n\u2022 DRUG \u2014 "
+       ],
+       [
+        "ins",
+        "Olodaterol"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "(BI"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "1744)"
+       ],
+       [
+        "eq",
+        "\n\u2022 DRUG \u2014 "
+       ],
+       [
+        "ins",
+        "Olodaterol"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "(BI"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "1744)"
+       ],
+       [
+        "eq",
+        "\n\u2022 DRUG \u2014 "
+       ],
+       [
+        "ins",
+        "Placebo"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "75 Years",
+     "after": "75 Years",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "150 (estimated)",
+     "after": "150 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT01040793",
+    "history": "https://clinicaltrials.gov/study/NCT01040793?tab=history"
+   },
+   "evidence_quote": "design_changed:  -> olodaterol bi 1744 high; olodaterol bi 1744 low; placebo",
+   "provisional": {
+    "label": "positive",
+    "confidence": "medium",
+    "source": "rule-based change analysis",
+    "summary": "1 substantive change(s)",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n1 substantive and 1 non-substantive finding(s):\n1. SUBSTANTIVE \u00b7 Arms / interventions changed: \"olodaterol bi 1744 high; olodaterol bi 1744 low; placebo\" (arm groups)\n2. minor \u00b7 Outcome wording: \"6weeks\" \u2192 \"6 weeks\" (time frame reworded, same time points)\nSuggested types: wording_rephrase, design_arms \u00b7 severity: major.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "wording_rephrase",
+     "design_arms"
+    ],
+    "suggested_severity": "major",
+    "kinds": [
+     "design_changed",
+     "outcome_wording"
+    ],
+    "n_substantive": 1
+   },
+   "_design": {
+    "truth": "positive",
+    "baseline_post_start": false,
+    "kinds": [
+     "design_changed",
+     "outcome_wording"
+    ],
+    "n_substantive": 1,
+    "suggested_types": [
+     "wording_rephrase",
+     "design_arms"
+    ],
+    "suggested_severity": "major"
+   },
+   "case_id": "c11",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT01613326",
+   "title": "Efficacy, Safety, and Tolerability of NVA237 Compared to Tiotropium in Patients With Chronic Obstructive Pulmonary Disease (COPD)",
+   "phase": "PHASE3",
+   "sponsor_class": "INDUSTRY",
+   "start": "2012-06",
+   "primary_completion": "2013-01",
+   "why_stopped": null,
+   "focus": "eligibility",
+   "question": "Between version 0 (2012-06-06) and version 2 (2012-11-29): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2012-06-06"
+   },
+   "b": {
+    "version": 2,
+    "date": "2012-11-29",
+    "labels": [
+     "Study Status",
+     "Eligibility",
+     "Contacts/Locations"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\nTo be eligible, patients have to fulfill all the criteria.\n\n\u2022 Patients with moderate to severe stable COPD (Stage II or Stage III) according to the current GOLD Guidelines (GOLD 2010).\n\u2022 Patients with a post-bronchodilator FEV1 \u2265 30% and < 80% of the predicted normal, and a post-bronchodilator FEV1/FVC < 0.70 at screening\n\u2022 Current or ex-smokers who have a smoking history of at least 10 pack years (e.g. 10 pack years = 1 pack/day x 10 yrs, or \u00bd pack/day x 20 yrs).\n\u2022 Symptomatic patients, according to daily electronic diary data between Visit 2 (Day -14) and Visit 3 (Day 1), with a total score of 1 or more on at least 4 of the last 7 days prior to Visit 3.\n\nExclusion Criteria:\n\n\u2022 Pregnant or nursing (lactating) women\n\u2022 Patients who, in the judgment of the investigator, or the responsible Novartis personnel, have a clinically relevant laboratory abnormality or a clinically significant condition before Visit 1.\n\u2022 Patients with narrow-angle glaucoma, symptomatic benign prostatic hyperplasia or bladder-neck obstruction or moderate to severe renal impairment or urinary retention.\n(BPH patients who are stable on treatment can be considered).\n\u2022 Patients receiving medications in the classes listed in the protocol as prohibited.\n\nOther protocol-defined inclusion/exclusion criteria may apply"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\nTo be eligible, patients have to fulfill all the criteria.\n\n\u2022 Patients with moderate to severe stable COPD (Stage II or Stage III) according to the current GOLD Guidelines (GOLD 2010).\n\u2022 Patients with a post-bronchodilator FEV1 \u2265 30% and < 80% of the predicted normal, and a post-bronchodilator FEV1/FVC < 0.70 at screening\n\u2022 Current or ex-smokers who have a smoking history of at least 10 pack years (e.g. 10 pack years = 1 pack/day x 10 yrs, or \u00bd pack/day x 20 yrs).\n\u2022 Symptomatic patients, according to daily electronic diary data between Visit 2 (Day -14) and Visit 3 (Day 1), with a total score of 1 or more on at least 4 of the last 7 days prior to Visit 3.\n\nExclusion Criteria:\n\n\u2022 Pregnant or nursing (lactating) women\n\u2022 Patients who, in the judgment of the investigator, or the responsible Novartis personnel, have a clinically relevant laboratory abnormality or a clinically significant condition before Visit 1.\n\u2022 Patients with narrow-angle glaucoma, symptomatic benign prostatic hyperplasia or bladder-neck obstruction or moderate to severe renal impairment or urinary retention.\n(BPH patients who are stable on treatment can be considered).\n\u2022 Patients receiving medications in the classes listed in the protocol as prohibited.\n\nOther protocol-defined inclusion/exclusion criteria may apply"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 Trough Forced Expiratory Volume in 1 Second (FEV1)  (time frame: 12 weeks)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 Trough Forced Expiratory Volume in 1 Second (FEV1)  (time frame: 12 weeks)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 NVA237 \u2014 EXPERIMENTAL\n\u2022 Tiotropium \u2014 ACTIVE_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 NVA237\n\u2022 DRUG \u2014 "
+       ],
+       [
+        "del",
+        "Tiotropium"
+       ],
+       [
+        "eq",
+        "\n\u2022 DRUG \u2014 Placebo to tiotropium\n\u2022 DRUG \u2014 Placebo to NVA237\n\u2022 DRUG \u2014 salbutamol/albuterol"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 NVA237 \u2014 EXPERIMENTAL\n\u2022 Tiotropium \u2014 ACTIVE_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 NVA237\n\u2022 DRUG \u2014 "
+       ],
+       [
+        "ins",
+        "Tiotrpium"
+       ],
+       [
+        "eq",
+        "\n\u2022 DRUG \u2014 Placebo to tiotropium\n\u2022 DRUG \u2014 Placebo to NVA237\n\u2022 DRUG \u2014 salbutamol/albuterol"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "",
+     "changed": true
+    },
+    {
+     "field": "maximum age",
+     "before": "",
+     "after": "",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "660 (estimated)",
+     "after": "660 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT01613326",
+    "history": "https://clinicaltrials.gov/study/NCT01613326?tab=history"
+   },
+   "evidence_quote": "age_limit_changed: 40 Years -> none",
+   "provisional": {
+    "label": "positive",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "1 substantive change(s)",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n1 substantive and 0 non-substantive finding(s):\n1. SUBSTANTIVE \u00b7 Age limit changed, broadened: \"40 Years\" \u2192 \"none\" (minimum age)\nSuggested types: age_sex \u00b7 severity: major.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "age_sex"
+    ],
+    "suggested_severity": "major",
+    "kinds": [
+     "age_limit_changed"
+    ],
+    "n_substantive": 1
+   },
+   "_design": {
+    "truth": "positive",
+    "baseline_post_start": true,
+    "kinds": [
+     "age_limit_changed"
+    ],
+    "n_substantive": 1,
+    "suggested_types": [
+     "age_sex"
+    ],
+    "suggested_severity": "major"
+   },
+   "case_id": "c12",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT02097992",
+   "title": "Effect of Roflumilast on Airway Blood Flow as an Expression of Airway Inflammation in COPD",
+   "phase": "PHASE1|PHASE2",
+   "sponsor_class": "OTHER",
+   "start": "2013-02",
+   "primary_completion": "2015-07",
+   "why_stopped": null,
+   "focus": "outcome",
+   "question": "Between version 0 (2014-03-26) and version 2 (2014-12-02): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2014-03-26"
+   },
+   "b": {
+    "version": 2,
+    "date": "2014-12-02",
+    "labels": [
+     "Study Identification",
+     "Study Status",
+     "Study Description",
+     "Study Design",
+     "Arms and Interventions",
+     "Outcome Measures"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Twenty-four patients with physician-diagnosed COPD (female and male, current smokers or ex-smokers) over the age of 45 years will be recruited for this study.\n\u2022 The patients will have to have a smoking history of at least 10 pack-years, and they must have been using an ICS regularly for at least 4 weeks at the time of screening.\n\u2022 Confirmation of the diagnosis of COPD will require the presence of persistent exertional dyspnea and a post-bronchodilator FEV1 of less than 80% of predicted and FEV1/FVC ratio less than 0.7 (GOLD stage \u22652).\nAt entry into the study, the patients will have to be clinically stable; they will be allowed to remain on their regular COPD treatment regimen and use a LABA and/or LAMA until 24 hours before, and a SABA and/or short-acting muscarinic antagonist (SAMA) until 6 hours before coming to the laboratory.\nIf using roflumilast, the subjects will have to discontinue it 4 weeks before entering into the study.-\n\nExclusion Criteria:\n\n\u2022 Women of childbearing potential who do not use accepted birth control measures\n\u2022 Pregnant and breast-feeding women.\n\u2022 Use of cardiovascular medications that cannot be held on the study days\n\u2022 Use of oral airway medications or anti-inflammatory agents\n\u2022 Use of supplemental oxygen that cannot be discontinued during the laboratory visit\n\u2022 Subjects with known SABA or roflumilast intolerance\n\u2022 An acute COPD exacerbation within four weeks prior to the study"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Twenty-four patients with physician-diagnosed COPD (female and male, current smokers or ex-smokers) over the age of 45 years will be recruited for this study.\n\u2022 The patients will have to have a smoking history of at least 10 pack-years, and they must have been using an ICS regularly for at least 4 weeks at the time of screening.\n\u2022 Confirmation of the diagnosis of COPD will require the presence of persistent exertional dyspnea and a post-bronchodilator FEV1 of less than 80% of predicted and FEV1/FVC ratio less than 0.7 (GOLD stage \u22652).\nAt entry into the study, the patients will have to be clinically stable; they will be allowed to remain on their regular COPD treatment regimen and use a LABA and/or LAMA until 24 hours before, and a SABA and/or short-acting muscarinic antagonist (SAMA) until 6 hours before coming to the laboratory.\nIf using roflumilast, the subjects will have to discontinue it 4 weeks before entering into the study.-\n\nExclusion Criteria:\n\n\u2022 Women of childbearing potential who do not use accepted birth control measures\n\u2022 Pregnant and breast-feeding women.\n\u2022 Use of cardiovascular medications that cannot be held on the study days\n\u2022 Use of oral airway medications or anti-inflammatory agents\n\u2022 Use of supplemental oxygen that cannot be discontinued during the laboratory visit\n\u2022 Subjects with known SABA or roflumilast intolerance\n\u2022 An acute COPD exacerbation within four weeks prior to the study"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 "
+       ],
+       [
+        "del",
+        "Change"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "from baseline on airway blood flow (Qaw) after single dose of roflumilast .  (time frame: baseline, and at 15, 30, 60,120 and 240 min after the oral administration of either 500\u00b5g roflumilast or placebo (lactose an inactive substance).)\n\u2022 Change from baseline on albuterol-induced vasodilation"
+       ],
+       [
+        "eq",
+        " in "
+       ],
+       [
+        "del",
+        "the airway"
+       ],
+       [
+        "eq",
+        " (delta Qaw) after a single dose of "
+       ],
+       [
+        "del",
+        "roflumilast."
+       ],
+       [
+        "eq",
+        "  (time frame: "
+       ],
+       [
+        "del",
+        "baseline"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "and"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "1"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "hour"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "later"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "administration"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "of"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "del",
+        "roflumilast or placebo)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 "
+       ],
+       [
+        "ins",
+        "Albuterol-induced"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "change"
+       ],
+       [
+        "eq",
+        " in "
+       ],
+       [
+        "ins",
+        "Qaw"
+       ],
+       [
+        "eq",
+        " (delta Qaw) after a single dose of "
+       ],
+       [
+        "ins",
+        "roflumilast vs placebo."
+       ],
+       [
+        "eq",
+        "  (time frame: "
+       ],
+       [
+        "ins",
+        "15"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "minutes"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "after"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "180"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "\u00b5g"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "albuterol"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "by"
+       ],
+       [
+        "eq",
+        " "
+       ],
+       [
+        "ins",
+        "inhalation)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 roflumilast \u2014 EXPERIMENTAL\n\u2022 placebo"
+       ],
+       [
+        "eq",
+        " \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 roflumilast\n\u2022 DRUG \u2014 placebo"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 roflumilast \u2014 EXPERIMENTAL\n\u2022 placebo"
+       ],
+       [
+        "ins",
+        " \u2014 PLACEBO_COMPARATOR\n\u2022 roflumilast 500\u00b5g single dose \u2014 ACTIVE_COMPARATOR\n\u2022 placebo single dose"
+       ],
+       [
+        "eq",
+        " \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 roflumilast\n\u2022 DRUG \u2014 placebo"
+       ],
+       [
+        "ins",
+        "\n\u2022 DRUG \u2014 roflumilast 500\u00b5g single dose\n\u2022 DRUG \u2014 placebo single dose"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "45 Years",
+     "after": "45 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "",
+     "after": "",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "40 (estimated)",
+     "after": "30 (estimated)",
+     "changed": true
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT02097992",
+    "history": "https://clinicaltrials.gov/study/NCT02097992?tab=history"
+   },
+   "evidence_quote": "outcome_metric_changed: Change from baseline on albuterol-induced vasodilation in the airway (delta Qaw) after a single dose of roflumilast. -> Albuterol-induced change in Qaw (delta Qaw) after a single dose of roflumilast vs placebo. | outcome_removed: Change from baseline on airway blood flow (Qaw",
+   "provisional": {
+    "label": "positive",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "4 substantive change(s)",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n4 substantive and 1 non-substantive finding(s):\n1. SUBSTANTIVE \u00b7 Outcome metric / cut-off changed: \"Change from baseline on albuterol-induced vasodilation in the airway (delta Qaw) after a single dose of roflumilast.\" \u2192 \"Albuterol-induced change in Qaw (delta Qaw) after a single dose of roflumilast vs placebo.\" (metric wording differs: change from baseline)\n2. SUBSTANTIVE \u00b7 Primary outcome removed: \"Change from baseline on airway blood flow (Qaw) after single dose of roflumilast .\"\n3. SUBSTANTIVE \u00b7 Enrolment target changed, decreased: \"40\" \u2192 \"30\" (25% change)\n4. SUBSTANTIVE \u00b7 Arms / interventions changed: \"placebo; roflumilast\" \u2192 \"placebo; placebo single dose; roflumilast; roflumilast 500 mcg single dose\" (arm groups)\n5. minor \u00b7 Outcome wording: \"baseline and 1 hour later administration of roflumilast or placebo\" \u2192 \"15 minutes after 180 \u00b5g albuterol by inhalation\" (time frame reworded, same time points)\nSuggested types: outcome_metric, wording_rephrase, outcome_added_removed, sample_size, design_arms \u00b7 severity: major.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "outcome_metric",
+     "wording_rephrase",
+     "outcome_added_removed",
+     "sample_size",
+     "design_arms"
+    ],
+    "suggested_severity": "major",
+    "kinds": [
+     "design_changed",
+     "outcome_metric_changed",
+     "outcome_removed",
+     "outcome_wording",
+     "sample_size_changed"
+    ],
+    "n_substantive": 4
+   },
+   "_design": {
+    "truth": "positive",
+    "baseline_post_start": true,
+    "kinds": [
+     "design_changed",
+     "outcome_metric_changed",
+     "outcome_removed",
+     "outcome_wording",
+     "sample_size_changed"
+    ],
+    "n_substantive": 4,
+    "suggested_types": [
+     "outcome_metric",
+     "wording_rephrase",
+     "outcome_added_removed",
+     "sample_size",
+     "design_arms"
+    ],
+    "suggested_severity": "major"
+   },
+   "case_id": "c13",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT01085045",
+   "title": "Study to Evaluate the Efficacy, Safety and Pharmacokinetics of PT001, PT003, and PT005 Following Chronic Dosing (7 Days) in Patients With Moderate to Very Severe Chronic Obstructive Pulmonary Disease (COPD)",
+   "phase": "PHASE2",
+   "sponsor_class": "INDUSTRY",
+   "start": "2010-03",
+   "primary_completion": "2010-11",
+   "why_stopped": null,
+   "focus": "design",
+   "question": "Between version 0 (2010-03-09) and version 6 (2010-09-01): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2010-03-09"
+   },
+   "b": {
+    "version": 6,
+    "date": "2010-09-01",
+    "labels": [
+     "Study Status",
+     "Outcome Measures"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Signed written informed consent\n\u2022 40 - 80 years of age\n\u2022 Clinical history of COPD with airflow limitation that is not fully reversible\n\u2022 Females of non-child bearing potential or females of child bearing potential with negative pregnancy test; and acceptable contraceptive methods\n\u2022 Current/former smokers with at least a 10 pack-year history of cigarette smoking\n\u2022 A measured post- bronchodilator FEV1/FVC ratio of < or = 0.70\n\u2022 A measured post- bronchodilator FEV1 > or = 750ml or 30% predicted and < or = 80% of predicted normal values\n\u2022 Able to change COPD treatment as required by protocol\n\nExclusion Criteria:\n\n\u2022 Women who are pregnant or lactating\n\u2022 Primary diagnosis of asthma\n\u2022 Alpha-1 antitrypsin deficiency as the cause of COPD\n\u2022 Active pulmonary diseases\n\u2022 Prior lung volume reduction surgery\n\u2022 Abnormal chest X-ray (or CT scan) not due to the presence of COPD\n\u2022 Hospitalized due to poorly controlled COPD within 3 months of Screening\n\u2022 Clinically significant medical conditions that preclude participation in the study (e.g.\nclinically significant abnormal ECG, uncontrolled hypertension, glaucoma, symptomatic prostatic hypertrophy)\n\u2022 Cancer that has not been in complete remission for at least 5 years\n\u2022 Treatment with investigational study drug or participation in another clinical trial or study within the last 30 days or 5 half lives\n\nOther protocol defined inclusion/exclusion criteria may apply"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Signed written informed consent\n\u2022 40 - 80 years of age\n\u2022 Clinical history of COPD with airflow limitation that is not fully reversible\n\u2022 Females of non-child bearing potential or females of child bearing potential with negative pregnancy test; and acceptable contraceptive methods\n\u2022 Current/former smokers with at least a 10 pack-year history of cigarette smoking\n\u2022 A measured post- bronchodilator FEV1/FVC ratio of < or = 0.70\n\u2022 A measured post- bronchodilator FEV1 > or = 750ml or 30% predicted and < or = 80% of predicted normal values\n\u2022 Able to change COPD treatment as required by protocol\n\nExclusion Criteria:\n\n\u2022 Women who are pregnant or lactating\n\u2022 Primary diagnosis of asthma\n\u2022 Alpha-1 antitrypsin deficiency as the cause of COPD\n\u2022 Active pulmonary diseases\n\u2022 Prior lung volume reduction surgery\n\u2022 Abnormal chest X-ray (or CT scan) not due to the presence of COPD\n\u2022 Hospitalized due to poorly controlled COPD within 3 months of Screening\n\u2022 Clinically significant medical conditions that preclude participation in the study (e.g.\nclinically significant abnormal ECG, uncontrolled hypertension, glaucoma, symptomatic prostatic hypertrophy)\n\u2022 Cancer that has not been in complete remission for at least 5 years\n\u2022 Treatment with investigational study drug or participation in another clinical trial or study within the last 30 days or 5 half lives\n\nOther protocol defined inclusion/exclusion criteria may apply"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 Change in forced expiratory volume in one second (FEV1) area under the curve from 0 to 12 hours [AUC(0-12)] from test day baseline  (time frame: Day 7)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 Change in forced expiratory volume in one second (FEV1) area under the curve from 0 to 12 hours [AUC(0-12)] from test day baseline  (time frame: Day 7)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 Inhaled PT003 (Dose 1) \u2014 EXPERIMENTAL\n\u2022 Inhaled PT003 (Dose 2) \u2014 EXPERIMENTAL\n\u2022 Inhaled PT005 (Dose 1) \u2014 EXPERIMENTAL\n\u2022 Inhaled PT005 (Dose 2) \u2014 EXPERIMENTAL\n\u2022 Inhaled Placebo \u2014 PLACEBO_COMPARATOR\n\u2022 Tiotropium bromide 18 \u03bcg (Spiriva Handihaler\u00ae) \u2014 ACTIVE_COMPARATOR\n\u2022 Formoterol Fumarate 12 \u03bcg (Foradil\u00ae Aerolizer\u00ae) \u2014 ACTIVE_COMPARATOR\n\u2022 Inhaled PT001 (Dose 1) \u2014 EXPERIMENTAL\nInterventions:\n\u2022 DRUG \u2014 PT003 MDI\n\u2022 DRUG \u2014 PT005 MDI\n\u2022 DRUG \u2014 Placebo MDI\n\u2022 DRUG \u2014 Tiotropium bromide 18 \u03bcg (Spiriva Handihaler\u00ae)\n\u2022 DRUG \u2014 Formoterol Fumarate 12 \u03bcg (Foradil\u00ae Aerolizer\u00ae)\n\u2022 DRUG \u2014 PT001 MDI"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 Inhaled PT003 (Dose 1) \u2014 EXPERIMENTAL\n\u2022 Inhaled PT003 (Dose 2) \u2014 EXPERIMENTAL\n\u2022 Inhaled PT005 (Dose 1) \u2014 EXPERIMENTAL\n\u2022 Inhaled PT005 (Dose 2) \u2014 EXPERIMENTAL\n\u2022 Inhaled Placebo \u2014 PLACEBO_COMPARATOR\n\u2022 Tiotropium bromide 18 \u03bcg (Spiriva Handihaler\u00ae) \u2014 ACTIVE_COMPARATOR\n\u2022 Formoterol Fumarate 12 \u03bcg (Foradil\u00ae Aerolizer\u00ae) \u2014 ACTIVE_COMPARATOR\n\u2022 Inhaled PT001 (Dose 1) \u2014 EXPERIMENTAL\nInterventions:\n\u2022 DRUG \u2014 PT003 MDI\n\u2022 DRUG \u2014 PT005 MDI\n\u2022 DRUG \u2014 Placebo MDI\n\u2022 DRUG \u2014 Tiotropium bromide 18 \u03bcg (Spiriva Handihaler\u00ae)\n\u2022 DRUG \u2014 Formoterol Fumarate 12 \u03bcg (Foradil\u00ae Aerolizer\u00ae)\n\u2022 DRUG \u2014 PT001 MDI"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "80 Years",
+     "after": "80 Years",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "84 (estimated)",
+     "after": "118 (actual)",
+     "changed": true
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT01085045",
+    "history": "https://clinicaltrials.gov/study/NCT01085045?tab=history"
+   },
+   "evidence_quote": "",
+   "provisional": {
+    "label": "negative",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "no meaningful change",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n0 substantive and 1 non-substantive finding(s):\n1. minor \u00b7 Actual enrolment recorded: \"84 (estimated)\" \u2192 \"118 (actual)\" (40% difference from the plan; not an amendment of the target)\nSuggested types: none \u00b7 severity: none.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [],
+    "suggested_severity": "none",
+    "kinds": [
+     "actual_enrolment_recorded"
+    ],
+    "n_substantive": 0
+   },
+   "_design": {
+    "truth": "negative",
+    "baseline_post_start": true,
+    "kinds": [
+     "actual_enrolment_recorded"
+    ],
+    "n_substantive": 0,
+    "suggested_types": [],
+    "suggested_severity": "none",
+    "match_level": 2
+   },
+   "case_id": "c14",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT04087590",
+   "title": "Impact of Inhaled PT003 on Complexity and Variability of Tidal Breathing and Oscillatory Mechanics in Stable COPD Patient",
+   "phase": "PHASE2",
+   "sponsor_class": "OTHER",
+   "start": "2020-01-14",
+   "primary_completion": "2023-03-23",
+   "why_stopped": "Following Brexit and the unavailability of the experimental drug (PT003) in France, the study was terminated prematurely.",
+   "focus": "eligibility",
+   "question": "Between version 1 (2019-12-02) and version 3 (2021-04-21): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 1,
+    "date": "2019-12-02"
+   },
+   "b": {
+    "version": 3,
+    "date": "2021-04-21",
+    "labels": [
+     "Study Status",
+     "Outcome Measures",
+     "Eligibility"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": true,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Female or male subjects aged 40-75 years Documented COPD in stable condition FEV1 between 30 % and 70 % predicted (post bronchodilator) Significant dyspnea with a mMRC dyspnea scale\n\nExclusion Criteria:\n\n\u2022 History or current diagnosis of asthma or ACO (asthma-COPD overlap syndrome)\n\u2022 Respiratory infection or COPD exacerbation within "
+       ],
+       [
+        "del",
+        "8"
+       ],
+       [
+        "eq",
+        " weeks "
+       ],
+       [
+        "del",
+        "(3"
+       ],
+       [
+        "eq",
+        " months if it resulted in hospitalization) prior to screening\n\u2022 Clinically significant or relevant cardiovascular conditions, laboratory tests, electrocardiogram (ECG) parameters\n\u2022 Severe renal impairment eGFR < 30\n\u2022 Narrow-angle glaucoma that, in the opinion of the Investigator, has not been adequately treated.\n\u2022 Symptomatic prostatic hypertrophy or bladder neck obstruction/urinary retention that is clinically significant"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Female or male subjects aged 40-75 years Documented COPD in stable condition FEV1 between 30 % and 70 % predicted (post bronchodilator) Significant dyspnea with a mMRC dyspnea scale\n\nExclusion Criteria:\n\n\u2022 History or current diagnosis of asthma or ACO (asthma-COPD overlap syndrome)\n\u2022 Respiratory infection or COPD exacerbation within "
+       ],
+       [
+        "ins",
+        "6"
+       ],
+       [
+        "eq",
+        " weeks "
+       ],
+       [
+        "ins",
+        "(2"
+       ],
+       [
+        "eq",
+        " months if it resulted in hospitalization) prior to screening\n\u2022 Clinically significant or relevant cardiovascular conditions, laboratory tests, electrocardiogram (ECG) parameters\n\u2022 Severe renal impairment eGFR < 30\n\u2022 Narrow-angle glaucoma that, in the opinion of the Investigator, has not been adequately treated.\n\u2022 Symptomatic prostatic hypertrophy or bladder neck obstruction/urinary retention that is clinically significant"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 Analysis of tidal volume (VT) complexity (noise limit as main parameter )  (time frame: at 1 month)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 Analysis of tidal volume (VT) complexity (noise limit as main parameter )  (time frame: at 1 month)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 PT003 treatment \u2014 EXPERIMENTAL\nInterventions:\n\u2022 DRUG \u2014 Formoterol-glycopyrronium co suspension (PT003)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 PT003 treatment \u2014 EXPERIMENTAL\nInterventions:\n\u2022 DRUG \u2014 Formoterol-glycopyrronium co suspension (PT003)"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "75 Years",
+     "after": "75 Years",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "35 (estimated)",
+     "after": "35 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [
+    "age in the criteria text (75) does not match the structured minimum age (40)"
+   ],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT04087590",
+    "history": "https://clinicaltrials.gov/study/NCT04087590?tab=history"
+   },
+   "evidence_quote": "threshold_changed: Respiratory infection or COPD exacerbation within 8 weeks (3 months if it resulted in hospitalization) prior to screening -> Respiratory infection or COPD exacerbation within 6 weeks (2 months if it resulted in hospitalization) prior to screening",
+   "provisional": {
+    "label": "positive",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "1 substantive change(s)",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\n1 substantive and 0 non-substantive finding(s):\n1. SUBSTANTIVE \u00b7 Threshold changed [exclusion]: \"Respiratory infection or COPD exacerbation within 8 weeks (3 months if it resulted in hospitalization) prior to screening\" \u2192 \"Respiratory infection or COPD exacerbation within 6 weeks (2 months if it resulted in hospitalization) prior to screening\" (8, 3 \u2192 6, 2)\nNote: age in the criteria text (75) does not match the structured minimum age (40).\nSuggested types: elig_clarified \u00b7 severity: major.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [
+     "elig_clarified"
+    ],
+    "suggested_severity": "major",
+    "kinds": [
+     "threshold_changed"
+    ],
+    "n_substantive": 1
+   },
+   "_design": {
+    "truth": "positive",
+    "baseline_post_start": false,
+    "kinds": [
+     "threshold_changed"
+    ],
+    "n_substantive": 1,
+    "suggested_types": [
+     "elig_clarified"
+    ],
+    "suggested_severity": "major"
+   },
+   "case_id": "c15",
+   "provisional_mode": "collapsed"
+  },
+  {
+   "nct_id": "NCT01490125",
+   "title": "The Effect of QVA149 on Patient Reported Dyspnea in Moderate to Severe Chronic Obstructive Pulmonary Disease (COPD)",
+   "phase": "PHASE3",
+   "sponsor_class": "INDUSTRY",
+   "start": "2011-10",
+   "primary_completion": "2012-08",
+   "why_stopped": null,
+   "focus": "design",
+   "question": "Between version 0 (2011-12-08) and version 1 (2011-12-12): did anything change in a meaningful way in who can enter (eligibility, age, sex), what is measured (primary outcomes), how many (enrolment), or the arms and interventions?",
+   "a": {
+    "version": 0,
+    "date": "2011-12-08"
+   },
+   "b": {
+    "version": 1,
+    "date": "2011-12-12",
+    "labels": [
+     "Study Status",
+     "Outcome Measures"
+    ]
+   },
+   "panels": [
+    {
+     "key": "eligibility",
+     "label": "Eligibility criteria",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Patients with moderate to severe chronic obstructive pulmonary disease\n\u2022 Smoking history of 10 pack years\n\u2022 Post-bronchodilator FEV1 between 30 - 80%\n\u2022 Patients must be able to use computer mouse and display\n\nExclusion Criteria:\n\n\u2022 Patients with a history of long QT syndrome\n\u2022 Patients with Type I or uncontrolled Type II diabetes\n\u2022 Patients who have had a COPD exacerbation or respiratory tract infection within 6 weeks prior to screening\n\u2022 Patients with any history of asthma/COPD\n\u2022 Patients with pulmonary lobectomy, lung volume reduction surgery, or lung transplantation\n\u2022 Patients with concomitant pulmonary disease\n\u2022 Patients requiring long term oxygen therapy (>15 h a day)\n\nOther protocol-defined inclusion/exclusion criteria may apply."
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Inclusion Criteria:\n\n\u2022 Patients with moderate to severe chronic obstructive pulmonary disease\n\u2022 Smoking history of 10 pack years\n\u2022 Post-bronchodilator FEV1 between 30 - 80%\n\u2022 Patients must be able to use computer mouse and display\n\nExclusion Criteria:\n\n\u2022 Patients with a history of long QT syndrome\n\u2022 Patients with Type I or uncontrolled Type II diabetes\n\u2022 Patients who have had a COPD exacerbation or respiratory tract infection within 6 weeks prior to screening\n\u2022 Patients with any history of asthma/COPD\n\u2022 Patients with pulmonary lobectomy, lung volume reduction surgery, or lung transplantation\n\u2022 Patients with concomitant pulmonary disease\n\u2022 Patients requiring long term oxygen therapy (>15 h a day)\n\nOther protocol-defined inclusion/exclusion criteria may apply."
+       ]
+      ]
+     }
+    },
+    {
+     "key": "outcomes",
+     "label": "Primary outcomes",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "\u2022 The improvement in TDI (total transient dyspnea index) score after treatment with QVA149 compared to placebo  (time frame: 6 weeks)"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "\u2022 The improvement in TDI (total transient dyspnea index) score after treatment with QVA149 compared to placebo  (time frame: 6 weeks)"
+       ]
+      ]
+     }
+    },
+    {
+     "key": "design",
+     "label": "Arms and interventions",
+     "changed": false,
+     "ops": {
+      "before": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 QVA149 \u2014 EXPERIMENTAL\n\u2022 Tiotropium \u2014 ACTIVE_COMPARATOR\n\u2022 Placebo to QVA149 and Placebo to Tiotropium \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 QVA149\n\u2022 DRUG \u2014 Tiotropium\n\u2022 DRUG \u2014 Placebo"
+       ]
+      ],
+      "after": [
+       [
+        "eq",
+        "Arm groups:\n\u2022 QVA149 \u2014 EXPERIMENTAL\n\u2022 Tiotropium \u2014 ACTIVE_COMPARATOR\n\u2022 Placebo to QVA149 and Placebo to Tiotropium \u2014 PLACEBO_COMPARATOR\nInterventions:\n\u2022 DRUG \u2014 QVA149\n\u2022 DRUG \u2014 Tiotropium\n\u2022 DRUG \u2014 Placebo"
+       ]
+      ]
+     }
+    }
+   ],
+   "table": [
+    {
+     "field": "minimum age",
+     "before": "40 Years",
+     "after": "40 Years",
+     "changed": false
+    },
+    {
+     "field": "maximum age",
+     "before": "",
+     "after": "",
+     "changed": false
+    },
+    {
+     "field": "sex",
+     "before": "ALL",
+     "after": "ALL",
+     "changed": false
+    },
+    {
+     "field": "healthy volunteers",
+     "before": "False",
+     "after": "False",
+     "changed": false
+    },
+    {
+     "field": "enrolment",
+     "before": "234 (estimated)",
+     "after": "234 (estimated)",
+     "changed": false
+    }
+   ],
+   "notes": [],
+   "links": {
+    "study": "https://clinicaltrials.gov/study/NCT01490125",
+    "history": "https://clinicaltrials.gov/study/NCT01490125?tab=history"
+   },
+   "evidence_quote": "",
+   "provisional": {
+    "label": "negative",
+    "confidence": "high",
+    "source": "rule-based change analysis",
+    "summary": "no meaningful change",
+    "evidence": "Checked: eligibility text, age/sex, primary outcomes, enrolment, arms and interventions.\nIdentical after normalising case, spacing, punctuation, markup, symbols and units. No change.\nNot examined: why the change was made, protocol text outside these registry fields.",
+    "suggested_types": [],
+    "suggested_severity": "none",
+    "kinds": [],
+    "n_substantive": 0
+   },
+   "_design": {
+    "truth": "negative",
+    "baseline_post_start": true,
+    "kinds": [],
+    "n_substantive": 0,
+    "suggested_types": [],
+    "suggested_severity": "none",
+    "match_level": 2
+   },
+   "case_id": "c16",
+   "provisional_mode": "collapsed"
+  }
+ ]
+}

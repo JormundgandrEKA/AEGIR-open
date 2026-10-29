@@ -6,3 +6,5 @@ state/
 build/.venv/
 build/work/
 build/dist/
+RAN*.exe
+RAN-error.log

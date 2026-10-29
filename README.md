@@ -21,9 +21,25 @@ How far along it is, honestly: [docs/STATUS.md](docs/STATUS.md). Pictures: [docs
 | Europe PMC licence lookup | works on single PMIDs; slow by design (one PMID per request) |
 | Label flags and content flags (rule-based change analysis) | works; stress-tested; not reviewed by a clinician |
 | Matched batches, batch audit, labelling app, tally, efficiency report | works; one labeller so far |
+| Demo with real data and a portable `RAN.exe` | works (Windows exe; source on any system) |
 | Not built | second-labeller agreement and adjudication, gold-set export, expert calibration |
 
 No language model is used anywhere in the tool. Every result comes from a logged request or a plain rule.
+
+## Try the labelling app in one minute (real demo data)
+
+`demo/` holds 16 real cases from ClinicalTrials.gov (COPD trials, 138 KB), with their provisional labels and findings, so you can try the
+labelling app without fetching anything. Source, date, modifications and terms are in [demo/ATTRIBUTION.md](demo/ATTRIBUTION.md); the app also
+shows them in a banner. The data are a dated snapshot, not current.
+
+- **Windows, no Python or build needed:** download `RAN.exe` from the repository's **Releases** page and double-click it. Enter a name; with
+  no batches of your own it opens the demo. Your labels and notepad are written to a `data/` folder beside the exe. The exe is unsigned, so
+  Windows SmartScreen may warn ("More info", then "Run anyway"); you can check its SHA-256 against the value in the release notes.
+- **From source (any system with Python 3.10+):**
+  ```bash
+  cd tool
+  python -m aegir_ran labels serve --labeller yourname --batch demo
+  ```
 
 ## Quick start
 
@@ -31,7 +47,7 @@ You need Python 3.10 or newer. There are no packages to install: the tool uses o
 
 ```bash
 # from the repository folder
-python -m unittest discover -s tool/tests          # 39 offline tests, no network
+python -m unittest discover -s tool/tests          # 41 offline tests, no network
 cd tool
 python -m aegir_ran --help                         # all commands
 python -m aegir_ran status                         # counts, last fetch, whether a key is configured
@@ -41,7 +57,7 @@ python -m aegir_ran ctgov search --query-id copd-p23-2010-2020 --dry-run    # sh
 (Or set `PYTHONPATH=tool` and run from the repository folder.) Every command ends with one JSON line saying what it did:
 counts, files written, requests used, errors. Add `--dry-run` to see the requests and an estimate first.
 
-**Try the labelling app without any data.** It makes five synthetic cases and serves them on your own machine only (127.0.0.1):
+**Or make synthetic cases.** Five invented cases, served on your own machine only (127.0.0.1):
 
 ```bash
 cd tool
@@ -127,6 +143,7 @@ your own browser session (small volumes) and imported. `ctgov import-history` ac
 tool/aegir_ran/     the package (fetchers, change analysis, batch builder, labelling app)
 tool/tests/         unit tests, fixtures (synthetic), stress_amend.py (needs fetched data)
 config/             settings, licence grades, named queries, ncbi.example.json
+demo/               16 real ClinicalTrials.gov cases for trying the labelling app, with ATTRIBUTION.md
 build/              build.ps1, ran.spec: builds a portable RAN.exe (Windows, needs PyInstaller via requirements-build.txt)
 docs/               STATUS.md and the diagrams
 data/  state/       created when you run things; ignored by git

@@ -444,5 +444,31 @@ class TestDrafts(Base):
             s2.save({"case_id": cid, "answers": {"real_change": "yes", "change_types": ["wording_acronym"]}})
 
 
+class TestDemo(Base):
+    """The bundled demo batch (real ClinicalTrials.gov cases) must load, carry its notice, and hold no contact details."""
+
+    def test_demo_batch_loads_and_is_clean(self):
+        from aegir_ran.core import demo_batch_path
+        p = demo_batch_path()
+        self.assertIsNotNone(p)
+        text = p.read_text(encoding="utf-8")
+        batch = json.loads(text)
+        self.assertEqual(len(batch["cases"]), 16)
+        self.assertIn("ClinicalTrials.gov", batch["notice"])
+        self.assertIn("28 Oct 2026", batch["notice"])
+        import re
+        self.assertEqual(re.findall(r"[\w.+-]+@[\w-]+\.[\w.]+", text), [])
+        self.assertLess(len(text), 5 * 1024 * 1024)
+        self.assertTrue(any(c["_design"]["truth"] == "positive" for c in batch["cases"]))
+        self.assertTrue(any(c["provisional_mode"] != "collapsed" for c in batch["cases"]))
+
+    def test_demo_opens_without_any_data_folder(self):
+        s = labels.Session(self.ctx, "tester", labels.resolve_batch(self.ctx, "demo"))
+        st = s.state()
+        self.assertEqual(len(st["cases"]), 16)
+        self.assertIn("DEMO DATA", st["notice"])
+        self.assertNotIn("provisional", st["cases"][0])
+
+
 if __name__ == "__main__":
     unittest.main()

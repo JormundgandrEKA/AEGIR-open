@@ -38,6 +38,14 @@ def bundled(name):
     return Path(base) / "defaults" / name if base else None
 
 
+def demo_batch_path():
+    """The demo batch: inside RAN.exe, or demo/ in the repository. None if it is not there."""
+    base = getattr(sys, "_MEIPASS", None)
+    root = Path(base) if base else Path(__file__).resolve().parents[2]
+    p = root / "demo" / "ran-demo-batch.json"
+    return p if p.is_file() else None
+
+
 def sha256(data):
     return hashlib.sha256(data).hexdigest()
 

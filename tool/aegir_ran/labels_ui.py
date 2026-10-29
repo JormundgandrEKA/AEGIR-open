@@ -144,6 +144,7 @@ function renderText(ops,full){const lines=toLines(ops),n=lines.length;
 function render(){
  const c=cur();if(!c)return;
  const m=$('main');m.replaceChildren();
+ if(S.notice)m.append(h('div',{class:'note',style:'background:#fff2a8;font-size:11.5px'},S.notice));
  m.append(h('div',{class:'hdr'},h('span',null,c.case_id),h('span',null,c.nct_id),h('span',{class:'t'},c.title||''),
   h('span',null,c.phase||'-'),h('span',null,c.sponsor_class||'-'),h('span',null,'start '+(c.start||'-')),
   h('span',null,'primary completion '+(c.primary_completion||'-')),h('span',null,'case '+(S.idx+1)+' of '+S.cases.length+' · '+Object.keys(S.done).length+' labelled')));
@@ -262,7 +263,7 @@ document.addEventListener('keydown',e=>{
  else if(/^[0-9]$/.test(k)){const g=gs[S.row];const j=(+k+9)%10;if(g&&g.opts&&j<g.opts.length){pick(g,j);e.preventDefault();}}
 });
 
-(async()=>{const st=await api('/api/state');S.cases=st.cases;S.done=st.done;S.drafts=st.drafts||{};S.defs=st.defs;
+(async()=>{const st=await api('/api/state');S.cases=st.cases;S.notice=st.notice||'';S.done=st.done;S.drafts=st.drafts||{};S.defs=st.defs;
  $('padtxt').value=st.notepad||'';padLast=$('padtxt').value;if(padLast)$('padst').textContent='restored';
  document.title='RAN labelling · '+st.labeller;
  const first=S.cases.findIndex(c=>!S.done[c.case_id]);

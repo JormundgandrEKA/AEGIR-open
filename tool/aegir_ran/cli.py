@@ -130,19 +130,24 @@ def interactive():
     from .labels import safe_name
     root = find_root()
     print("RAN labelling tool" + NL)
-    batches = sorted((root / "data" / "labels" / "batches").glob("*.json"),
-                     key=lambda p: p.stat().st_mtime, reverse=True)
-    if not batches:
-        print("No batch found in data/labels/batches. Ask design to build one, or run:" + NL
-              + "  RAN.exe labels build-batch --from <content_flags file> --name <name>")
+    from .core import demo_batch_path
+    found = sorted((root / "data" / "labels" / "batches").glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    choices = [(b.stem, str(b)) for b in found]
+    if demo_batch_path():
+        choices.append(("ran-demo (16 real cases from ClinicalTrials.gov, for trying the tool)", "demo"))
+    if not choices:
+        print("No batch found in data/labels/batches. Build one, or run:" + NL
+              + "  RAN.exe labels build-batch --synthetic 5 --name demo")
         return 1
-    batch = batches[0]
-    if len(batches) > 1:
-        for i, b in enumerate(batches, 1):
-            print(f"  {i}. {b.stem}")
-        pick = input(f"Batch number [1 = {batches[0].stem}]: ").strip()
-        if pick.isdigit() and 1 <= int(pick) <= len(batches):
-            batch = batches[int(pick) - 1]
+    batch = choices[0][1]
+    if len(choices) > 1:
+        for i, (label, _) in enumerate(choices, 1):
+            print(f"  {i}. {label}")
+        pick = input(f"Batch number [1 = {choices[0][0]}]: ").strip()
+        if pick.isdigit() and 1 <= int(pick) <= len(choices):
+            batch = choices[int(pick) - 1][1]
+    elif batch == "demo":
+        print("No batches of your own yet, so this opens the demo: 16 real cases from ClinicalTrials.gov." + NL)
     last = root / "state" / "last_labeller.txt"
     default = last.read_text(encoding="utf-8").strip() if last.is_file() else ""
     while True:
@@ -155,7 +160,7 @@ def interactive():
     last.parent.mkdir(parents=True, exist_ok=True)
     last.write_text(name, encoding="utf-8")
     print(NL + "Starting. A browser tab opens; if not, open the address shown below." + NL)
-    return main(["labels", "serve", "--labeller", name, "--batch", str(batch)])
+    return main(["labels", "serve", "--labeller", name, "--batch", batch])
 
 
 def run(argv=None):

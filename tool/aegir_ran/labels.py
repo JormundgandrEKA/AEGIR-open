@@ -7,7 +7,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from .batches import build_batch, labels_dir  # noqa: F401  (build_batch re-exported for the CLI)
-from .core import iso_now, read_jsonl, utc_stamp
+from .core import demo_batch_path, iso_now, read_jsonl, utc_stamp
 from .labels_ui import HTML
 from .taxonomy import AVOID_VALUE, CAUSES, CHANGE_ENUM, LABEL, SEVERITY, page_defs
 
@@ -64,7 +64,7 @@ class Session:
             if r.get("batch") == self.batch["name"] and r.get("case_id") not in done:
                 drafts[r["case_id"]] = r["answers"]
         return {"labeller": self.labeller, "batch": self.batch["name"], "notepad": self.notepad_text(),
-                "defs": page_defs(), "cases": [self.public_case(c) for c in self.batch["cases"]],
+                "defs": page_defs(), "notice": self.batch.get("notice"), "cases": [self.public_case(c) for c in self.batch["cases"]],
                 "done": done, "drafts": drafts}
 
     def draft_save(self, body):
@@ -211,6 +211,8 @@ def resolve_batch(ctx, batch):
     if p.is_file():
         return p
     q = labels_dir(ctx) / "batches" / (batch if batch.endswith(".json") else batch + ".json")
+    if not q.is_file() and batch in ("demo", "ran-demo") and demo_batch_path():
+        return demo_batch_path()                    # the bundled real-data demo (see demo/ATTRIBUTION.md)
     if not q.is_file():
         raise FileNotFoundError(f"batch not found: {batch}")
     return q
@@ -219,9 +221,12 @@ def resolve_batch(ctx, batch):
 def serve(ctx, labeller, batch, port=8765, open_browser=True):
     if not batch:
         files = sorted((labels_dir(ctx) / "batches").glob("*.json"), key=lambda p: p.stat().st_mtime)
-        if not files:
+        if not files and demo_batch_path():
+            batch = "demo"
+        elif not files:
             raise FileNotFoundError("no batch in data/labels/batches; run `labels build-batch` first")
-        batch = str(files[-1])
+        else:
+            batch = str(files[-1])
     session = Session(ctx, labeller, resolve_batch(ctx, batch))
     holder = {}
     httpd = ThreadingHTTPServer(("127.0.0.1", port), make_handler(session, lambda: holder["s"].shutdown()))
