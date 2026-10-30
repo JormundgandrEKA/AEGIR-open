@@ -1,14 +1,4 @@
-config/*.local.json
-data/*
-!data/README.md
-!data/demo/
-data/demo/*
-!data/demo/README.md
 __pycache__/
 *.pyc
 state/
-build/.venv/
-build/work/
-build/dist/
-RAN*.exe
-RAN-error.log
+*.local.json

@@ -3,7 +3,7 @@ from PyInstaller.utils.hooks import collect_data_files
 
 a = Analysis(
     ["ran_entry.py"],
-    pathex=["../tool"],
+    pathex=[".."],
     datas=[("../config/aegir.json", "defaults"), ("../config/grades.json", "defaults"),
            ("../demo/ran-demo-batch.json", "demo")]
           + collect_data_files("tzdata"),

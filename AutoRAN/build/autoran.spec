@@ -6,7 +6,7 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules
 HERE = os.path.abspath(".")
 ROOT = os.path.dirname(HERE)
 # RAN's package, bundled into the exe: AEGIR_TOOL, then ../tool (AutoRAN inside AEGIR-open), ../AEGIR/tool, ../AEGIR-open/tool
-_cands = ([os.environ["AEGIR_TOOL"]] if os.environ.get("AEGIR_TOOL") else []) + [os.path.join(ROOT, "..", *p) for p in (("tool",), ("AEGIR", "tool"), ("AEGIR-open", "tool"))]
+_cands = ([os.environ["AEGIR_TOOL"]] if os.environ.get("AEGIR_TOOL") else []) + [os.path.join(ROOT, "..", *p) for p in (("RAN",), ("tool",), ("AEGIR", "tool"), ("AEGIR-open", "tool"))]
 TOOL = next((os.path.abspath(c) for c in _cands if os.path.isfile(os.path.join(c, "aegir_ran", "__init__.py"))), None)
 if TOOL is None:
     raise SystemExit("build: cannot find RAN (aegir_ran). Put AutoRAN inside AEGIR-open or set AEGIR_TOOL to the folder that contains aegir_ran/.")

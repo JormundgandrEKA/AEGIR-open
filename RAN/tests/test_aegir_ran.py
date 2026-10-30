@@ -27,7 +27,7 @@ def fixture(name):
 class Base(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
-        shutil.copytree(HERE.parent.parent / "config", self.tmp / "config",
+        shutil.copytree(HERE.parent / "config", self.tmp / "config",
                         ignore=shutil.ignore_patterns("*.local.json"))
         os.environ.pop("NCBI_API_KEY", None)
         os.environ.pop("NCBI_EMAIL", None)

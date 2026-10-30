@@ -1,7 +1,7 @@
 """Metamorphic stress test of amend.py on every stored real eligibility text (not part of the unit-test run).
 
 Non-substantive edits must NOT produce substantive findings; substantive edits must. Prints false-alarm and miss rates
-per edit type and writes the failures to a JSON file for review.  Usage: python tool/tests/stress_amend.py [seed]
+per edit type and writes the failures to a JSON file for review.  Usage: python RAN/tests/stress_amend.py [seed]
 """
 import json
 import random

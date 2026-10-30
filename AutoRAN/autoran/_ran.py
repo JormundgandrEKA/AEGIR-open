@@ -17,7 +17,7 @@ def find_tool():
         cands.append(Path(settings.get("aegir_tool")))
     if os.environ.get("AEGIR_TOOL"):
         cands.append(Path(os.environ["AEGIR_TOOL"]))
-    cands += [HERE.parent / "tool", HERE.parent / "AEGIR" / "tool", HERE.parent / "AEGIR-open" / "tool"]
+    cands += [HERE.parent / "RAN", HERE.parent / "tool", HERE.parent / "AEGIR" / "tool", HERE.parent / "AEGIR-open" / "tool"]
     for c in cands:
         if (c / "aegir_ran" / "__init__.py").is_file():
             return c

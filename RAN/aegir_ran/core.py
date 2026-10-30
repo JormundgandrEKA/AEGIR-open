@@ -29,7 +29,7 @@ def find_root():
     if getattr(sys, "frozen", False):
         exe = Path(sys.executable).resolve().parent
         return exe if (exe / "config").is_dir() or not (Path.cwd() / "config").is_dir() else Path.cwd()
-    return Path(__file__).resolve().parents[2]
+    return Path(__file__).resolve().parents[1]
 
 
 def bundled(name):
@@ -41,7 +41,7 @@ def bundled(name):
 def demo_batch_path():
     """The demo batch: inside RAN.exe, or demo/ in the repository. None if it is not there."""
     base = getattr(sys, "_MEIPASS", None)
-    root = Path(base) if base else Path(__file__).resolve().parents[2]
+    root = Path(base) if base else Path(__file__).resolve().parents[1]
     p = root / "demo" / "ran-demo-batch.json"
     return p if p.is_file() else None
 
