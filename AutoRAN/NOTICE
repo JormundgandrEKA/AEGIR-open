@@ -1,0 +1,9 @@
+AutoRAN
+Copyright 2026 David J. W. O'Rourke (tentative; attribution to be confirmed)
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product does not contain registry data. It downloads it at your request from third-party services under their own terms:
+  - ClinicalTrials.gov, U.S. National Library of Medicine (https://clinicaltrials.gov/about-site/terms-conditions)
+  - Open Targets, "clinical_trial_reason_to_stop" curated stop reasons, Apache License 2.0 (via the Hugging Face dataset server)
+See THIRD_PARTY.md for software and data attributions and DISCLAIMERS.md for what AutoRAN's output does and does not mean.

@@ -1,0 +1,71 @@
+{
+  "scope": {
+    "phases": "all",
+    "start_from": "2005-01-01",
+    "statuses": [
+      "COMPLETED",
+      "TERMINATED"
+    ]
+  },
+  "page_size": 1000,
+  "fields": [
+    "NCTId",
+    "BriefTitle",
+    "OverallStatus",
+    "WhyStopped",
+    "StartDate",
+    "PrimaryCompletionDate",
+    "CompletionDate",
+    "StudyFirstPostDate",
+    "LastUpdatePostDate",
+    "Phase",
+    "LeadSponsorName",
+    "LeadSponsorClass",
+    "EnrollmentCount",
+    "EnrollmentType",
+    "Condition",
+    "ConditionMeshTerm",
+    "ConditionAncestorTerm",
+    "DesignAllocation",
+    "DesignMasking",
+    "DesignPrimaryPurpose",
+    "EligibilityCriteria",
+    "MinimumAge",
+    "MaximumAge",
+    "Sex",
+    "HealthyVolunteers",
+    "StdAge",
+    "ArmGroupLabel",
+    "InterventionType",
+    "PrimaryOutcomeMeasure",
+    "LocationCountry",
+    "ReferencePMID"
+  ],
+  "grade_floor": "B-",
+  "split": {
+    "seed": "autoran-1",
+    "test": 0.2,
+    "dev": 0.1
+  },
+  "history_roots": [
+    "../AEGIR/data/raw/ctgov/history",
+    "../data/raw/ctgov/history"
+  ],
+  "opentargets": {
+    "dataset": "opentargets/clinical_trial_reason_to_stop",
+    "page": 100,
+    "split": {
+      "seed": "ot-1",
+      "test": 0.2,
+      "dev": 0.1
+    }
+  },
+  "bootstrap": {
+    "resamples": 1000,
+    "seed": 28
+  },
+  "labeller": {
+    "ie_dev_precision_floor": 0.93,
+    "note": "design target is 0.90 on the frozen test part; the extra margin allows for dev-to-test shrinkage"
+  }
+}

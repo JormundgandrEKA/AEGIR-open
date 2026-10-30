@@ -1,0 +1,14 @@
+# Disclaimers
+
+AutoRAN is research software. Read these before you use or share anything it produces.
+
+1. **Not medical, regulatory, legal or investment advice.** Nothing AutoRAN outputs says anything about whether a treatment works, is safe, or should be used, funded or approved.
+2. **Machine labels, not facts.** The "silver set" is made by rules and a small text model reading registry free text. On the curated test text the recruitment-failure label reached about 94% precision and 70% recall. **No human audit of labels on real registry records has been recorded yet, so precision on registry text is unmeasured** and may be lower. Use the Review page to measure it for your own data.
+3. **A label is a stop reason, not a judgement.** "Recruitment failure" means a registry stop reason was classified that way. It is not a finding about the sponsor, investigators or the trial's quality, and sponsors and companies named in the Browse page and plots are named only because the registry names them.
+4. **Scores do not show a protocol was flawed.** A scorer that predicts recruitment failure may be picking up site, sponsor, funding or era effects. Read the baselines and the "clean inputs" caveats in About before drawing conclusions.
+5. **Hindsight.** Most records are the current version of a registration, which may have changed after the trial began. "Clean" inputs are a small, different population (mostly small trials registered retrospectively); results on them are wide and not a cleaner version of the full results.
+6. **Data may be out of date or wrong.** Registry records are self-reported, are stored here as dated snapshots, and some contain errors. Check the original record (the app links to it) before relying on any single trial.
+7. **Data terms are yours to follow.** AutoRAN downloads data from ClinicalTrials.gov and Open Targets on your computer. You are responsible for complying with their terms, including attribution, not implying endorsement by the U.S. National Library of Medicine or NIH, and respecting rate limits (AutoRAN's defaults are polite; do not raise them). Some registry text may be subject to third-party copyright. Do not redistribute downloaded data from this project without checking those terms.
+8. **Personal data.** Contact fields (names, emails, phone numbers of study contacts and officials) are never requested. Review files you create may carry reviewer identity; do not commit them.
+9. **Your settings are yours.** Optional keys and tokens you enter are stored encrypted for your Windows user, outside the project folder, and are never sent anywhere except to the service they belong to. They are never written to project files or logs.
+10. **No warranty.** The software is provided "as is" under the Apache License 2.0. Windows-only desktop build; the executable is unsigned and Windows SmartScreen may warn about it.

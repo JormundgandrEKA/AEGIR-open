@@ -1,0 +1,12 @@
+data/
+state/
+.venv/
+__pycache__/
+*.pyc
+AutoRAN.exe
+_internal/
+build/dist/
+build/work/
+config/*.local.json
+*.local.json
+settings.json

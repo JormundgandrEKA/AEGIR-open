@@ -1,0 +1,27 @@
+{
+  "sources": {
+    "ctgov_current": {
+      "label": "ClinicalTrials.gov API v2 (current records)",
+      "licence": "public, NLM terms",
+      "grade": "A+",
+      "terms": "https://clinicaltrials.gov/about-site/terms-conditions"
+    },
+    "opentargets_reasons": {
+      "label": "Open Targets curated stop reasons",
+      "licence": "apache-2.0",
+      "grade": "B-",
+      "terms": "https://huggingface.co/datasets/opentargets/clinical_trial_reason_to_stop"
+    },
+    "ran_history": {
+      "label": "RAN browser-collected version histories",
+      "licence": "public, NLM terms",
+      "grade": "A-",
+      "terms": "https://clinicaltrials.gov/about-site/terms-conditions"
+    }
+  },
+  "refused": [
+    "TrialBench (CC BY-NC)",
+    "Anamnesis sample (CC BY-NC)",
+    "CTO (efficacy labels, out of scope)"
+  ]
+}

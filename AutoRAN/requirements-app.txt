@@ -1,0 +1,9 @@
+# The desktop app, plots and Parquet frame (the core pipeline needs only the standard library).
+# Add torch for GPU scoring: see requirements-gpu.txt.  Add pyinstaller to build the exe.
+numpy
+pandas
+pyarrow
+matplotlib
+plotly
+scipy
+pywebview

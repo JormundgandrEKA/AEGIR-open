@@ -1,0 +1,22 @@
+{
+  "scale": ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "ungraded"],
+  "licence_grades": {
+    "cc0": "B",
+    "public-domain": "B",
+    "cc-by": "B-",
+    "cc-by-sa": "C",
+    "cc-by-nd": "D",
+    "cc-by-nc": "D-",
+    "cc-by-nc-sa": "D-",
+    "cc-by-nc-nd": "D-",
+    "custom": "F",
+    "all-rights-reserved": "F"
+  },
+  "journal_overrides": {
+    "cc-by": {
+      "trials": "B",
+      "jmir res protoc": "B",
+      "jmir research protocols": "B"
+    }
+  }
+}

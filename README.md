@@ -11,6 +11,13 @@ planning documents. It is not a finished product and not a guide for rebuilding 
 How far along it is, honestly: [docs/STATUS.md](docs/STATUS.md). Pictures: [docs/ran-overview.html](docs/ran-overview.html)
 (or [how it works](docs/ran-how-it-works.svg) and [capabilities](docs/ran-capabilities.svg)).
 
+## AutoRAN (automatic labelling, in `AutoRAN/`)
+
+`AutoRAN/` is a separate tool that sits beside RÁN and reuses its client, rate limits and store. It downloads the whole ClinicalTrials.gov scope itself,
+labels recruitment failure automatically from registry stop reasons (the machine-made "silver set"), categorises and scores trials, and shows the
+results in a Windows desktop app with review tools. It holds no data and no executable; **read [AutoRAN/DISCLAIMERS.md](AutoRAN/DISCLAIMERS.md) and
+[AutoRAN/README.md](AutoRAN/README.md)** first. Silver labels are not gold labels and no human audit of them has been recorded yet.
+
 ## What works
 
 | Area | State |
