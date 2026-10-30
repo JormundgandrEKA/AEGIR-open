@@ -1,9 +1,9 @@
-"""Starter plots from AutoRAN's Parquet frame and metrics file. Run with the AutoRAN environment:
+"""Starter plots from AutoRAN's Parquet frame and metrics file. Run it from the AutoRAN folder:
 
-    .venv\\Scripts\\python viz\\plots.py            # newest frame and metrics
-    .venv\\Scripts\\python viz\\plots.py --show     # also open interactive windows
+    python viz/plots.py              # newest frame and metrics
+    python viz/plots.py --show       # also open interactive windows
 
-Everything is plain pandas + matplotlib, so adapting a plot is a few lines. The same frame reads in R with arrow (see viz/README.md).
+Everything is plain pandas + matplotlib, so adapting a plot is a few lines. The same frame reads in R with arrow (see the AutoRAN README).
 """
 import argparse
 import json

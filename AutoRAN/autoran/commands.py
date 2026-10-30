@@ -71,7 +71,7 @@ def _use_gpu(pref):
         return bool(torch.cuda.is_available()) or pref == "cuda"
     except ImportError:
         if pref == "cuda":
-            raise SystemExit("--device cuda needs PyTorch: run this with the AutoRAN virtual environment (.venv\\Scripts\\python -m autoran ...)")
+            raise SystemExit("--device cuda needs PyTorch (see the README: setup.ps1 -Gpu, or Settings > GPU pack folder)")
         return False
 
 

@@ -1,6 +1,0 @@
-# Optional: GPU scoring (NVIDIA). About 3 GB, so install it once in your main Python rather than in a project copy.
-#   pip install -r requirements-gpu.txt --index-url https://download.pytorch.org/whl/cu128
-# (cu128 matches recent NVIDIA drivers; pick another index from https://pytorch.org/get-started/locally/ if yours is older.)
-# The small AutoRAN.exe has no PyTorch inside. It uses this install through Settings > "GPU pack folder"
-# (the site-packages folder that holds torch/), or a `gpu_pack` folder next to the exe made with `pip install --target gpu_pack torch ...`.
-torch

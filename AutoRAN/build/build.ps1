@@ -16,7 +16,8 @@ if ($Full) { $env:AUTORAN_LITE = "0"; $dist = "$here\dist"; $work = "$here\work"
 $out = Join-Path $dist "AutoRAN"
 if (-not (Test-Path (Join-Path $out "AutoRAN.exe"))) { throw "Build did not produce AutoRAN.exe" }
 if (-not $Full) {
-    foreach ($f in "LICENSE", "NOTICE", "THIRD_PARTY.md", "DISCLAIMERS.md") { Copy-Item (Join-Path $root $f) $out -Force }
+    foreach ($f in "NOTICE", "THIRD_PARTY.md", "DISCLAIMERS.md") { Copy-Item (Join-Path $root $f) $out -Force }
+    Copy-Item (Join-Path (Split-Path -Parent $root) "LICENSE") $out -Force
     Copy-Item (Join-Path $root "config") (Join-Path $out "config") -Recurse -Force
     Copy-Item (Join-Path $root "plugins") (Join-Path $out "plugins") -Recurse -Force
     $zip = Join-Path $dist "AutoRAN-lite-win64.zip"

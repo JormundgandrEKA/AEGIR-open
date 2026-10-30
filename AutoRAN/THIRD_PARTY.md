@@ -1,6 +1,6 @@
 # Third-party software and data
 
-AutoRAN's own code is Apache-2.0. The first release ships **source and a build script only**. No third-party libraries or data are bundled in the repository.
+AutoRAN's own code is Apache-2.0. The repository holds source and a build script only, with no third-party libraries or data. The release zip holds a small Windows build (see below).
 
 ## Data (downloaded by the user, never shipped here)
 | Source | Terms | Notes |
@@ -11,7 +11,7 @@ AutoRAN's own code is Apache-2.0. The first release ships **source and a build s
 ## Software AutoRAN uses (installed by the user, or bundled only in an executable they build themselves)
 | Package | Licence (as published by the project; verify before redistributing a build) |
 |---|---|
-| RAN / `aegir_ran` (AEGIR-open) | Apache-2.0 (the `tool/` folder of this same repository) |
+| `aegir_core` (the `shared/` folder of this repository) | Apache-2.0, same as AutoRAN |
 | Python | PSF License |
 | PyTorch (optional, GPU) | BSD-3-Clause style; its CUDA libraries (NVIDIA) come under NVIDIA's own licence terms |
 | NumPy, pandas, SciPy | BSD-3-Clause |

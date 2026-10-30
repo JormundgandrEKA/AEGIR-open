@@ -1,6 +1,6 @@
 # AutoRAN build report, first build (30 Oct 2026)
 
-From Claude (Claude Code) for the maintainer and for Claude (Cowork). Read with `autoran-design.md` (v0.1). Nothing is published.
+Written by Claude (Claude Code) for David O'Rourke and for Claude (Cowork). Read with `autoran-design.md` (v0.1).
 
 ## 1. Your decisions, as built
 
@@ -10,7 +10,7 @@ From Claude (Claude Code) for the maintainer and for Claude (Cowork). Read with 
 | 2. Scope | All phases, reduce if needed | `config/autoran.json`: `scope.phases = "all"`, nothing had to be reduced: 266,916 trials fetched |
 | 3. Contact NLM | Not now; work around it | No history calls anywhere. Clean inputs come from RAN's 233 browser-collected first versions and from never-updated records (section 4) |
 | 4. Spot-check volume | Decide by realism; the interface should support supervising at scale | Exception-based review screens, review by rule, canaries, live intervals (section 5); no fixed audit quota |
-| (later) Run on the GPU, Python or R | | Optional PyTorch backend in `.venv` (section 6); Parquet frame and plot scripts for Python and R |
+| (later) Run on the GPU, Python or R | | Optional PyTorch backend (section 6); Parquet frame and plot scripts for Python and R |
 
 ## 2. What was built and run
 
@@ -69,13 +69,13 @@ Site, sponsor and funding effects also predict failure, so this is not evidence 
 
 ## 6. The GPU
 
-Machine: RTX 4070, 12 GB, driver 595.59; PyTorch 2.11.0+cu128 in `.venv` (4.5 GB, isolated; the system Python was not touched).
-- `--device cuda` trains `gpu_logistic`, `gpu_logistic_text` and `gpu_mlp` on the whole train split (172k rows, 5,199 positives) with early stopping on dev AUROC and Platt calibration on dev:
-  2 to 6 s each, 3.1 GB peak GPU memory, 8.8 s to build the feature matrix.
-- The bootstrap (1,000 resamples, AUROC and AUPRC) runs as batched sorts: metrics for 7 scorers in 17 s versus 73 s for 4 scorers on the CPU. The GPU intervals agree with the CPU ones to ±0.003; point estimates are identical.
+Optional: PyTorch with CUDA on an NVIDIA card. Everything also runs on the CPU, only slower.
+- `--device cuda` trains `gpu_logistic`, `gpu_logistic_text` and `gpu_mlp` on the whole train split (172k rows, 5,199 positives) with early stopping on dev AUROC and Platt calibration on dev.
+  Each takes seconds on a recent card; peak card memory is about 3.1 GB.
+- The bootstrap (1,000 resamples, AUROC and AUPRC) runs as batched sorts, about 4 times faster than the CPU path for the same work. The GPU intervals agree with the CPU ones to plus or minus 0.003; point estimates are identical.
 - Not on the GPU, on purpose: fetching and normalising (network and string work) and the regex labeller. Parallelising normalise across CPU cores is the next speed-up there.
 - GPU training is not bit-for-bit repeatable run to run (seeded, but CUDA kernels differ slightly); the standard-library path is the exact reference.
-- Why GPU gave better scores than the first CPU run: it uses all training rows and early stopping, not that the hardware is smarter.
+- The GPU scorers scored higher than the first CPU run because they use all training rows and early stopping, not because of the hardware.
 
 ## 7. Where this departs from the design
 
@@ -104,35 +104,24 @@ Machine: RTX 4070, 12 GB, driver 595.59; PyTorch 2.11.0+cu128 in `.venv` (4.5 GB
 1. Run Review for real: start with "Random recruitment failures", 24 per screen. About 200 checks give ±7 points; the screen tells you when ±3 is reached.
 2. Decide whether the "rules AND model" trade (94% precision, 70% recall) is the right one, or whether to accept lower precision for more positives.
 3. Decide how clean inputs should be scaled: wait for a supported NLM channel, or accept the never-updated subset with its caveats.
-4. Say when AutoRAN should be moved into the AEGIR-open folder as a submodule, and whether `data/` stays out of it (it should).
+4. Decide how and when RÁN's capabilities merge into AutoRAN (they are separate programs sharing `shared/` for now).
 
-## 10. The desktop app (added the same day)
+## 10. The desktop app and its packaging
 
-Why: running a local web server and opening a browser tab was not wanted. Now `AutoRAN.exe` opens a native window.
+Why: running a local web server and opening a browser tab was not wanted. `AutoRAN.exe` opens a native window instead.
 
-How it works: pywebview hosts the same dashboard in the Microsoft Edge WebView2 control that Windows already has (v156 here), and the page talks to Python
-through an in-process bridge (`window.pywebview.api.call`), using the same routing function (`server.dispatch`) as the optional web server. No port is opened
-(checked: the running exe listens on none). The trial index loads in a background thread behind a start-up screen.
+How it works: pywebview hosts the same dashboard in the Microsoft Edge WebView2 control that Windows already has, and the page talks to Python through an in-process bridge
+(`window.pywebview.api.call`), using the same routing function (`server.dispatch`) as the optional web server. No port is opened. The trial index loads in a background thread behind a start-up screen.
+With no data yet the app opens on a Get started page.
 
-What was added: **Run** page (background jobs on CPU/GPU/auto, one at a time, logs, a "reload data" flag), **Plots** page (five built-in plots, one of which
-runs a 5,000-resample bootstrap on the GPU in under a second, plus a `plugins/` folder: one `.py` file per plot), a CPU/GPU badge, links to ClinicalTrials.gov opening in
-your default browser (only that host is allowed), a message box and `state/app.log` for start-up failures, `--selftest` for a headless check.
+Pages added: **Run** (background jobs on CPU/GPU/auto, one at a time, logs), **Plots** (built-in plots and a `plugins/` folder, one `.py` file per plot), **Settings** (per-user, outside the project,
+tokens encrypted with Windows DPAPI). Links to ClinicalTrials.gov open in the default browser (only that host is allowed). Start-up failures show a message box and write `state/app.log`; `--selftest` is a headless check.
 
-Packaging: PyInstaller one-folder build, windowed, with Python 3.13, PyTorch 2.11 (CUDA 12.8), numpy, pandas, pyarrow, matplotlib, scipy, pywebview and RAN's
-`aegir_ran` inside: `AutoRAN.exe` (45 MB) plus `_internal/` (4.2 GB). The frozen exe's own self-test passes: CUDA seen, 266,916 trials loaded in 6 s, plots rendered
-(GPU plot 0.9 s). It was also launched as a real window (title "AutoRAN 0.1.0", about 1.2 GB of memory). I could look at the Overview page; the Run and Plots pages
-were tested through the same routes headlessly (a background job ran, a second job was refused, a plug-in rendered) but I did not click through them in the window.
+Packaging: a PyInstaller one-folder windowed build, about 170 MB (75 MB zipped), with Python, numpy, pandas, pyarrow, matplotlib, pywebview and the shared `aegir_core` package inside, and **no PyTorch**. An earlier build bundled PyTorch and CUDA
+(about 4.3 GB); it is still available as `build.ps1 -Full` but is not meant for release. The small exe uses a PyTorch the user already has (Settings > GPU pack folder, or a `gpu_pack` folder beside the exe) and runs on the CPU without one.
+Dependencies are listed in `requirements.txt` and `pyproject.toml` and installed by `setup.ps1`.
 
-Python environment: your default `python` (uv 3.13.7, marked externally managed) had none of numpy, pandas, torch or matplotlib. I installed them there with an explicit override:
-numpy 2.5.4, pandas 3.1.0, matplotlib 3.11.2, pyarrow 26.0.0, scipy, plotly 7.1.0, torch 2.11.0+cu128 (CUDA works). Nothing was broken in the other Pythons
-(Anaconda 3.14 and the Store 3.13.14 pass `pip check`; the Store one already had torch 2.14.1+cu126), so I did not touch them.
+Verified: the frozen exe loads the 266,916-trial index, renders every plot, and uses the GPU through an existing PyTorch (self-test exit 0). A real window was opened and the Overview page viewed; the Run and Plots pages were exercised through
+the same routes headlessly (a background job ran, a second was refused, a plug-in rendered), not clicked through in the window. Not tested: a computer with no Python at all (CPU only there).
 
-Limits: the app is Windows-only (WebView2); 4.3 GB on disk; the unsigned exe may trigger SmartScreen; GPU runs are seeded but not bit-for-bit repeatable;
-`serve` (browser mode) still works and shares all code. Tests: 37 pass (core 22, GPU 5, app layer 10).
-
-### Update: size of the build
-
-The first desktop build bundled PyTorch and CUDA (4.3 GB), and a project `.venv` held a second copy (4.5 GB). Both were removed. The default build is now about 170 MB
-(75 MB zipped), with no PyTorch inside; it finds the PyTorch already installed in the user's own Python (Settings > GPU pack folder, or a `gpu_pack` folder beside the exe)
-and runs on the CPU without it. Verified: the small exe reads the 266,916-trial index and renders plots on the GPU through the system PyTorch (exit 0). Dependencies are listed in
-`requirements.txt` and `pyproject.toml` and installed by `setup.ps1`. Not tested: a computer with no Python at all (the small exe runs on the CPU there).
+Limits: Windows-only (WebView2); the exe is unsigned, so SmartScreen may warn; GPU runs are seeded but not bit-for-bit repeatable; `serve` (browser mode) still works and shares all code.

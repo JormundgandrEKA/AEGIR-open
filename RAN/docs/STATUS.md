@@ -1,9 +1,9 @@
 # RÁN status: a snapshot of development
 
-> This file covers **RÁN** only. For AutoRAN, the main tool, see [`AutoRAN/docs/build-report.md`](../AutoRAN/docs/build-report.md).
+> This file covers **RÁN** only. For AutoRAN, the main tool, see [`AutoRAN/docs/build-report.md`](../../AutoRAN/docs/build-report.md).
 
 
-Snapshot of 29 Oct 2026. Tool: RÁN (`aegir_ran`) 0.1.0, part of AEGIR (Amendment Evidence Gathering and Independent Review). Written by Claude (Claude Code) for David and for Claude (Cowork), the design side of the project. This is a status report on what exists and how well it works. It is not a build guide.
+Snapshot of 29 Oct 2026. Tool: RÁN (`aegir_ran`) 0.1.0, part of AEGIR (Amendment Evidence Gathering and Independent Review). Built by David O'Rourke with Claude (Claude Code); written for Claude (Cowork), the design side of the project. This is a status report on what exists and how well it works. It is not a build guide.
 
 Pictures: [how it works](ran-how-it-works.svg), [capabilities, built and to build](ran-capabilities.svg), or both on one page: [ran-overview.html](ran-overview.html).
 
@@ -11,13 +11,13 @@ Pictures: [how it works](ran-how-it-works.svg), [capabilities, built and to buil
 
 RÁN fetches public trial and article data, stores it unchanged with provenance, flags registry changes by rules, and
 serves a local labelling app. The COPD pool is fully loaded (433 trials, 433 version indexes, 152 trials with 401 version
-files) and David has given 31 labels as the only labeller so far. The five Track 2 PubMed searches have also been run (7,361 PMIDs found; 96 articles and 372 licences fetched so far). The change-analysis rules are stress-tested and agree with the labeller on
+files) and one labeller has given 31 labels so far. The five Track 2 PubMed searches have also been run (7,361 PMIDs found; 96 articles and 372 licences fetched so far). The change-analysis rules are stress-tested and agree with the labeller on
 30 of 31 cases, but were tuned on those cases and have not been reviewed by a clinician or methodologist. The next real
 bottleneck is data, not code: there are only 36 clean negatives, and there is no second labeller yet.
 
 ## 2. Technical summary
 
-**Shape.** Python 3.10+, standard library only, about 3,700 lines in 19 modules (`tool/aegir_ran/`), plus about 660 lines of
+**Shape.** Python 3.10+, standard library only, about 3,700 lines in 19 modules (`aegir_ran/`; since 30 Oct the client, store, context, text cleaning and grades live in `../../shared/aegir_core/`, shared with AutoRAN), plus about 660 lines of
 tests. One entry point, `python -m aegir_ran <group> <command>` or `RAN.exe` (PyInstaller one-file, about 8 MB, build files in
 `build/`; the exe itself is not in this repository). Every command ends with one JSON summary line. Running `RAN.exe` with no arguments starts the labelling tool.
 
@@ -51,7 +51,7 @@ autosave; timing is passive (active seconds only). Writes `gold-label/0.1` recor
 ## 3. Methodology
 
 **Fetching.** Named queries only for gold-set pulls; ClinicalTrials.gov API v2 for current records; version histories only
-through David's browser (the registry's internal history endpoint refuses scripts, and RÁN does not work around that); NCBI E-utilities with key;
+through the maintainer's browser (the registry's internal history endpoint refuses scripts, and RÁN does not work around that); NCBI E-utilities with key;
 PMC licence read from the article record; Europe PMC one PMID per request.
 
 **Flags.** Two layers, kept apart. *Label flags* (T12 rule, from version indexes only) are a cheap pre-screen and reproduce 159
@@ -68,16 +68,16 @@ EU CTR 536/2014 Art. 2(2)(13) for "substantial" and severity, SPIRIT 2025 items 
 and outcome elements, COMPare categories for outcome changes, Tufts CSDD for the avoidability scale and causes.
 
 **Labelling design.** 50 positives plus matched negatives (phase, sponsor class, start year, relaxing in that order), shuffled so
-the labeller cannot tell which is which, about 10% with the provisional label hidden to measure anchoring, David first as the only labeller, nothing
+the labeller cannot tell which is which, about 10% with the provisional label hidden to measure anchoring, one labeller first, nothing
 is "confirmed" until two different humans agree. Model labels are always provisional.
 
 ## 4. Tests
 
 | Test | What it covers | Result |
 | --- | --- | --- |
-| Unit tests, 41 (`python -m unittest discover -s tool/tests`) | licence parsing and grades (4), PubMed parsing and links (2), store rules and redaction (4), history import, diff, label flags (4), client budget/retry/limits (4), tally (1), content flags, Europe PMC, notepad, window, server loopback (9), change analysis (10), drafts and answer schema (1) | all pass |
-| Stress test (`python tool/tests/stress_amend.py <seed>`) | 398 real stored eligibility texts, about 4,500 known edits per seed, seeds 28, 7, 99 | harmless edits 0-2.9% false alarms; real edits detected 97-100% |
-| Real labels | analysis vs David's 31 labels, on the field shown | 30 of 31, kappa 0.93 (old provisional 28 of 31, kappa 0.78). Tuned on these cases, so optimistic |
+| Unit tests, 41 (`python -m unittest discover -s RAN/tests`) | licence parsing and grades (4), PubMed parsing and links (2), store rules and redaction (4), history import, diff, label flags (4), client budget/retry/limits (4), tally (1), content flags, Europe PMC, notepad, window, server loopback (9), change analysis (10), drafts and answer schema (1) | all pass |
+| Stress test (`python RAN/tests/stress_amend.py <seed>`) | 398 real stored eligibility texts, about 4,500 known edits per seed, seeds 28, 7, 99 | harmless edits 0-2.9% false alarms; real edits detected 97-100% |
+| Real labels | analysis vs the labeller's 31 labels, on the field shown | 30 of 31, kappa 0.93 (old provisional 28 of 31, kappa 0.78). Tuned on these cases, so optimistic |
 | Batch audit (`labels audit`) | 11 randomised 50/50 batches (seeds 28, 101, 2026 and eight more) | found markup residue, the negatives shortage; both reported below |
 | Live checks | ClinicalTrials.gov search, PubMed fetch, PMC licence (372), Europe PMC (2), key check, exe launch | pass |
 | Browser check | page rendering, keyboard answers, reveal, notepad, save, quit | pass on synthetic and real cases |
@@ -92,7 +92,7 @@ fixed; the lesson is that the rules should be re-run through this test whenever 
 - The labelling form is grounded in named standards and defines every option on screen.
 - Reproducible: the T12 counts, the stress test and the batch audit can all be re-run from the command line.
 - Portable executable and a no-argument launcher.
-- David overrode the old provisional label in 17% of reveals, so the anchoring risk looks modest so far (n is small).
+- The labeller overrode the old provisional label in 17% of reveals, so the anchoring risk looks modest so far (n is small).
 
 ## 6. Weak points
 
@@ -105,7 +105,7 @@ fixed; the lesson is that the rules should be re-run through this test whenever 
 - Word-swap and removal detection (97-98%) misses cases where the dropped or swapped text also appears elsewhere.
 - The batch audit counts all finding kinds under "positive kinds" (substantive and not); minor.
 - About a third of cases have a baseline registered after the start date, so "before" is not a pre-enrolment protocol.
-- Single labeller (David): no agreement statistics are possible yet. Only Windows was exercised.
+- Single labeller: no agreement statistics are possible yet. Only Windows was exercised.
 
 ## 7. Gaps (built but unproven, or missing)
 
@@ -130,7 +130,7 @@ fixed; the lesson is that the rules should be re-run through this test whenever 
 
 ## 9. Feature completeness against the design
 
-AutoRAN, the main tool, is not part of this table: see [`AutoRAN/docs/build-report.md`](../AutoRAN/docs/build-report.md).
+AutoRAN, the main tool, is not part of this table: see [`AutoRAN/docs/build-report.md`](../../AutoRAN/docs/build-report.md).
 
 | Design item | Status |
 | --- | --- |
@@ -154,11 +154,11 @@ reports and QA 70%, gold-set export 30%, second-labeller flow 15%.
 1. Two rule choices: planned-to-actual enrolment (now not an amendment) and post-start baselines (now kept, marked in the batch `_design`).
 2. A reviewer for the rule findings (item 3 above), and a second labeller.
 3. Whether to fetch and review the two small Track 2 sets now.
-4. About 100 extra version files for clean negatives would have to be collected by David in his own browser.
+4. About 100 extra version files for clean negatives would have to be collected by the maintainer in their own browser.
 5. Licence: Apache-2.0 is in place, but the **copyright holder (name and year) is not filled in**; add it later, with a `NOTICE` file or file headers if wanted.
 
 ## 11. Where things are in this repository
 
-- Code `tool/aegir_ran/`; tests `tool/tests/` (unit tests, `stress_amend.py`); build `build/build.ps1`.
+- Code `aegir_ran/`; tests `tests/` (unit tests, `stress_amend.py`); build `build/build.ps1`.
 - Settings `config/`; named queries `config/queries/`.
 - Not included: `data/` (fetched and derived data, labels, notepads), `state/`, `config/ncbi.local.json`, the built exe, and the planning and hand-off documents. See the README for how to rebuild the data.

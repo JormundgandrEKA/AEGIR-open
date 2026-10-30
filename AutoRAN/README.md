@@ -1,145 +1,92 @@
 # AutoRAN
 
-Automatic labelling of clinical-trial recruitment failure at registry scale: the **silver set**. The main tool of AEGIR; for now it reuses
-RÁN's HTTP client, rate limits, store and text tools (the `tool/` folder of this repository) and changes nothing in RÁN.
+The main AEGIR program: **automatic labelling of clinical-trial recruitment failure at registry scale** (the "silver set"). It downloads the
+ClinicalTrials.gov registry, labels each trial's outcome from its own stop reason, categorises and scores the trials with baseline predictors, and shows the
+results in a desktop app where a person supervises the labels at scale instead of reading them one by one.
 
-The question it serves: could a protocol review pick out, in advance, the trials that later **failed to recruit**? AutoRAN
-fetches the trials, labels each one from the registry's own stop reason, categorises it, scores it with baseline predictors, and
-shows the results in a dashboard where a person can supervise the labels at scale.
+The question it serves: could a protocol review pick out, in advance, the trials that later **failed to recruit**? Machine labels are not gold labels; the
+human-checked side is [RÁN](../RAN/). **Read [DISCLAIMERS.md](DISCLAIMERS.md) before using or sharing results.**
 
-Status: first working build (0.1.0), 30 Oct 2026, as a Windows desktop app and a command line. Research software: **read [DISCLAIMERS.md](DISCLAIMERS.md) before using or sharing results.**
-This repository holds code only. It contains no registry data: you fetch the data yourself. A ready-built Windows app is attached to the [AutoRAN release](https://github.com/JormundgandrEKA/AEGIR-open/releases/tag/autoran-v0.1.0); you can also build it yourself (below).
+## Run it
 
-## Requirements
+- **Easiest (Windows):** download `AutoRAN-lite-win64.zip` from the [latest release](https://github.com/JormundgandrEKA/AEGIR-open/releases/latest), unzip, double-click `AutoRAN\AutoRAN.exe`.
+  It is about 170 MB, unsigned (SmartScreen may warn: "More info", then "Run anyway"), and contains no data and no PyTorch.
+- **From source:** clone the whole repository (AutoRAN needs `../shared`), then `python -m autoran.app`.
+- **Build the exe yourself:** `powershell -ExecutionPolicy Bypass -File build\build.ps1` (after `setup.ps1 -Build`).
 
-- **Windows 10 or 11** for the desktop window (the command line and the pipeline also run elsewhere; the window needs the Edge WebView2 runtime, which Windows normally has).
-- **Python 3.11 or newer.** The command-line pipeline uses only the standard library. The window, plots and Parquet frame add `numpy`, `pandas`, `pyarrow`, `matplotlib` and `pywebview` (about 300 MB), listed in [requirements.txt](requirements.txt) and `pyproject.toml` (extras `app`, `gpu`, `build`).
-  **`setup.ps1` checks your Python and installs only what is missing** (`-Gpu` adds PyTorch, about 3 GB, installed once in your main Python; `-Build` adds PyInstaller; `-Ran` clones RAN with git if it is not beside AutoRAN).
-- **PyTorch is optional** (NVIDIA GPU scoring). Without it everything runs on the CPU.
-- **RÁN** (`aegir_ran`, the `tool/` folder of this repository). AutoRAN reuses its HTTP client, rate limits and store. Keep AutoRAN inside the repository (as it is here), or point to RÁN's `tool` folder on the Settings page (or the `AEGIR_TOOL` environment variable).
-- **Internet access and about 2 GB of disk** for the first fetch: roughly 267 requests to clinicaltrials.gov (214 MB) at 40 a minute, about 10 minutes (8 minutes in the first run), resumable, plus about 38 requests to the Hugging Face dataset server for the Open Targets stop reasons.
-- **No account and no API key is needed to fetch.** A contact email, a Hugging Face token and an NCBI key are optional (Settings page, or `autoran settings`). If a service ever starts requiring a key, enter it there.
+On first run, with no data yet, the app opens on **Get started**: it downloads the registry to your computer (about 270 requests to clinicaltrials.gov and 40 to
+the Hugging Face dataset server, 10 to 15 minutes, no account or key needed, resumable), then labels, categorises, scores and measures. A small sample for a quick try:
+`autoran fetch --max-pages 2`, `labeller-data`, `normalise --partial`, `label`, `categorize`, `score`, `metrics` (about 2,000 trials, a few minutes).
 
-## First run
-
-1. Start the app (next section). With no data yet it opens on a **Get started** page.
-2. Optional: **Settings** (workspace folder, contact email, tokens).
-3. Press **Fetch everything and build (first run)**, or run `autoran run` on the command line. Close and reopen, or press Reload data, when it finishes.
-
-To try it on a small sample first: `autoran fetch --max-pages 2`, `autoran labeller-data`, `autoran normalise --partial`, then `label`, `categorize`, `score`, `metrics` (about 2,000 trials, a few minutes in all).
-
-## Settings (per user, persistent)
-
-The **Settings** page (or `autoran settings --set name=value`) saves, for your Windows user and outside the project folder: the workspace folder for `data/` and `state/`, the RAN folder, an optional RAN history folder, a contact email (added to request User-Agents), and optional Hugging Face and NCBI tokens. Tokens are stored encrypted (Windows DPAPI) and are never shown again or written to project files or logs. File: `%APPDATA%\AutoRAN\settings.json`.
-
-## What it holds in the author's run (30 Oct 2026; not included here)
+## What you need
 
 | | |
-|---|---|
-| Trials | 266,916 (all phases, interventional, started 2005 or later, completed or terminated) from ClinicalTrials.gov, grade A+ |
-| Recruitment failures | 7,486 (labelled from whyStopped); 238,360 completed; 17,021 other stops; 4,049 with no usable reason |
-| Stop-reason labeller | exact match, 40 pattern rules, a naive Bayes text model; 93.9% precision (69.5% recall) on the held-out curated test with the "rules AND model agree" mode |
-| Baselines (test AUROC) | random 0.51, criteria count 0.63, linear 0.73–0.76, small neural net 0.76 |
+| --- | --- |
+| Operating system | Windows 10 or 11 for the app (it needs the Edge WebView2 runtime, normally already installed). The command line runs anywhere Python does |
+| Python (source only) | 3.11 or newer; `setup.ps1` installs the few packages in [requirements.txt](requirements.txt) that are missing (numpy, pandas, pyarrow, matplotlib, pywebview) |
+| Disk | about 2 GB for the downloaded and derived data, plus about 170 MB for the app |
+| Memory | 8 GB of RAM recommended (the full index takes about 1.2 GB in the window) |
+| Graphics card (optional) | any recent NVIDIA card with CUDA support. It makes scoring and bootstrap intervals several times faster than the CPU; more card memory allows larger batches. About 3 GB of card memory is the peak when training on the full set. **Without one, everything still runs on the CPU**, just slower |
+| PyTorch (optional) | only for the GPU. Install it once in your main Python with a CUDA build that matches your driver (`setup.ps1 -Gpu`, or `pip install torch --index-url https://download.pytorch.org/whl/cu128`, about 3 GB) |
 
-## Open the app
+The small exe finds an existing PyTorch through **Settings > GPU pack folder** (the `site-packages` folder that contains `torch/`) or a `gpu_pack` folder beside the exe
+(`pip install --target gpu_pack torch --index-url ...`). From source it is found automatically. `--device auto` (default) uses the GPU when PyTorch and CUDA are present and the CPU otherwise.
 
-**Easiest:** download `AutoRAN-lite-win64.zip` from the [release](https://github.com/JormundgandrEKA/AEGIR-open/releases/tag/autoran-v0.1.0), unzip it and double-click `AutoRAN\AutoRAN.exe`. It is about 170 MB, unsigned (Windows SmartScreen may warn), has no PyTorch inside and runs on the CPU unless you point it at a PyTorch you already have (see GPU below).
-**From source:** `python -m autoran.app`. **Build the exe yourself:** `powershell -ExecutionPolicy Bypass -File buildbuilduild.ps1` after `setup.ps1 -Build` (same small build; `-Full` also bundles PyTorch and CUDA, about 4 GB, and is only for a machine with no Python of its own).
-Running `AutoRAN.exe` opens a native window (no browser, no web server, no network port) and runs on this
-computer's CPU, and on its GPU when PyTorch is available. It loads the 266,916-trial index in about half a minute, then shows the dashboard: Overview, Coverage,
-Labels and rules, Scorers, Browse, Review, **Plots**, **Run** and About.
+## The app
 
-- **Run** page: run any pipeline step (normalise, label, categorize, score, metrics, Parquet frame, export, or everything) in the background, on the
-  GPU, the CPU, or "auto"; read the log; press "Reload data" when new results are ready.
-- **Plots** page: built-in plots plus any plug-in. To add a visualisation, drop one `.py` file in `plugins/` (see `plugins/example_sponsor.py`) and press
-  Refresh. Plug-ins get the pandas frame, the metrics and the GPU (`ctx.frame()`, `ctx.metrics`, `ctx.torch`, `ctx.device`).
-- A startup problem shows a message box and writes `state/app.log`.
+Pages: **Overview**, **Coverage**, **Labels and rules**, **Scorers**, **Browse** (filters, search, sort by any scorer, a trial inspector), **Review**, **Plots**, **Run**, **Settings**, **About**.
 
-The exe carries its own Python and libraries (PyTorch excepted), so a broken Python module on this machine cannot stop it. It needs the
-Microsoft Edge WebView2 runtime, which Windows 10 and 11 normally have. It is unsigned, so Windows SmartScreen may warn the first time.
-Rebuild it after code changes with `powershell -ExecutionPolicy Bypass -File build\build.ps1`.
+- **Run:** any pipeline step in the background on the CPU or GPU, with a log; Reload data when it finishes.
+- **Plots:** built-in plots plus your own: drop one `.py` file in `plugins/` (see `plugins/example_sponsor.py`) and press Refresh. A plug-in gets `ctx.frame()` (a pandas table of every trial, label, category and score), `ctx.metrics`, `ctx.torch` and `ctx.device`.
+- **Settings** (saved per user in `%APPDATA%\AutoRAN\settings.json`, outside the project; also `autoran settings --set name=value`): workspace folder for `data/` and `state/`, RÁN history folder, GPU pack folder, contact email
+  (added to request User-Agents), optional Hugging Face token and NCBI key. Tokens are stored encrypted (Windows DPAPI) and never shown again or written to project files or logs. All optional.
+- **Review** supervises thousands of labels without reading each: sheets of 12 to 48 cards, every card correct unless flagged (X wrong, U unsure, J/K move, Enter submit), live precision with a 95% interval and an "enough" signal at plus or minus 3 points;
+  **canary** cards (about one in twelve, deliberately wrong) measure how closely screens are read and never count toward precision; **review by rule** samples what one rule matched; **targeted samples** surface the least certain labels, rule-versus-model disagreements and completed trials with tiny enrolment.
+- A start-up problem shows a message box and writes `state/app.log`; `AutoRAN.exe --selftest` writes `state/selftest.json`.
 
-## Quick start (command line)
-
-AutoRAN needs RAN (`aegir_ran`). It finds it next to itself: put this folder inside AEGIR-open, or beside `AEGIR/`, or set `AEGIR_TOOL`.
+## The pipeline (command line)
 
 ```
-python -m autoran --help                      # standard-library path, Python 3.11+, no installs
-python -m unittest discover -s tests          # offline tests (GPU tests skip without PyTorch)
-
-# the pipeline, in order (each stage writes new dated files)
-python -m autoran fetch                       # ~267 requests, resumable; --delta for later updates
-python -m autoran labeller-data               # Open Targets curated stop reasons (Apache-2.0, graded B-)
-python -m autoran normalise
-python -m autoran label
-python -m autoran categorize
-python -m autoran score
-python -m autoran metrics
-python -m autoran serve                       # optional: the same dashboard in a browser on 127.0.0.1:8780 (the exe does not need this)
-python -m autoran.app                         # the desktop window, from source
+python -m autoran fetch            # ClinicalTrials.gov API v2, resumable; --delta later for updates
+python -m autoran labeller-data    # Open Targets curated stop reasons (Apache-2.0, graded B-)
+python -m autoran normalise        # one compact record per trial, with input_state
+python -m autoran label            # stop-reason labeller: exact match, 40 pattern rules, a naive Bayes model
+python -m autoran categorize       # areas, phase, region, frozen 70/10/20 split by NCT hash
+python -m autoran score            # baselines (and GPU scorers when available); --device auto|cpu|cuda
+python -m autoran metrics          # AUROC/AUPRC with bootstrap intervals, calibration, audits
+python -m autoran run              # the whole chain, idempotent
+python -m autoran frame            # one Parquet file of every trial, label, category and score
+python -m autoran serve            # optional: the dashboard in a browser on 127.0.0.1:8780 (the app does not need it)
+python -m unittest discover -s tests
 ```
 
-### GPU
+Visualising: `autoran frame` writes `data/derived/autoran/frame_<stamp>.parquet`, readable from Python (`pandas.read_parquet`) and R (`arrow::read_parquet`);
+`python viz/plots.py` draws four starter plots. In R: `df <- arrow::read_parquet(f); df |> dplyr::filter(class %in% c("positive_recruitment", "negative_completed"))`.
+The `score_*` columns exist only for trials in the binary task (completed, or failed to recruit).
 
-The heavy maths (scorer training and scoring, bootstrap intervals, GPU plots) can run on an NVIDIA GPU through PyTorch. PyTorch is optional and is **not** inside the small exe.
-Install it once in your main Python (`setup.ps1 -Gpu`, or `pip install torch --index-url https://download.pytorch.org/whl/cu128`; the CUDA version must match your driver).
-From source it is found automatically. The small exe finds it through Settings > "GPU pack folder" (the `site-packages` folder that contains `torch/`), or a `gpu_pack` folder beside the exe made with `pip install --target gpu_pack torch --index-url ...`.
+## What it found (author's run, 30 Oct 2026; data not included)
 
-```
-python -m autoran gpu-info
-python -m autoran score --device cuda      # adds gpu_logistic, gpu_logistic_text, gpu_mlp
-python -m autoran metrics --device cuda    # batched bootstrap on the GPU
-```
-
-`--device auto` (the default) uses the GPU when PyTorch and CUDA are present and falls back to the standard-library path otherwise.
-On the author's mid-range NVIDIA card (RTX 4070, 12 GB) the three GPU scorers train on the full 172k-row training split in 2 to 6 seconds each, and the metrics run takes
-17 s against 73 s on the CPU. Fetching, normalising and the regex labeller are I/O or string work and stay on the CPU.
-
-### Visualising
-
-```
-python -m autoran frame        # one Parquet file: trial, label, categories, split, every score
-python viz\plots.py            # four starter plots
-```
-
-The Parquet file reads in pandas, plotly, or R (`arrow::read_parquet`); see [viz/README.md](viz/README.md).
-
-## The dashboard (`autoran serve`)
-
-Overview, Coverage (any category, with failure rates), Labels and rules, Scorers (ROC, intervals, calibration, by area and phase), Browse (filters,
-search, sort by any scorer), a trial inspector, Review and About. It is square, high-contrast and keyboard-first, like RAN's labelling app.
-
-Supervising thousands of labels without reading each one:
-- **Review screens.** A sheet of 12 to 48 cards, every card counted as correct unless you flag it (X wrong, U unsure, J/K move, Enter submit).
-  Live precision with a 95% Wilson interval and an "enough / keep going" signal at ±3 points.
-- **Canary cards.** About one card in twelve is a real curated stop reason shown with a deliberately wrong class, with a borrowed real title.
-  The share you flag is "reviewer attention". Canaries never count toward any precision.
-- **Review by rule.** Sample the trials one rule matched and judge them together; one screen speaks for thousands of trials.
-- **Targeted samples:** least-certain labels, rules-versus-model disagreements, and completed trials with tiny enrolment (hidden failures?).
+266,916 trials (all phases, interventional, started 2005 or later, completed or terminated): 7,486 recruitment failures, 238,360 completed, 17,021 other stops, 4,049 with no usable reason.
+The labeller reaches 93.9% precision and 69.5% recall on a held-out curated test ("rules AND model agree" mode). Baseline AUROC on the test split: random 0.51, criteria count 0.63, linear 0.73 to 0.76, small neural net 0.76.
+**No human has yet checked labels on real registry text**, so precision there is unmeasured. Full results, deviations from the design and weak points: [docs/build-report.md](docs/build-report.md).
 
 ## Rules AutoRAN keeps
 
-- RAN's: append-only storage, sidecars with provenance, polite shared rate limits, request budgets, no history-endpoint calls, no personal data
-  (contact fields are never even requested), no language-model calls inside the tool.
-- Every record carries `source`, `grade` and `licence`; `export` refuses anything below the grade floor (config: B-). Open Targets (Apache-2.0) is graded B-.
-- Scorers see input fields only (a pinned allow-list; tests check no outcome field can reach them).
-- Splits are frozen by hash of the NCT number (20% test).
+- Append-only storage with provenance sidecars, polite shared rate limits and request budgets, no calls to history endpoints that refuse scripts, no personal data (contact fields are never requested), no language model inside the tool.
+- Every record carries `source`, `grade` and `licence`; `export` refuses anything below the grade floor (config: B-).
+- Scorers see input fields only (a pinned allow-list; tests check no outcome field can reach them). Splits are frozen by hash of the NCT number (20% test).
 
 ## Layout
 
 ```
-AutoRAN.exe    the desktop app (with _internal/); appears after you build it (build/build.ps1) or unzip the release
-autoran/        the package (fetch, normalise, labeller, categorize, scorers, metrics, gpu, app, plots, jobs, server, ui, audit, export)
-plugins/        your own plots (one .py file each)
-config/         autoran.json (scope, fields, splits, labeller floor), sources.json (licences and grades), aegir.json, grades.json
-tests/          offline tests; tests/test_gpu.py needs PyTorch
-viz/            plots.py and a README for Python and R
-docs/           the design (autoran-design.md) and the build report (build-report.md)
-data/           fetched pages, derived files, audits (ignored by git; about 1.6 GB)
+autoran/    the package (fetch, normalise, labeller, categorize, scorers, metrics, gpu, app, plots, jobs, server, ui, audit, export, settings)
+plugins/    your own plots, one .py file each
+config/     autoran.json (scope, fields, splits), sources.json (licences and grades); rate limits and grade scale come from ../shared/config
+tests/      offline tests (the GPU tests skip without PyTorch)
+viz/        starter plots
+docs/       build-report.md (results and gaps) and autoran-design.md (the original design, historical)
+build/      build.ps1 and autoran.spec: the exe
+data/       downloaded and derived files (ignored by git)
 ```
 
-See [docs/build-report.md](docs/build-report.md) for results, deviations from the design, weak points and what is next.
-
-## Licence and attribution
-
-Apache License 2.0, see [LICENSE](LICENSE) and [NOTICE](NOTICE). Data sources, software licences and the question of redistributing a built executable are in [THIRD_PARTY.md](THIRD_PARTY.md). Registry data: ClinicalTrials.gov, U.S. National Library of Medicine; curated stop reasons: Open Targets (Apache-2.0). Neither provider endorses this project.
+Licence: Apache-2.0, see the repository [LICENSE](../LICENSE) and [NOTICE](NOTICE). Data and software attributions: [THIRD_PARTY.md](THIRD_PARTY.md). No ClinicalTrials.gov or Open Targets data is included; neither provider endorses this project.

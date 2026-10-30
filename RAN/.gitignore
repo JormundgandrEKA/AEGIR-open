@@ -1,9 +1,6 @@
 config/*.local.json
 data/*
 !data/README.md
-!data/demo/
-data/demo/*
-!data/demo/README.md
 __pycache__/
 *.pyc
 state/

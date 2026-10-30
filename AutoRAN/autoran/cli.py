@@ -16,7 +16,7 @@ def _common():
     p.add_argument("--offline", action="store_true")
     p.add_argument("--verbose", action="store_true")
     p.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto",
-                   help="where the heavy maths runs: auto uses the GPU when PyTorch and CUDA are available (use .venv)")
+                   help="where the heavy maths runs: auto uses the GPU when PyTorch and CUDA are available (needs PyTorch; see the README)")
     return p
 
 

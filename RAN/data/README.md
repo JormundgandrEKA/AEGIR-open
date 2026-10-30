@@ -1,7 +1,6 @@
 # data/
 
-Everything RAN fetches, derives or records is written here. It is created by running the tool and is ignored by git, except this file
-and `demo/README.md`.
+Everything RÁN fetches, derives or records is written here. It is created by running the tool and ignored by git, except this file.
 
 | Folder | Holds |
 | --- | --- |
@@ -10,6 +9,6 @@ and `demo/README.md`.
 | `derived/` | flags, diffs, tallies, batch audits (new dated files, never edited) |
 | `labels/` | per labeller: `labels.jsonl`, `notepad.jsonl`, `drafts.jsonl`, `sessions/`; and `batches/` |
 | `scratch/` | exploratory pulls; never eligible for a gold set |
-| `demo/` | labels, notes and drafts from sessions on the bundled demo (see `demo/README.md`) |
+| `demo/` | sessions on the bundled demo, kept apart from real labels so they never enter the tally (setting `demo_output_dir` in `../shared/config/aegir.json`) |
 
-Nothing here is deleted or overwritten by the tool. The repository ships no fetched data; see the main README for how to build it.
+Nothing here is deleted or overwritten by the tool. The repository ships no fetched data.
