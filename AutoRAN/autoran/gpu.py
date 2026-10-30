@@ -25,9 +25,9 @@ def _torch():
         import torch
         return np, torch
     except ImportError as e:
-        raise SystemExit("The GPU backend needs PyTorch and numpy. Use the AutoRAN virtual environment:\n"
-                         "  .venv\\Scripts\\python -m autoran <command> --device cuda\n"
-                         f"({e})")
+        raise SystemExit("The GPU backend needs PyTorch and numpy. Run from a Python that has them, or give the small AutoRAN.exe a GPU pack: "
+                         "a gpu_pack folder next to it (pip install --target gpu_pack torch --index-url https://download.pytorch.org/whl/cu128) "
+                         f"or Settings > GPU pack folder. ({e})")
 
 
 def info():

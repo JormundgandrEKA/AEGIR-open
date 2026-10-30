@@ -46,6 +46,22 @@ def _find_root():
 
 CODE_ROOT = _find_code_root()
 ROOT = _find_root()
+
+
+def _torch_pack():
+    """The small exe has no PyTorch inside. If a folder with torch/ is available, make it importable: Settings > gpu_site, then gpu_pack/ beside
+    the exe or in the workspace. (pip install --target gpu_pack torch --index-url https://download.pytorch.org/whl/cu128). No effect when torch is bundled or absent."""
+    import importlib.util
+    if importlib.util.find_spec("torch") is not None:
+        return
+    exe_dir = Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else CODE_ROOT
+    for c in (settings.get("gpu_site"), exe_dir / "gpu_pack", CODE_ROOT / "gpu_pack", ROOT / "gpu_pack"):
+        if c and (Path(c) / "torch" / "__init__.py").is_file():
+            sys.path.append(str(c))
+            return
+
+
+_torch_pack()
 NL = chr(10)
 
 

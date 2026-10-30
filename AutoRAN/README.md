@@ -13,7 +13,9 @@ This repository holds code only. It contains no registry data and no executable:
 ## Requirements
 
 - **Windows 10 or 11** for the desktop window (the command line and the pipeline also run elsewhere; the window needs the Edge WebView2 runtime, which Windows normally has).
-- **Python 3.11 or newer.** The core pipeline uses only the standard library. The dashboard window, plots and GPU scoring need `numpy`, `pandas`, `pyarrow`, `matplotlib`, `scipy`, `pywebview` (`pip install -r requirements-app.txt`), and optionally PyTorch for an NVIDIA GPU (`requirements-gpu.txt`).
+- **Python 3.11 or newer.** The command-line pipeline uses only the standard library. The window, plots and Parquet frame add `numpy`, `pandas`, `pyarrow`, `matplotlib` and `pywebview` (about 300 MB), listed in [requirements.txt](requirements.txt) and `pyproject.toml` (extras `app`, `gpu`, `build`).
+  **`setup.ps1` checks your Python and installs only what is missing** (`-Gpu` adds PyTorch, about 3 GB, installed once in your main Python; `-Build` adds PyInstaller; `-Ran` clones RAN with git if it is not beside AutoRAN).
+- **PyTorch is optional** (NVIDIA GPU scoring). Without it everything runs on the CPU.
 - **RAN** (`aegir_ran`, from the AEGIR-open repository). AutoRAN reuses its HTTP client, rate limits and store. Put AutoRAN inside the AEGIR-open folder or next to it, or point to RAN's `tool` folder on the Settings page (or the `AEGIR_TOOL` environment variable).
 - **Internet access and about 2 GB of disk** for the first fetch: roughly 267 requests to clinicaltrials.gov (214 MB) at 40 a minute, a little under an hour, resumable, plus about 38 requests to the Hugging Face dataset server for the Open Targets stop reasons.
 - **No account and no API key is needed to fetch.** A contact email, a Hugging Face token and an NCBI key are optional (Settings page, or `autoran settings`). If a service ever starts requiring a key, enter it there.
@@ -52,7 +54,7 @@ Labels and rules, Scorers, Browse, Review, **Plots**, **Run** and About.
   Refresh. Plug-ins get the pandas frame, the metrics and the GPU (`ctx.frame()`, `ctx.metrics`, `ctx.torch`, `ctx.device`).
 - A startup problem shows a message box and writes `state/app.log`.
 
-The exe is a self-contained build (about 4.3 GB with PyTorch and CUDA inside), so a broken Python module on this machine cannot stop it. It needs the
+The exe carries its own Python and libraries (PyTorch excepted, see above), so a broken Python module on this machine cannot stop it. It needs the
 Microsoft Edge WebView2 runtime, which Windows 10 and 11 normally have. It is unsigned, so Windows SmartScreen may warn the first time.
 Rebuild it after code changes with `powershell -ExecutionPolicy Bypass -File build\build.ps1`.
 

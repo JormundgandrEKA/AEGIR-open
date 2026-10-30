@@ -1,0 +1,19 @@
+[project]
+name = "autoran"
+version = "0.1.0"
+description = "Automatic labelling of clinical-trial recruitment failure (the silver set)"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+readme = "README.md"
+dependencies = []                       # the command-line pipeline is standard library + RAN (aegir_ran)
+
+[project.optional-dependencies]
+app = ["numpy>=2.0", "pandas>=2.2", "pyarrow>=16", "matplotlib>=3.9", "pywebview>=5.0"]
+gpu = ["torch"]                         # NVIDIA GPU scoring; install with --index-url https://download.pytorch.org/whl/cu128
+build = ["pyinstaller>=6"]
+
+[project.scripts]
+autoran = "autoran.cli:main"
+
+[tool.setuptools]
+packages = ["autoran"]

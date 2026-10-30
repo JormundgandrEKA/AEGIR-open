@@ -95,7 +95,7 @@ function wilson(k,n){if(!n)return[0,1];const z=1.96,p=k/n,d=1+z*z/n,c=(p+z*z/(2*
 const PAGES=[['start','Get started'],['overview','Overview'],['coverage','Coverage'],['labels','Labels and rules'],['scorers','Scorers'],['browse','Browse'],['review','Review'],['plots','Plots'],['run','Run'],['settings','Settings'],['about','About']];
 function nav(){const n=$('nav');n.replaceChildren(h('b',null,'AutoRAN'));
  PAGES.filter(([k])=>S.empty?['start','run','settings','about'].includes(k):k!=='start').forEach(([k,l])=>n.append(h('a',{class:S.page===k?'on':'',href:'#'+k},l)));
- const m=S.m,g=S.gpu;n.append(h('span',null,(g&&g.cuda_available?'GPU '+g.device+' '+g.memory_gb+' GB':'CPU only')+' · '+(m?fmt(m.pipeline.trials)+' trials · registry data '+(m.pipeline.data_timestamp||'?').slice(0,10):'')));}
+ const m=S.m,g=S.gpu;n.append(h('span',null,(g&&g.cuda_available?'GPU '+g.device+' '+g.memory_gb+' GB':(g&&g.torch===null?'CPU only (no GPU pack, see Settings)':'CPU only'))+' · '+(m?fmt(m.pipeline.trials)+' trials · registry data '+(m.pipeline.data_timestamp||'?').slice(0,10):'')));}
 async function go(){const k=(location.hash||'#overview').slice(1).split('?')[0];S.page=PAGES.some(p=>p[0]===k)?k:'overview';if(S.empty&&!['start','run','settings','about'].includes(S.page))S.page='start';if(!S.empty&&S.page==='start')S.page='overview';nav();closeDrawer();
  const main=$('main');const ld=h('div',{class:'small'},'Loading…');main.replaceChildren(ld);
  try{if(S.timer){clearInterval(S.timer);S.timer=null;}await ({start,overview,coverage,labels,scorers,browse,review,plots,run,settings,about}[S.page])(main);ld.remove();}catch(e){main.replaceChildren(h('div',{class:'warn bad'},'Error: '+e.message));}}
@@ -319,6 +319,7 @@ async function settings(main){
   ['workspace','Workspace folder','Where data/ and state/ are kept. Empty = the AutoRAN folder ('+a.program_folder+'). Needs a restart. Currently using: '+a.active_workspace,'text'],
   ['aegir_tool','RAN folder (tool)','The folder that contains aegir_ran/. Only needed when running from source and RAN is not next to AutoRAN. Needs a restart.','text'],
   ['history_dir','RAN history folder','Optional. RAN’s browser-collected trial histories (adds a few more clean inputs). Used at the next normalise.','text'],
+  ['gpu_site','GPU pack folder','Optional, for the small AutoRAN.exe, which has no PyTorch inside. A folder that contains torch/ (a site-packages, or a folder made with pip install --target gpu_pack torch). A gpu_pack folder next to the exe is found automatically. Needs a restart.','text'],
   ['contact_email','Contact email','Optional. Added to the User-Agent of requests so a registry operator can reach you: '+a.user_agent,'text'],
   ['hf_token','Hugging Face token','Optional. Raises the rate limit of the Open Targets download (datasets-server.huggingface.co). ClinicalTrials.gov needs no key.','password'],
   ['ncbi_api_key','NCBI API key','Optional. AutoRAN’s own fetches do not use NCBI; the key is passed on to RAN’s NCBI client if you use RAN features.','password']];

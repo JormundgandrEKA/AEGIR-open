@@ -1,0 +1,13 @@
+# AutoRAN: what to install. Everything here is on PyPI; `setup.ps1` (or `pip install -r requirements.txt`) installs what is missing.
+# The command-line pipeline itself needs only the Python standard library plus RAN (aegir_ran, from AEGIR-open).
+#
+# The desktop window, plots and Parquet frame:
+numpy>=2.0
+pandas>=2.2
+pyarrow>=16
+matplotlib>=3.9
+pywebview>=5.0
+# Optional, GPU scoring on an NVIDIA card (about 3 GB; install it once, in your main Python):
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128        (see requirements-gpu.txt)
+# Optional, only to build AutoRAN.exe yourself:
+#   pip install pyinstaller

@@ -96,7 +96,8 @@ def selftest():
     out = {"version": __version__, "frozen": bool(getattr(sys, "frozen", False)), "root": str(core.ROOT), "python": sys.version.split()[0]}
     try:
         from . import gpu, plots
-        out["gpu"] = gpu.info()
+        from . import server as _srv
+        out["gpu"] = _srv.gpu_info()
         t = time.time()
         api = Api()
         while api.status()["ready"] is False and not api.status()["error"] and time.time() - t < 240:

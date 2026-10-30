@@ -6,6 +6,7 @@ Fields (all optional):
   workspace      folder that holds data/ and state/ (and a copy of config/). Default: the AutoRAN folder. Applies after a restart.
   aegir_tool     folder that contains aegir_ran/ (RAN). Default: looked for next to AutoRAN. Applies after a restart.
   history_dir    folder of RAN's browser-collected trial histories (optional input; makes a few more inputs "clean").
+  gpu_site       a folder that contains torch/ (a site-packages or a `pip install --target` folder). Lets the small AutoRAN.exe use your GPU.
   contact_email  added to the User-Agent of requests, so a registry operator can reach you. Never needed to run AutoRAN.
   hf_token       Hugging Face access token. Optional: raises the Open Targets download's rate limit.
   ncbi_api_key   NCBI API key. Optional and not used by AutoRAN's own fetches (ClinicalTrials.gov needs no key); passed on to RAN's NCBI client.
@@ -19,9 +20,9 @@ import os
 import sys
 from pathlib import Path
 
-FIELDS = ("workspace", "aegir_tool", "history_dir", "contact_email", "hf_token", "ncbi_api_key")
+FIELDS = ("workspace", "aegir_tool", "history_dir", "gpu_site", "contact_email", "hf_token", "ncbi_api_key")
 SECRETS = ("hf_token", "ncbi_api_key")
-PATHS = ("workspace", "aegir_tool", "history_dir")
+PATHS = ("workspace", "aegir_tool", "history_dir", "gpu_site")
 
 
 def path():
@@ -118,6 +119,8 @@ def validate(name, value):
             raise ValueError("that folder does not contain aegir_ran/ (choose the RAN 'tool' folder)")
         if name == "history_dir" and not p.is_dir():
             raise ValueError("history folder not found")
+        if name == "gpu_site" and not (p / "torch" / "__init__.py").is_file():
+            raise ValueError("that folder does not contain torch/ (choose a site-packages folder, or a folder made with pip install --target)")
         if name == "workspace":
             p.mkdir(parents=True, exist_ok=True)
             if not os.access(p, os.W_OK):

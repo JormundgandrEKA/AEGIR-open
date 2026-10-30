@@ -129,3 +129,10 @@ numpy 2.5.4, pandas 3.1.0, matplotlib 3.11.2, pyarrow 26.0.0, scipy, plotly 7.1.
 
 Limits: the app is Windows-only (WebView2); 4.3 GB on disk; the unsigned exe may trigger SmartScreen; GPU runs are seeded but not bit-for-bit repeatable;
 `serve` (browser mode) still works and shares all code. Tests: 37 pass (core 22, GPU 5, app layer 10).
+
+### Update: size of the build
+
+The first desktop build bundled PyTorch and CUDA (4.3 GB), and a project `.venv` held a second copy (4.5 GB). Both were removed. The default build is now about 170 MB
+(75 MB zipped), with no PyTorch inside; it finds the PyTorch already installed in the user's own Python (Settings > GPU pack folder, or a `gpu_pack` folder beside the exe)
+and runs on the CPU without it. Verified: the small exe reads the 266,916-trial index and renders plots on the GPU through the system PyTorch (exit 0). Dependencies are listed in
+`requirements.txt` and `pyproject.toml` and installed by `setup.ps1`. Not tested: a computer with no Python at all (the small exe runs on the CPU there).

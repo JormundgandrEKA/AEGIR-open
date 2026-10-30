@@ -10,3 +10,6 @@ build/work/
 config/*.local.json
 *.local.json
 settings.json
+build/dist-lite/
+build/work-lite/
+gpu_pack/
