@@ -1,6 +1,6 @@
 """Links between registry records and publications."""
 from . import ctgov, pubmed
-from .core import NCT_RE, iso_now
+from aegir_core.core import NCT_RE, iso_now
 
 
 def _have(ctx):

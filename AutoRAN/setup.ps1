@@ -2,8 +2,7 @@
 #   powershell -ExecutionPolicy Bypass -File setup.ps1            core app packages (about 300 MB)
 #   powershell -ExecutionPolicy Bypass -File setup.ps1 -Gpu       also PyTorch for an NVIDIA GPU (about 3 GB)
 #   powershell -ExecutionPolicy Bypass -File setup.ps1 -Build     also PyInstaller, to build AutoRAN.exe
-#   powershell -ExecutionPolicy Bypass -File setup.ps1 -Ran       also clone RAN (aegir_ran) from AEGIR-open with git if it is not beside AutoRAN
-param([switch]$Gpu, [switch]$Build, [switch]$Ran)
+param([switch]$Gpu, [switch]$Build)
 $ErrorActionPreference = "Stop"
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $py = (Get-Command python -ErrorAction SilentlyContinue).Source
@@ -24,10 +23,5 @@ function Pip($pkgs, $extra) {
 Pip (Missing @(@("numpy","numpy>=2.0"),@("pandas","pandas>=2.2"),@("pyarrow","pyarrow>=16"),@("matplotlib","matplotlib>=3.9"),@("webview","pywebview>=5.0"))) @()
 if ($Gpu)   { Pip (Missing @(,@("torch","torch"))) @("--index-url","https://download.pytorch.org/whl/cu128") }
 if ($Build) { Pip (Missing @(,@("PyInstaller","pyinstaller>=6"))) @() }
-$tool = @("$here\..\tool", "$here\..\AEGIR\tool", "$here\..\AEGIR-open\tool") | Where-Object { Test-Path "$_\aegir_ran\__init__.py" } | Select-Object -First 1
-if ($tool) { Write-Host "RAN found: $tool" }
-elseif ($Ran) {
-    git clone --depth 1 https://github.com/JormundgandrEKA/AEGIR-open.git "$here\..\AEGIR-open"
-    Write-Host "Cloned AEGIR-open next to AutoRAN."
-} else { Write-Host "RAN (aegir_ran) not found. Put AutoRAN inside the AEGIR-open folder, run this with -Ran, or set the RAN folder in Settings." }
+if (-not (Test-Path "$here\..\shared\aegir_core\__init__.py")) { Write-Host "Note: AutoRAN needs the repository's shared\ folder next to it. Use a full clone of AEGIR-open (git clone https://github.com/JormundgandrEKA/AEGIR-open.git)." }
 Write-Host "Done. Start the app with:  python -m autoran.app"

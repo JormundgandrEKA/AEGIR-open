@@ -5,7 +5,7 @@ description = "Automatic labelling of clinical-trial recruitment failure (the si
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 readme = "README.md"
-dependencies = []                       # the command-line pipeline is standard library + RAN (aegir_ran)
+dependencies = []                       # the command-line pipeline is standard library + the repository's shared/ package (aegir_core)
 
 [project.optional-dependencies]
 app = ["numpy>=2.0", "pandas>=2.2", "pyarrow>=16", "matplotlib>=3.9", "pywebview>=5.0"]

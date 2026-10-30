@@ -88,3 +88,28 @@ def clean_text(s):
     s = "\n".join(lines)
     s = re.sub(r"\n{3,}", "\n\n", s)
     return s.strip()
+
+
+# -- eligibility text -> (section, criterion) items
+
+def split_items(text):
+    section, items = "inclusion", []
+    for line in (text or "").split("\n"):
+        s = " ".join(line.split())
+        if not s:
+            continue
+        low = s.lower().rstrip(":").strip()
+        if re.match(r"^(key |main |general )?(inclusion|exclusion)\b", low) and len(low.split()) <= 6 \
+                and not re.search(r"[.;]$", low):
+            section = "exclusion" if "exclusion" in low.split()[:2] else "inclusion"
+            continue
+        if re.match(r"^(inclusion|exclusion) criteria\s*:", low):
+            section = "exclusion" if low.startswith("exclusion") else "inclusion"
+            s = s.split(":", 1)[1].strip()
+            if not s:
+                continue
+        s = re.sub(r"^(•\s*)?((\d{1,2}|[a-z])[.)]\s+)?", "", s)
+        if not re.search(r"[A-Za-z0-9]", s):
+            continue                                 # a stray bullet or rule
+        items.append((section, s))
+    return items

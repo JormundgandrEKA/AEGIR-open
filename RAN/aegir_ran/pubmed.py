@@ -3,7 +3,7 @@ import json
 import math
 import xml.etree.ElementTree as ET
 
-from .core import NCT_RE, iso_now, utc_stamp
+from aegir_core.core import NCT_RE, iso_now, utc_stamp
 
 EU = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 TERMS = "https://www.ncbi.nlm.nih.gov/home/about/policies/"

@@ -317,7 +317,6 @@ async function settings(main){
  main.append(h('div',{class:'small'},'Saved for you only, in '+a.settings_file+' (outside the project, never committed). Nothing here is needed to run AutoRAN; each field is optional. Tokens and keys are stored encrypted for this Windows user and are not shown again, only whether one is set.'));
  const rows=[
   ['workspace','Workspace folder','Where data/ and state/ are kept. Empty = the AutoRAN folder ('+a.program_folder+'). Needs a restart. Currently using: '+a.active_workspace,'text'],
-  ['aegir_tool','RAN folder (tool)','The folder that contains aegir_ran/. Only needed when running from source and RAN is not next to AutoRAN. Needs a restart.','text'],
   ['history_dir','RAN history folder','Optional. RAN’s browser-collected trial histories (adds a few more clean inputs). Used at the next normalise.','text'],
   ['gpu_site','GPU pack folder','Optional, for the small AutoRAN.exe, which has no PyTorch inside. A folder that contains torch/ (a site-packages, or a folder made with pip install --target gpu_pack torch). A gpu_pack folder next to the exe is found automatically. Needs a restart.','text'],
   ['contact_email','Contact email','Optional. Added to the User-Agent of requests so a registry operator can reach you: '+a.user_agent,'text'],

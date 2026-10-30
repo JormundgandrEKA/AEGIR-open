@@ -1,5 +1,5 @@
 # AutoRAN: what to install. Everything here is on PyPI; `setup.ps1` (or `pip install -r requirements.txt`) installs what is missing.
-# The command-line pipeline itself needs only the Python standard library plus RAN (aegir_ran, from AEGIR-open).
+# The command-line pipeline itself needs only the Python standard library plus the shared/ folder of the AEGIR-open repository.
 #
 # The desktop window, plots and Parquet frame:
 numpy>=2.0

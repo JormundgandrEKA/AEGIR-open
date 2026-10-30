@@ -5,19 +5,19 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules
 
 HERE = os.path.abspath(".")
 ROOT = os.path.dirname(HERE)
-# RAN's package, bundled into the exe: AEGIR_TOOL, then ../tool (AutoRAN inside AEGIR-open), ../AEGIR/tool, ../AEGIR-open/tool
-_cands = ([os.environ["AEGIR_TOOL"]] if os.environ.get("AEGIR_TOOL") else []) + [os.path.join(ROOT, "..", *p) for p in (("RAN",), ("tool",), ("AEGIR", "tool"), ("AEGIR-open", "tool"))]
-TOOL = next((os.path.abspath(c) for c in _cands if os.path.isfile(os.path.join(c, "aegir_ran", "__init__.py"))), None)
-if TOOL is None:
-    raise SystemExit("build: cannot find RAN (aegir_ran). Put AutoRAN inside AEGIR-open or set AEGIR_TOOL to the folder that contains aegir_ran/.")
+# The shared package (aegir_core) and its config, bundled into the exe: ../shared in the repository, or AEGIR_SHARED
+_cands = ([os.environ["AEGIR_SHARED"]] if os.environ.get("AEGIR_SHARED") else []) + [os.path.join(ROOT, "..", "shared")]
+SHARED = next((os.path.abspath(c) for c in _cands if os.path.isfile(os.path.join(c, "aegir_core", "__init__.py"))), None)
+if SHARED is None:
+    raise SystemExit("build: cannot find the shared folder (shared/aegir_core). Build from a full clone of AEGIR-open, or set AEGIR_SHARED.")
 
-datas, binaries, hidden = [], [], []
+datas, binaries, hidden = [(os.path.join(SHARED, "config", "aegir.json"), "defaults"), (os.path.join(SHARED, "config", "grades.json"), "defaults")], [], []
 for pkg in ("webview",):
     d, b, h = collect_all(pkg)
     datas += d
     binaries += b
     hidden += h
-hidden += collect_submodules("autoran") + collect_submodules("aegir_ran")
+hidden += collect_submodules("autoran") + collect_submodules("aegir_core")
 LITE = os.environ.get("AUTORAN_LITE") == "1"            # small build: no PyTorch/CUDA inside (CPU everywhere; GPU via a gpu_pack folder)
 if LITE:   # PyTorch is loaded at run time from the user's own install; it needs standard-library modules this app never imports itself
     import sys as _sys
@@ -27,7 +27,7 @@ hidden += ["clr_loader", "pythonnet", "matplotlib.backends.backend_agg", "matplo
 
 a = Analysis(
     [os.path.join(HERE, "entry_gui.py")],
-    pathex=[ROOT, TOOL],
+    pathex=[ROOT, SHARED],
     datas=datas,
     binaries=binaries,
     hiddenimports=hidden,

@@ -196,7 +196,7 @@ class TestExportAndCanaries(unittest.TestCase):
         shutil.rmtree(self.tmp, ignore_errors=True)
 
     def test_grade_floor_refuses_below_floor(self):
-        from aegir_ran import pmc
+        from aegir_core import grades as pmc
         ctx = core.make_ctx(self.tmp)
         self.assertTrue(pmc.grade_at_least(ctx.grades, "B-", "B-"))
         self.assertFalse(pmc.grade_at_least(ctx.grades, "D-", "B-"))

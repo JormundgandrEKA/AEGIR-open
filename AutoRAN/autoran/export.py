@@ -5,7 +5,7 @@ no free text from the registry beyond the stop reason that justifies a label, an
 """
 import json
 
-from aegir_ran import pmc
+from aegir_core import grades as _grades
 
 from .core import Paths, iso_now, iter_jsonl, utc_stamp, write_jsonl
 from .scorers import iter_joined
@@ -20,7 +20,7 @@ def export(ctx, cfg, floor=None):
 
     def ok(source):
         g = srcs[source]["grade"]
-        good = pmc.grade_at_least(grades, g, floor)
+        good = _grades.grade_at_least(grades, g, floor)
         if not good and source not in refused:
             refused.append(source)
         return good

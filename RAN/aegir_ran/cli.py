@@ -4,8 +4,8 @@ import json
 import sys
 
 from . import batches, ctgov, derive, epmc, labels, link, pmc, pubmed, reports
-from .context import Ctx
-from .http import BudgetExceeded, HostBlocked, WindowRefused
+from aegir_core.context import Ctx
+from aegir_core.http import BudgetExceeded, HostBlocked, WindowRefused
 
 
 NL = chr(10)
@@ -126,11 +126,11 @@ def _pause():
 def interactive():
     """Double-click / no-argument start: ask who is labelling and open the labelling tool."""
     from pathlib import Path
-    from .core import find_root
+    from aegir_core.core import find_root
     from .labels import safe_name
     root = find_root()
     print("RAN labelling tool" + NL)
-    from .core import demo_batch_path
+    from .labels import demo_batch_path
     found = sorted((root / "data" / "labels" / "batches").glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
     choices = [(b.stem, str(b)) for b in found]
     if demo_batch_path():
@@ -177,7 +177,7 @@ def run(argv=None):
     except SystemExit:
         raise
     except Exception:
-        from .core import find_root, iso_now
+        from aegir_core.core import find_root, iso_now
         tb = traceback.format_exc()
         print(tb)
         try:

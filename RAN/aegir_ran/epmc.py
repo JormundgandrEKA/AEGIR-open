@@ -1,7 +1,7 @@
 """Europe PMC licence lookup: one PMID per request (OR queries return 503), cache first."""
 import json
 
-from .core import iso_now, read_jsonl, utc_stamp
+from aegir_core.core import iso_now, read_jsonl, utc_stamp
 from .pmc import classify, grade_for
 
 API = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"

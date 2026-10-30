@@ -7,8 +7,8 @@ from collections import Counter
 from pathlib import Path
 
 from . import amend, ctgov, derive
-from .core import iso_now, utc_stamp
-from .textclean import clean_text
+from aegir_core.core import iso_now, utc_stamp
+from aegir_core.textclean import clean_text
 
 BATCH_SCHEMA = "label-batch/0.2"
 QUESTION = ("Between version {a} ({da}) and version {b} ({db}): did anything change in a meaningful way in who can enter "

@@ -14,10 +14,11 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 FIX = HERE / "fixtures"
 
+import aegir_ran  # noqa: E402,F401  (puts ../shared on the path)
 from aegir_ran import ctgov, derive, epmc, labels, link, pmc, pubmed, reports  # noqa: E402
-from aegir_ran.context import Ctx  # noqa: E402
-from aegir_ran.core import redact_url, read_jsonl  # noqa: E402
-from aegir_ran.http import BudgetExceeded, is_ncbi_daytime  # noqa: E402
+from aegir_core.context import Ctx  # noqa: E402
+from aegir_core.core import redact_url, read_jsonl  # noqa: E402
+from aegir_core.http import BudgetExceeded, is_ncbi_daytime  # noqa: E402
 
 
 def fixture(name):
@@ -84,7 +85,7 @@ class TestPubmed(Base):
 
     def test_fetch_splits_and_links(self):
         body = fixture("pubmed_article.xml")
-        from aegir_ran.http import Response
+        from aegir_core.http import Response
         resp = Response(200, body, "https://eutils.example/efetch", {}, "GET")
         with mock.patch.object(self.ctx.client, "get", return_value=resp):
             link.from_pubmed(self.ctx, ["11111111"])
@@ -233,7 +234,7 @@ class TestV2(Base):
         self.assertIsNone(epmc.normalise(""))
 
     def test_epmc_one_pmid_per_request(self):
-        from aegir_ran.http import Response
+        from aegir_core.http import Response
         body = json.dumps({"resultList": {"result": [{"pmid": "1", "pmcid": "PMC1", "license": "cc by",
                            "journalInfo": {"journal": {"medlineAbbreviation": "Trials"}}}]}}).encode()
         seen = []
@@ -326,7 +327,7 @@ class TestV2(Base):
         s.notepad_save({"text": "first and more", "case_id": "c002"})
         s2 = labels.Session(self.ctx, "tester", self.tmp / "data/labels/batches/syn.json")
         self.assertEqual(s2.state()["notepad"], "first and more")
-        from aegir_ran.textclean import clean_text
+        from aegir_core.textclean import clean_text
         html_v = "<p>Inclusion Criteria:</p><ul><li>Age &#x2265; 18</li><li>Pi*ZZ a&#x2F;b</li></ul>"
         md_v = "**Inclusion Criteria:**" + chr(10) * 2 + "* Age ≥ 18" + chr(10) + "* Pi*ZZ a/b"
         flat = lambda t: " ".join(t.split())
@@ -359,7 +360,7 @@ class TestAmend(unittest.TestCase):
 
     def test_identical_after_normalisation(self):
         a = self.F("Inclusion Criteria:\n\n• FEV1 ≥ 50 percent\n• Age 40 years")
-        b = self.F(__import__("aegir_ran.textclean", fromlist=["x"]).clean_text("**Inclusion Criteria:**\n\n* FEV1 >= 50 percent\n* AGE 40 YEARS"))
+        b = self.F(__import__("aegir_core.textclean", fromlist=["x"]).clean_text("**Inclusion Criteria:**\n\n* FEV1 >= 50 percent\n* AGE 40 YEARS"))
         self.assertEqual(self.kinds(a, b), [])
         self.assertEqual(self.kinds(a, b, False), ["format_only"])      # listed as a minor format difference only
 
@@ -448,7 +449,7 @@ class TestDemo(Base):
     """The bundled demo batch (real ClinicalTrials.gov cases) must load, carry its notice, and hold no contact details."""
 
     def test_demo_batch_loads_and_is_clean(self):
-        from aegir_ran.core import demo_batch_path
+        from aegir_ran.labels import demo_batch_path
         p = demo_batch_path()
         self.assertIsNotNone(p)
         text = p.read_text(encoding="utf-8")

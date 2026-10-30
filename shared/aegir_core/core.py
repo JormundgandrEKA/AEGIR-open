@@ -1,4 +1,4 @@
-"""Paths, config, append-only storage and provenance sidecars."""
+"""Shared by RAN and AutoRAN: paths, config, append-only storage and provenance sidecars."""
 import hashlib
 import json
 import os
@@ -21,28 +21,30 @@ def iso_now():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+DEFAULT_ROOT = None            # a tool sets this to its own folder (RAN does, in aegir_ran/__init__.py)
+SHARED_CONFIG = Path(__file__).resolve().parents[1] / "config"
+
+
 def find_root():
-    """AEGIR_ROOT, else the folder holding RAN.exe (frozen build) or the source checkout."""
+    """AEGIR_ROOT, else the folder holding the frozen exe, else the folder the tool registered as DEFAULT_ROOT."""
     env = os.environ.get("AEGIR_ROOT")
     if env:
         return Path(env)
     if getattr(sys, "frozen", False):
         exe = Path(sys.executable).resolve().parent
         return exe if (exe / "config").is_dir() or not (Path.cwd() / "config").is_dir() else Path.cwd()
-    return Path(__file__).resolve().parents[1]
+    return Path(DEFAULT_ROOT) if DEFAULT_ROOT else Path.cwd()
 
 
 def bundled(name):
-    """Default config shipped inside the frozen executable (used when the folder has none)."""
+    """Default config shipped inside a frozen executable (used when the folder has none)."""
     base = getattr(sys, "_MEIPASS", None)
     return Path(base) / "defaults" / name if base else None
 
 
-def demo_batch_path():
-    """The demo batch: inside RAN.exe, or demo/ in the repository. None if it is not there."""
-    base = getattr(sys, "_MEIPASS", None)
-    root = Path(base) if base else Path(__file__).resolve().parents[1]
-    p = root / "demo" / "ran-demo-batch.json"
+def shared_config(name):
+    """The config file shared by both tools (shared/config/), or None."""
+    p = SHARED_CONFIG / name
     return p if p.is_file() else None
 
 

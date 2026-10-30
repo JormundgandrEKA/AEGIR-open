@@ -8,8 +8,8 @@ from datetime import datetime, timezone
 from urllib.parse import urlsplit
 
 from . import ctgov, pmc
-from .core import read_jsonl, sha256, utc_stamp, iso_now
-from .http import NCBI_HOSTS
+from aegir_core.core import read_jsonl, sha256, utc_stamp, iso_now
+from aegir_core.http import NCBI_HOSTS
 
 CATALOGUES = ["fetch_log", "studies", "versions", "articles", "licences", "links", "searches"]
 

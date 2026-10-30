@@ -26,6 +26,12 @@
     },
     "www.ebi.ac.uk": {
       "per_minute": 50
+    },
+    "datasets-server.huggingface.co": {
+      "per_minute": 20
+    },
+    "huggingface.co": {
+      "per_minute": 30
     }
   },
   "source_grades": {
@@ -38,6 +44,11 @@
   },
   "backoff": {
     "www.ebi.ac.uk": [
+      30,
+      60,
+      120
+    ],
+    "datasets-server.huggingface.co": [
       30,
       60,
       120

@@ -28,7 +28,7 @@ class SettingsTests(unittest.TestCase):
     def test_clear_and_validation(self):
         self.s.save({"contact_email": "a@b.org"})
         self.assertEqual(self.s.save({"contact_email": ""})["contact_email"], "")
-        for bad in ({"contact_email": "nope"}, {"aegir_tool": str(self.tmp)}, {"hf_token": "has space"}, {"bogus": "x"}):
+        for bad in ({"contact_email": "nope"}, {"gpu_site": str(self.tmp)}, {"hf_token": "has space"}, {"bogus": "x"}):
             with self.assertRaises(ValueError):
                 self.s.save(bad)
 

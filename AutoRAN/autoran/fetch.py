@@ -2,7 +2,7 @@
 import json
 import gzip
 
-from aegir_ran import ctgov as rctgov
+from aegir_core import ctgov_common as rctgov
 
 from . import __version__
 from .core import Paths, install_gzip, iso_now, utc_stamp

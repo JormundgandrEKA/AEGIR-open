@@ -2,7 +2,7 @@
 import re
 from pathlib import Path
 
-from aegir_ran import amend, textclean
+from aegir_core import textclean
 
 from .core import Paths, iso_now, iter_jsonl, norm_date, read_gz_json, utc_stamp, write_jsonl
 from .fetch import page_files
@@ -24,7 +24,7 @@ def history_index(cfg, root):
         d = (Path(root) / rel).resolve()
         if not d.is_dir():
             continue
-        from aegir_ran import ctgov
+        from aegir_core import ctgov_common as ctgov
         for sub in d.iterdir():
             if not sub.is_dir() or not sub.name.startswith("NCT"):
                 continue
@@ -42,7 +42,7 @@ def history_index(cfg, root):
 
 
 def count_criteria(text):
-    items = amend.split_items(textclean.clean_text(text))
+    items = textclean.split_items(textclean.clean_text(text))
     return sum(1 for s, _ in items if s == "inclusion"), sum(1 for s, _ in items if s == "exclusion")
 
 

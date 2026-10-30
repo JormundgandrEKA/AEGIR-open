@@ -6,8 +6,8 @@ import json
 import re
 
 from . import amend, ctgov
-from .core import delimit, iso_now, utc_stamp
-from .textclean import clean_text
+from aegir_core.core import delimit, iso_now, utc_stamp
+from aegir_core.textclean import clean_text
 
 ELIGIBILITY = ("eligibility_criteria", "min_age", "max_age", "sex", "healthy_volunteers")
 OUTCOME = ("primary_outcomes",)

@@ -20,6 +20,8 @@ import difflib
 import re
 import unicodedata
 
+from aegir_core.textclean import split_items  # noqa: F401  (moved to the shared package; RAN and AutoRAN both use it)
+
 STOP = {"the", "a", "an", "of", "to", "with", "in", "for", "is", "are", "be", "by", "as", "on", "at", "that", "this"}
 LOGIC = {"and", "or", "not", "no", "without", "any", "all", "only", "except", "unless", "if", "than", "ge", "le",
          "gt", "lt", "within", "prior", "before", "after", "previous", "current", "active", "history", "severe",
@@ -223,29 +225,6 @@ def _direction(section, nb, na, toks):
 
 
 # -- eligibility ----------------------------------------------------------------
-
-def split_items(text):
-    section, items = "inclusion", []
-    for line in (text or "").split("\n"):
-        s = " ".join(line.split())
-        if not s:
-            continue
-        low = s.lower().rstrip(":").strip()
-        if re.match(r"^(key |main |general )?(inclusion|exclusion)\b", low) and len(low.split()) <= 6 \
-                and not re.search(r"[.;]$", low):
-            section = "exclusion" if "exclusion" in low.split()[:2] else "inclusion"
-            continue
-        if re.match(r"^(inclusion|exclusion) criteria\s*:", low):
-            section = "exclusion" if low.startswith("exclusion") else "inclusion"
-            s = s.split(":", 1)[1].strip()
-            if not s:
-                continue
-        s = re.sub(r"^(•\s*)?((\d{1,2}|[a-z])[.)]\s+)?", "", s)
-        if not re.search(r"[A-Za-z0-9]", s):
-            continue                                 # a stray bullet or rule
-        items.append((section, s))
-    return items
-
 
 def _ratio(tb, ta):
     return max(difflib.SequenceMatcher(None, tb, ta, autojunk=False).ratio(),

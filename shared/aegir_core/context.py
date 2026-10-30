@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 
-from .core import Store, bundled, find_root, load_json
+from .core import Store, bundled, find_root, load_json, shared_config
 from .http import Client
 
 
@@ -21,7 +21,10 @@ class Ctx:
         self.cache = {}
 
     def _conf(self, name):
+        """The tool's own config/ wins; then the shared one (shared/config/); then the copy bundled in a frozen exe."""
         d = load_json(self.root / "config" / name)
+        if d is None and shared_config(name):
+            d = load_json(shared_config(name))
         if d is None and bundled(name):
             d = load_json(bundled(name))
         return d or {}

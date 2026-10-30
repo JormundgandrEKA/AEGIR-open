@@ -5,7 +5,8 @@ import json
 import re
 import xml.etree.ElementTree as ET
 
-from .core import iso_now, utc_stamp
+from aegir_core.core import iso_now, utc_stamp
+from aegir_core.grades import grade_at_least, grade_for, rank  # noqa: F401  (re-exported: RAN and AutoRAN call pmc.grade_at_least)
 
 EU = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 TERMS = "https://pmc.ncbi.nlm.nih.gov/about/copyright/"
@@ -86,27 +87,6 @@ def parse_licence(xml_bytes):
 
 
 # -- grading ------------------------------------------------------------
-
-def grade_for(grades, key, journal=None, journal_title=None):
-    if not key:
-        return "ungraded"
-    base = grades["licence_grades"].get(key, "F")
-    ov = grades.get("journal_overrides", {}).get(key, {})
-    for j in (journal, journal_title):
-        if j and j.strip().lower() in ov:
-            return ov[j.strip().lower()]
-    return base
-
-
-def rank(grades, g):
-    scale = grades["scale"]
-    return scale.index(g) if g in scale else len(scale)
-
-
-def grade_at_least(grades, g, minimum):
-    """True if g is as good as or better than `minimum`; ungraded never qualifies."""
-    return g != "ungraded" and rank(grades, g) <= rank(grades, minimum)
-
 
 def do_not_redistribute(ctx, g):
     return not grade_at_least(ctx.grades, g, ctx.cfg.get("min_redistribute_grade", "B-"))

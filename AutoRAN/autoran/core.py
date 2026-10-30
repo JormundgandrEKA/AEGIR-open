@@ -12,9 +12,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import settings
-from . import _ran  # noqa: F401  (makes aegir_ran importable)
-from aegir_ran.context import Ctx
-from aegir_ran.core import iso_now, read_jsonl, sha256, utc_stamp  # noqa: F401
+from . import _shared  # noqa: F401  (makes aegir_core importable)
+from aegir_core.context import Ctx
+from aegir_core.core import iso_now, read_jsonl, sha256, utc_stamp  # noqa: F401
 
 from . import __version__
 

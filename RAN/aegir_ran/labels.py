@@ -1,19 +1,28 @@
 """Labelling tool: the local web app (stdlib http.server, 127.0.0.1 only). Batches are built in batches.py."""
 import json
 import re
+import sys
 import threading
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from .batches import build_batch, labels_dir  # noqa: F401  (build_batch re-exported for the CLI)
-from .core import demo_batch_path, iso_now, read_jsonl, utc_stamp
+from aegir_core.core import iso_now, read_jsonl, utc_stamp
 from .labels_ui import HTML
 from .taxonomy import AVOID_VALUE, CAUSES, CHANGE_ENUM, LABEL, SEVERITY, page_defs
 
 SCHEMA = "gold-label/0.1"
 CAUSE_IDS = {c[0] for c in CAUSES}
 SEVERITY_IDS = {s[0] for s in SEVERITY}
+
+
+def demo_batch_path():
+    """The demo batch: inside RAN.exe, or demo/ in the RAN folder. None if it is not there."""
+    base = getattr(sys, "_MEIPASS", None)
+    root = Path(base) if base else Path(__file__).resolve().parents[1]
+    p = root / "demo" / "ran-demo-batch.json"
+    return p if p.is_file() else None
 
 
 def safe_name(name):

@@ -5,7 +5,7 @@ import sys
 
 from . import __version__
 from . import core
-from aegir_ran.http import BudgetExceeded, HostBlocked, WindowRefused
+from aegir_core.http import BudgetExceeded, HostBlocked, WindowRefused
 
 
 def _common():
@@ -30,7 +30,7 @@ def build_parser():
 
     p = sub.add_parser("settings", help="show or change your per-user settings (workspace, RAN folder, contact email, optional tokens)")
     p.add_argument("--set", action="append", default=[], metavar="NAME=VALUE",
-                   help="names: workspace, aegir_tool, history_dir, contact_email, hf_token, ncbi_api_key; an empty value clears it")
+                   help="names: workspace, history_dir, gpu_site, contact_email, hf_token, ncbi_api_key; an empty value clears it")
     p = leaf("fetch", help="page the ClinicalTrials.gov API (resumable)")
     g = p.add_mutually_exclusive_group()
     g.add_argument("--full", action="store_true", help="the whole scope (default)")

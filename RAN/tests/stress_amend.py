@@ -13,9 +13,10 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
+import aegir_ran  # noqa: E402,F401  (puts ../shared on the path)
 from aegir_ran import amend, ctgov, derive  # noqa: E402
-from aegir_ran.context import Ctx  # noqa: E402
-from aegir_ran.textclean import clean_text  # noqa: E402
+from aegir_core.context import Ctx  # noqa: E402
+from aegir_core.textclean import clean_text  # noqa: E402
 
 NL = chr(10)
 ctx = Ctx(HERE.parent.parent)

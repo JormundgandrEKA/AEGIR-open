@@ -4,7 +4,6 @@ Windows: %APPDATA%\\AutoRAN\\settings.json     other systems: ~/.config/autoran/
 
 Fields (all optional):
   workspace      folder that holds data/ and state/ (and a copy of config/). Default: the AutoRAN folder. Applies after a restart.
-  aegir_tool     folder that contains aegir_ran/ (RAN). Default: looked for next to AutoRAN. Applies after a restart.
   history_dir    folder of RAN's browser-collected trial histories (optional input; makes a few more inputs "clean").
   gpu_site       a folder that contains torch/ (a site-packages or a `pip install --target` folder). Lets the small AutoRAN.exe use your GPU.
   contact_email  added to the User-Agent of requests, so a registry operator can reach you. Never needed to run AutoRAN.
@@ -20,9 +19,9 @@ import os
 import sys
 from pathlib import Path
 
-FIELDS = ("workspace", "aegir_tool", "history_dir", "gpu_site", "contact_email", "hf_token", "ncbi_api_key")
+FIELDS = ("workspace", "history_dir", "gpu_site", "contact_email", "hf_token", "ncbi_api_key")
 SECRETS = ("hf_token", "ncbi_api_key")
-PATHS = ("workspace", "aegir_tool", "history_dir", "gpu_site")
+PATHS = ("workspace", "history_dir", "gpu_site")
 
 
 def path():
@@ -115,8 +114,6 @@ def validate(name, value):
         return ""
     if name in PATHS:
         p = Path(os.path.expandvars(os.path.expanduser(value)))
-        if name == "aegir_tool" and not (p / "aegir_ran" / "__init__.py").is_file():
-            raise ValueError("that folder does not contain aegir_ran/ (choose the RAN 'tool' folder)")
         if name == "history_dir" and not p.is_dir():
             raise ValueError("history folder not found")
         if name == "gpu_site" and not (p / "torch" / "__init__.py").is_file():
