@@ -1,5 +1,7 @@
 # AutoRAN: design v0.1
 
+> **Historical:** design v0.1 as handed to the build. Departures (no longer standard-library only, a desktop app instead of a local server, naive Bayes instead of BERT, the `never_updated` input state) are in `build-report.md`, section 7 ("Where this departs from the design") and section 10.
+
 Date: 30 Oct 2026. Author: design (Claude, Cowork) for the user; build by Claude Code.
 Read with `fetcher-design.md` (RÁN, whose rules still apply) and `CLAUDE.md`.
 Tags: [U] user decision or request, [C] design proposal, [Code] to verify or decide during the build.

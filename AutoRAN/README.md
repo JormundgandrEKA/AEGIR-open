@@ -1,14 +1,14 @@
 # AutoRAN
 
-Automatic labelling of clinical-trial recruitment failure at registry scale: the **silver set**. A part of AEGIR, built on RAN
-(it reuses RAN's HTTP client, rate limits, store and text tools and changes nothing in RAN).
+Automatic labelling of clinical-trial recruitment failure at registry scale: the **silver set**. The main tool of AEGIR; for now it reuses
+RÁN's HTTP client, rate limits, store and text tools (the `tool/` folder of this repository) and changes nothing in RÁN.
 
 The question it serves: could a protocol review pick out, in advance, the trials that later **failed to recruit**? AutoRAN
 fetches the trials, labels each one from the registry's own stop reason, categorises it, scores it with baseline predictors, and
 shows the results in a dashboard where a person can supervise the labels at scale.
 
 Status: first working build (0.1.0), 30 Oct 2026, as a Windows desktop app and a command line. Research software: **read [DISCLAIMERS.md](DISCLAIMERS.md) before using or sharing results.**
-This repository holds code only. It contains no registry data and no executable: you fetch the data yourself and build the app (below).
+This repository holds code only. It contains no registry data: you fetch the data yourself. A ready-built Windows app is attached to the [AutoRAN release](https://github.com/JormundgandrEKA/AEGIR-open/releases/tag/autoran-v0.1.0); you can also build it yourself (below).
 
 ## Requirements
 
@@ -16,8 +16,8 @@ This repository holds code only. It contains no registry data and no executable:
 - **Python 3.11 or newer.** The command-line pipeline uses only the standard library. The window, plots and Parquet frame add `numpy`, `pandas`, `pyarrow`, `matplotlib` and `pywebview` (about 300 MB), listed in [requirements.txt](requirements.txt) and `pyproject.toml` (extras `app`, `gpu`, `build`).
   **`setup.ps1` checks your Python and installs only what is missing** (`-Gpu` adds PyTorch, about 3 GB, installed once in your main Python; `-Build` adds PyInstaller; `-Ran` clones RAN with git if it is not beside AutoRAN).
 - **PyTorch is optional** (NVIDIA GPU scoring). Without it everything runs on the CPU.
-- **RAN** (`aegir_ran`, from the AEGIR-open repository). AutoRAN reuses its HTTP client, rate limits and store. Put AutoRAN inside the AEGIR-open folder or next to it, or point to RAN's `tool` folder on the Settings page (or the `AEGIR_TOOL` environment variable).
-- **Internet access and about 2 GB of disk** for the first fetch: roughly 267 requests to clinicaltrials.gov (214 MB) at 40 a minute, a little under an hour, resumable, plus about 38 requests to the Hugging Face dataset server for the Open Targets stop reasons.
+- **RÁN** (`aegir_ran`, the `tool/` folder of this repository). AutoRAN reuses its HTTP client, rate limits and store. Keep AutoRAN inside the repository (as it is here), or point to RÁN's `tool` folder on the Settings page (or the `AEGIR_TOOL` environment variable).
+- **Internet access and about 2 GB of disk** for the first fetch: roughly 267 requests to clinicaltrials.gov (214 MB) at 40 a minute, about 10 minutes (8 minutes in the first run), resumable, plus about 38 requests to the Hugging Face dataset server for the Open Targets stop reasons.
 - **No account and no API key is needed to fetch.** A contact email, a Hugging Face token and an NCBI key are optional (Settings page, or `autoran settings`). If a service ever starts requiring a key, enter it there.
 
 ## First run
@@ -43,9 +43,10 @@ The **Settings** page (or `autoran settings --set name=value`) saves, for your W
 
 ## Open the app
 
-From source: `python -m autoran.app`. As an executable: build it with `powershell -ExecutionPolicy Bypass -File build\build.ps1` (needs the packages above plus PyInstaller; the result is large, about 4 GB with PyTorch and CUDA, and unsigned).
-Then double-click **`AutoRAN.exe`** in this folder. A native window opens (no browser, no web server, no network port) and runs on this
-computer's CPU and GPU. It loads the 266,916-trial index in about half a minute, then shows the dashboard: Overview, Coverage,
+**Easiest:** download `AutoRAN-lite-win64.zip` from the [release](https://github.com/JormundgandrEKA/AEGIR-open/releases/tag/autoran-v0.1.0), unzip it and double-click `AutoRAN\AutoRAN.exe`. It is about 170 MB, unsigned (Windows SmartScreen may warn), has no PyTorch inside and runs on the CPU unless you point it at a PyTorch you already have (see GPU below).
+**From source:** `python -m autoran.app`. **Build the exe yourself:** `powershell -ExecutionPolicy Bypass -File buildbuilduild.ps1` after `setup.ps1 -Build` (same small build; `-Full` also bundles PyTorch and CUDA, about 4 GB, and is only for a machine with no Python of its own).
+Running `AutoRAN.exe` opens a native window (no browser, no web server, no network port) and runs on this
+computer's CPU, and on its GPU when PyTorch is available. It loads the 266,916-trial index in about half a minute, then shows the dashboard: Overview, Coverage,
 Labels and rules, Scorers, Browse, Review, **Plots**, **Run** and About.
 
 - **Run** page: run any pipeline step (normalise, label, categorize, score, metrics, Parquet frame, export, or everything) in the background, on the
@@ -54,7 +55,7 @@ Labels and rules, Scorers, Browse, Review, **Plots**, **Run** and About.
   Refresh. Plug-ins get the pandas frame, the metrics and the GPU (`ctx.frame()`, `ctx.metrics`, `ctx.torch`, `ctx.device`).
 - A startup problem shows a message box and writes `state/app.log`.
 
-The exe carries its own Python and libraries (PyTorch excepted, see above), so a broken Python module on this machine cannot stop it. It needs the
+The exe carries its own Python and libraries (PyTorch excepted), so a broken Python module on this machine cannot stop it. It needs the
 Microsoft Edge WebView2 runtime, which Windows 10 and 11 normally have. It is unsigned, so Windows SmartScreen may warn the first time.
 Rebuild it after code changes with `powershell -ExecutionPolicy Bypass -File build\build.ps1`.
 
@@ -63,7 +64,7 @@ Rebuild it after code changes with `powershell -ExecutionPolicy Bypass -File bui
 AutoRAN needs RAN (`aegir_ran`). It finds it next to itself: put this folder inside AEGIR-open, or beside `AEGIR/`, or set `AEGIR_TOOL`.
 
 ```
-python -m autoran --help                      # standard-library path, Python 3.10+, no installs
+python -m autoran --help                      # standard-library path, Python 3.11+, no installs
 python -m unittest discover -s tests          # offline tests (GPU tests skip without PyTorch)
 
 # the pipeline, in order (each stage writes new dated files)
@@ -80,26 +81,25 @@ python -m autoran.app                         # the desktop window, from source
 
 ### GPU
 
-The heavy maths (scorer training and scoring, bootstrap intervals, GPU plots) runs on an NVIDIA GPU through PyTorch. The exe has PyTorch inside.
-From source, use `.venv` (or any Python with torch, numpy, pandas, matplotlib and pyarrow; the default `python` on this machine has them too):
+The heavy maths (scorer training and scoring, bootstrap intervals, GPU plots) can run on an NVIDIA GPU through PyTorch. PyTorch is optional and is **not** inside the small exe.
+Install it once in your main Python (`setup.ps1 -Gpu`, or `pip install torch --index-url https://download.pytorch.org/whl/cu128`; the CUDA version must match your driver).
+From source it is found automatically. The small exe finds it through Settings > "GPU pack folder" (the `site-packages` folder that contains `torch/`), or a `gpu_pack` folder beside the exe made with `pip install --target gpu_pack torch --index-url ...`.
 
 ```
-uv venv .venv --python 3.13
-uv pip install --python .venv/Scripts/python.exe --torch-backend=auto torch numpy pandas pyarrow matplotlib plotly
-.venv\Scripts\python -m autoran gpu-info
-.venv\Scripts\python -m autoran score --device cuda      # adds gpu_logistic, gpu_logistic_text, gpu_mlp
-.venv\Scripts\python -m autoran metrics --device cuda    # batched bootstrap on the GPU
+python -m autoran gpu-info
+python -m autoran score --device cuda      # adds gpu_logistic, gpu_logistic_text, gpu_mlp
+python -m autoran metrics --device cuda    # batched bootstrap on the GPU
 ```
 
 `--device auto` (the default) uses the GPU when PyTorch and CUDA are present and falls back to the standard-library path otherwise.
-On the RTX 4070 the three GPU scorers train on the full 172k-row training split in 2 to 6 seconds each, and the metrics run takes
+On the author's mid-range NVIDIA card (RTX 4070, 12 GB) the three GPU scorers train on the full 172k-row training split in 2 to 6 seconds each, and the metrics run takes
 17 s against 73 s on the CPU. Fetching, normalising and the regex labeller are I/O or string work and stay on the CPU.
 
 ### Visualising
 
 ```
-.venv\Scripts\python -m autoran frame        # one Parquet file: trial, label, categories, split, every score
-.venv\Scripts\python viz\plots.py            # four starter plots
+python -m autoran frame        # one Parquet file: trial, label, categories, split, every score
+python viz\plots.py            # four starter plots
 ```
 
 The Parquet file reads in pandas, plotly, or R (`arrow::read_parquet`); see [viz/README.md](viz/README.md).
@@ -128,7 +128,7 @@ Supervising thousands of labels without reading each one:
 ## Layout
 
 ```
-AutoRAN.exe    the desktop app (with _internal/, its libraries); build/ rebuilds it
+AutoRAN.exe    the desktop app (with _internal/); appears after you build it (build/build.ps1) or unzip the release
 autoran/        the package (fetch, normalise, labeller, categorize, scorers, metrics, gpu, app, plots, jobs, server, ui, audit, export)
 plugins/        your own plots (one .py file each)
 config/         autoran.json (scope, fields, splits, labeller floor), sources.json (licences and grades), aegir.json, grades.json
@@ -142,4 +142,4 @@ See [docs/build-report.md](docs/build-report.md) for results, deviations from th
 
 ## Licence and attribution
 
-Apache License 2.0, see [LICENSE](LICENSE) and [NOTICE](NOTICE) (copyright holder tentatively David J. W. O'Rourke; attribution to be confirmed). Data sources, software licences and the question of redistributing a built executable are in [THIRD_PARTY.md](THIRD_PARTY.md). Registry data: ClinicalTrials.gov, U.S. National Library of Medicine; curated stop reasons: Open Targets (Apache-2.0). Neither provider endorses this project.
+Apache License 2.0, see [LICENSE](LICENSE) and [NOTICE](NOTICE). Data sources, software licences and the question of redistributing a built executable are in [THIRD_PARTY.md](THIRD_PARTY.md). Registry data: ClinicalTrials.gov, U.S. National Library of Medicine; curated stop reasons: Open Targets (Apache-2.0). Neither provider endorses this project.

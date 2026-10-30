@@ -303,7 +303,7 @@ async function start(main){
  main.append(h('h2',null,'Welcome to AutoRAN'));
  main.append(h('div',null,'There is no trial data on this computer yet. AutoRAN does not ship with any: it downloads the registry data itself, then labels it, scores it and shows you the results. Everything runs locally.'));
  main.append(h('h2',null,'What the first run does'));
- ['Downloads every trial in scope from ClinicalTrials.gov (about 267 requests, 214 MB, a little under an hour at the polite rate limit of 40 requests a minute). It can be stopped and resumed. No account or API key is needed.',
+ ['Downloads every trial in scope from ClinicalTrials.gov (about 267 requests, 214 MB, about 10 minutes at the polite rate limit of 40 requests a minute). It can be stopped and resumed. No account or API key is needed.',
   'Downloads the Open Targets curated stop reasons (about 38 requests) that the labeller learns from. A Hugging Face token is optional and only raises the rate limit.',
   'Normalises, labels, categorises, scores and measures: a few minutes on a CPU, less with a GPU. The app then reloads and fills the other pages.'].forEach(x=>main.append(h('div',{class:'small',style:'margin:2px 0'},'· '+x)));
  main.append(h('div',{class:'warn'},'Requirements: an internet connection, about 2 GB of free disk space for the data, and permission to use the data under the providers’ terms (see About). Optional: set a contact email under Settings first, so the registry can reach you if your requests cause trouble.'));
@@ -336,7 +336,7 @@ async function settings(main){
    if(!Object.keys(body).length){msg.textContent='nothing changed';return;}
    try{await api('/api/settings',body);msg.textContent='Saved. Folder changes apply after you restart AutoRAN.';setTimeout(()=>location.reload(),900);}catch(e){msg.textContent='Not saved: '+e.message;}}},'Save'),' ',msg);
  main.append(h('h2',null,'Before you fetch'));
- ['Fetching downloads about 214 MB from clinicaltrials.gov at 40 requests a minute; it takes a little under an hour and can be stopped and resumed. No account or key is needed.',
+ ['Fetching downloads about 214 MB from clinicaltrials.gov at 40 requests a minute; it takes about 10 minutes and can be stopped and resumed. No account or key is needed.',
   'The Open Targets stop-reason download comes from the Hugging Face dataset server; a token is optional.',
   'You are responsible for using registry data under the providers’ own terms (see About).'].forEach(x=>main.append(h('div',{class:'small',style:'margin:2px 0'},'· '+x)));}
 

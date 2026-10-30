@@ -10,7 +10,7 @@ from . import core
 # stage -> (label, what it does, whether it needs the network)
 STAGES = {
     "fetch-delta": ("Fetch updates", "Pull trials changed since the last finished fetch from ClinicalTrials.gov (about 1 to 20 requests).", True),
-    "fetch-full": ("Fetch all trials", "First download from ClinicalTrials.gov: about 267 requests, 214 MB, a little under an hour at the polite rate limit. Safe to stop and resume. No key needed.", True),
+    "fetch-full": ("Fetch all trials", "First download from ClinicalTrials.gov: about 267 requests, 214 MB, about 10 minutes at the polite rate limit (8 minutes in the first run). Safe to stop and resume. No key needed.", True),
     "labeller-data": ("Fetch stop-reason data", "Download the Open Targets curated stop reasons (about 38 requests, a couple of minutes). The labeller needs it.", True),
     "normalise": ("Normalise", "Stored pages to one compact record per trial (CPU, about 70 s).", False),
     "label": ("Label", "Stop-reason labeller and outcome classes for every trial (CPU, about 45 s).", False),

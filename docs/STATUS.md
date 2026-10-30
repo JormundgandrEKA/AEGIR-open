@@ -1,5 +1,8 @@
 # RÁN status: a snapshot of development
 
+> This file covers **RÁN** only. For AutoRAN, the main tool, see [`AutoRAN/docs/build-report.md`](../AutoRAN/docs/build-report.md).
+
+
 Snapshot of 29 Oct 2026. Tool: RÁN (`aegir_ran`) 0.1.0, part of AEGIR (Amendment Evidence Gathering and Independent Review). Written by Claude (Claude Code) for David and for Claude (Cowork), the design side of the project. This is a status report on what exists and how well it works. It is not a build guide.
 
 Pictures: [how it works](ran-how-it-works.svg), [capabilities, built and to build](ran-capabilities.svg), or both on one page: [ran-overview.html](ran-overview.html).
@@ -72,7 +75,7 @@ is "confirmed" until two different humans agree. Model labels are always provisi
 
 | Test | What it covers | Result |
 | --- | --- | --- |
-| Unit tests, 39 (`python -m unittest discover -s tool/tests`) | licence parsing and grades (4), PubMed parsing and links (2), store rules and redaction (4), history import, diff, label flags (4), client budget/retry/limits (4), tally (1), content flags, Europe PMC, notepad, window, server loopback (9), change analysis (10), drafts and answer schema (1) | all pass |
+| Unit tests, 41 (`python -m unittest discover -s tool/tests`) | licence parsing and grades (4), PubMed parsing and links (2), store rules and redaction (4), history import, diff, label flags (4), client budget/retry/limits (4), tally (1), content flags, Europe PMC, notepad, window, server loopback (9), change analysis (10), drafts and answer schema (1) | all pass |
 | Stress test (`python tool/tests/stress_amend.py <seed>`) | 398 real stored eligibility texts, about 4,500 known edits per seed, seeds 28, 7, 99 | harmless edits 0-2.9% false alarms; real edits detected 97-100% |
 | Real labels | analysis vs David's 31 labels, on the field shown | 30 of 31, kappa 0.93 (old provisional 28 of 31, kappa 0.78). Tuned on these cases, so optimistic |
 | Batch audit (`labels audit`) | 11 randomised 50/50 batches (seeds 28, 101, 2026 and eight more) | found markup residue, the negatives shortage; both reported below |
@@ -126,6 +129,8 @@ fixed; the lesson is that the rules should be re-run through this test whenever 
 7. Snapshot with study files and the licence gate; signed exe or an installer; Mac and Linux checks.
 
 ## 9. Feature completeness against the design
+
+AutoRAN, the main tool, is not part of this table: see [`AutoRAN/docs/build-report.md`](../AutoRAN/docs/build-report.md).
 
 | Design item | Status |
 | --- | --- |

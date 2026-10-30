@@ -11,7 +11,7 @@ AutoRAN's own code is Apache-2.0. The first release ships **source and a build s
 ## Software AutoRAN uses (installed by the user, or bundled only in an executable they build themselves)
 | Package | Licence (as published by the project; verify before redistributing a build) |
 |---|---|
-| RAN / `aegir_ran` (AEGIR-open) | Apache-2.0 (a separate repository; AutoRAN is meant to live beside it) |
+| RAN / `aegir_ran` (AEGIR-open) | Apache-2.0 (the `tool/` folder of this same repository) |
 | Python | PSF License |
 | PyTorch (optional, GPU) | BSD-3-Clause style; its CUDA libraries (NVIDIA) come under NVIDIA's own licence terms |
 | NumPy, pandas, SciPy | BSD-3-Clause |

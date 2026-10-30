@@ -1,22 +1,36 @@
-# AEGIR / RÁN
+# AEGIR
 
-**AEGIR** (Amendment Evidence Gathering and Independent Review) is a research prototype for studying how clinical-trial
-protocols change after they start, and whether those changes were avoidable. **RÁN** (`aegir_ran`, "Registry and Article Net")
-is its data tool: it fetches public trial and article data, stores it unchanged and traceable, flags what changed between registry
-versions by plain rules, and runs a local app for a person to label the changes.
+**AEGIR** (Amendment Evidence Gathering and Independent Review) is a research prototype for testing whether a protocol review can
+catch avoidable clinical-trial problems in advance. This repository holds its two data tools: **AutoRAN** ([`AutoRAN/`](AutoRAN/)), the main one,
+which machine-labels recruitment failure across the whole ClinicalTrials.gov registry and scores predictors against it; and **RÁN** (`tool/aegir_ran`),
+which builds a small, human-labelled answer key on protocol amendments. The review engine itself is not in this repository yet.
 
-This repository is a **snapshot of development** (29 Oct 2026), built by Claude (Claude Code) with David, with design work done in
+This repository is a **snapshot of development** (30 Oct 2026), built by Claude (Claude Code) with David, with design work done in
 Claude (Cowork). It holds the working code, tests, settings and diagrams. It does not hold any fetched data, labels, or the
 planning documents. It is not a finished product and not a guide for rebuilding the project from scratch.
+
+## AutoRAN in one minute
+
+AutoRAN downloads the registry itself, labels each trial's outcome from its stop reason (completed, or stopped for failing to recruit), categorises and
+scores the trials, and shows the results in a Windows desktop app with tools for a person to supervise the labels at scale. These labels are machine-made (a "silver set"); the human-checked "gold set" is RÁN's job.
+
+| In the author's run, 30 Oct 2026 (not shipped) | |
+| --- | --- |
+| Trials fetched | 266,916 (all phases, started 2005 or later, completed or terminated) |
+| Recruitment failures labelled | 7,486 (3.0% of completed plus failed) |
+| Labeller on a held-out curated test | 93.9% precision, 69.5% recall. **No human check on real registry text yet.** |
+| Best baseline predictor (test AUROC) | about 0.75 |
+
+Try it: download `AutoRAN-lite-win64.zip` from the [latest release](https://github.com/JormundgandrEKA/AEGIR-open/releases/latest), unzip, double-click `AutoRAN\AutoRAN.exe`.
+Read [AutoRAN/README.md](AutoRAN/README.md) and [AutoRAN/DISCLAIMERS.md](AutoRAN/DISCLAIMERS.md) first. Honest status: [AutoRAN/docs/build-report.md](AutoRAN/docs/build-report.md).
+
+## RÁN (the answer-key tool)
+
+**RÁN** (`aegir_ran`, "Registry and Article Net")
+fetches public trial and article data, stores it unchanged and traceable, flags what changed between registry
+versions by plain rules, and runs a local app for a person to label the changes.
 How far along it is, honestly: [docs/STATUS.md](docs/STATUS.md). Pictures: [docs/ran-overview.html](docs/ran-overview.html)
 (or [how it works](docs/ran-how-it-works.svg) and [capabilities](docs/ran-capabilities.svg)).
-
-## AutoRAN (automatic labelling, in `AutoRAN/`)
-
-`AutoRAN/` is a separate tool that sits beside RÁN and reuses its client, rate limits and store. It downloads the whole ClinicalTrials.gov scope itself,
-labels recruitment failure automatically from registry stop reasons (the machine-made "silver set"), categorises and scores trials, and shows the
-results in a Windows desktop app with review tools. It holds no data and no executable; **read [AutoRAN/DISCLAIMERS.md](AutoRAN/DISCLAIMERS.md) and
-[AutoRAN/README.md](AutoRAN/README.md)** first. Silver labels are not gold labels and no human audit of them has been recorded yet.
 
 ## What works
 
@@ -28,10 +42,10 @@ results in a Windows desktop app with review tools. It holds no data and no exec
 | Europe PMC licence lookup | works on single PMIDs; slow by design (one PMID per request) |
 | Label flags and content flags (rule-based change analysis) | works; stress-tested; not reviewed by a clinician |
 | Matched batches, batch audit, labelling app, tally, efficiency report | works; one labeller so far |
-| Demo with real data and a portable `RAN.exe` | works (Windows exe; source on any system) |
+| RÁN demo with real data and a portable `RAN.exe` | works (Windows exe; source on any system) |
 | Not built | second-labeller agreement and adjudication, gold-set export, expert calibration |
 
-No language model is used anywhere in the tool. Every result comes from a logged request or a plain rule.
+No language model is used anywhere in either tool. Every result comes from a logged request or a plain rule.
 
 ## Try the labelling app in one minute (real demo data)
 
@@ -39,7 +53,7 @@ No language model is used anywhere in the tool. Every result comes from a logged
 labelling app without fetching anything. Source, date, modifications and terms are in [demo/ATTRIBUTION.md](demo/ATTRIBUTION.md); the app also
 shows them in a banner. The data are a dated snapshot, not current.
 
-- **Windows, no Python or build needed:** download `RAN.exe` from the repository's **Releases** page and double-click it. Enter a name; with
+- **Windows, no Python or build needed:** download `RAN.exe` from the [RÁN snapshot release](https://github.com/JormundgandrEKA/AEGIR-open/releases/tag/v0.1.0-snapshot) and double-click it. Enter a name; with
   no batches of your own it opens the demo. Your labels and notepad are written to `data/demo/<name>/` beside the exe (demo labels are kept apart from real ones in `data/labels/`). The exe is unsigned, so
   Windows SmartScreen may warn ("More info", then "Run anyway"); you can check its SHA-256 against the value in the release notes.
 - **From source (any system with Python 3.10+):**
@@ -48,9 +62,9 @@ shows them in a banner. The data are a dated snapshot, not current.
   python -m aegir_ran labels serve --labeller yourname --batch demo
   ```
 
-## Quick start
+## RÁN quick start
 
-You need Python 3.10 or newer. There are no packages to install: the tool uses only the standard library.
+The commands below are for **RÁN**. You need Python 3.10 or newer. RÁN uses only the standard library, so there are no packages to install. (AutoRAN's command line is standard library too, but its desktop app, plots and Parquet need the packages in [`AutoRAN/requirements.txt`](AutoRAN/requirements.txt); see its README.)
 
 ```bash
 # from the repository folder
@@ -147,12 +161,13 @@ your own browser session (small volumes) and imported. `ctgov import-history` ac
 ## Layout
 
 ```
-tool/aegir_ran/     the package (fetchers, change analysis, batch builder, labelling app)
+AutoRAN/            the main tool: fetch, label, categorise, score, desktop app (own README, config, tests, docs)
+tool/aegir_ran/     RÁN, the answer-key tool: fetchers, change analysis, batch builder, labelling app (AutoRAN reuses its client)
 tool/tests/         unit tests, fixtures (synthetic), stress_amend.py (needs fetched data)
 config/             settings, licence grades, named queries, ncbi.example.json
 demo/               16 real ClinicalTrials.gov cases for trying the labelling app, with ATTRIBUTION.md
 build/              build.ps1, ran.spec: builds a portable RAN.exe (Windows, needs PyInstaller via requirements-build.txt)
-docs/               STATUS.md and the diagrams
+docs/               RÁN status (STATUS.md) and RÁN diagrams; AutoRAN has its own docs/ inside AutoRAN/
 data/               what RAN fetches and records (ignored by git; data/README.md explains it); demo sessions go to data/demo/
 state/              rate-limit state, created when you run things (ignored by git)
 ```
@@ -168,10 +183,7 @@ Details and the test results are in [docs/STATUS.md](docs/STATUS.md).
 
 ## License
 
-The code, tests, settings and diagrams in this repository are licensed under the [Apache License 2.0](LICENSE).
-
-**Copyright holder: not filled in yet.** The name and year are to be added later; there is no `NOTICE` file or per-file copyright header
-for now, and the `LICENSE` file is the unmodified Apache-2.0 text.
+The code, tests, settings and diagrams in this repository are licensed under the [Apache License 2.0](LICENSE) (AutoRAN also carries a [NOTICE](AutoRAN/NOTICE) and third-party list).
 
 This repository contains no ClinicalTrials.gov, PubMed, PMC or Europe PMC data. Anything you fetch with it stays under the source's own
 terms and licences, which the Apache licence does not change.
