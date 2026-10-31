@@ -375,7 +375,7 @@ document.addEventListener('keydown',e=>{
   else if(/^[1-9]$/.test(e.key)){r.pick(+e.key-1);}}});
 
 // ------------------------------------------------------------------ Fetch panel (always visible by default; collapses to a strip)
-const FP={layout:lget('fp.layout','a'),hidden:lget('fp.hidden','0')==='1',sound:lget('fp.sound','1')==='1',data:null,alerted:{},lastPing:0,t0:Date.now()/1000,confirm:null,toast:null,sched:{},lastStage:null,idleSince:null,pinned:false,err:null};
+const FP={layout:lget('fp.layout','a'),hidden:lget('fp.hidden','0')==='1',data:null,alerted:{},t0:Date.now()/1000,confirm:null,toast:null,sched:{},lastStage:null,idleSince:null,pinned:false,err:null};
 function lget(k,d){try{const v=localStorage.getItem(k);return v==null?d:v;}catch(e){return d;}}
 function lput(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 const FCOL={green:'#2e8b3d',yellow:'#e0a100',red:'#c0192f'};
@@ -383,20 +383,12 @@ const NET_STAGES=['fetch-full','fetch-delta','labeller-data','run-all'];
 function fdot(c,s){return h('span',{style:`display:inline-block;width:${s||10}px;height:${s||10}px;border-radius:50%;background:${FCOL[c]};vertical-align:middle`});}
 function fpct(a,b){return b>0?Math.max(0,Math.min(100,Math.round(100*a/b))):0;}
 function fmtS(s){return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2);}
-function fpPing(){
- try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;FP.ac=FP.ac||new AC();const ac=FP.ac;if(ac.state==='suspended')ac.resume();
-  const burst=(t,dur,freq,q,gain,tone)=>{const n=Math.floor(ac.sampleRate*dur),b=ac.createBuffer(1,n,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
-   const s=ac.createBufferSource();s.buffer=b;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=freq;f.Q.value=q;const g=ac.createGain();g.gain.value=gain;s.connect(f);f.connect(g);g.connect(ac.destination);s.start(t);
-   if(tone){const o=ac.createOscillator();o.type='square';o.frequency.value=tone;const og=ac.createGain();og.gain.setValueAtTime(gain*0.5,t);og.gain.exponentialRampToValueAtTime(0.001,t+dur);o.connect(og);og.connect(ac.destination);o.start(t);o.stop(t+dur);}};
-  const t=ac.currentTime+0.02;burst(t,0.09,900,1.2,0.9,170);burst(t+0.13,0.06,3200,2.5,0.7,0);}catch(e){}}
 function fpAlerts(evs){
  let fresh=false;
  (evs||[]).slice().reverse().forEach(e=>{if(e.ts<FP.t0||FP.alerted['id'+e.ts+e.host])return;FP.alerted['id'+e.ts+e.host]=1;
   if(e.level!=='warn'&&e.level!=='error')return;
   FP.toast=e;FP.hidden=false;fresh=true;
-  const key=e.host+'|'+e.kind,now=Date.now()/1000;                       // one ca-chik per host and kind every 10 minutes, and never more than one every 15 s
-  if(FP.sound&&(!FP.alerted[key]||now-FP.alerted[key]>600)&&now-FP.lastPing>15){fpPing();FP.lastPing=now;}
-  FP.alerted[key]=now;});
+  });
  return fresh;}
 function fpQuota(x){const w=fpct(x.used,x.max),lp=fpct(x.line,x.max);return {w,lp};}
 function fpProg(x){const p=x.progress;if(!p)return '';const q=fpct(p.done,p.total);return `<div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--dim);margin-top:3px"><div style="flex:1;height:6px;background:var(--soft);border:1px solid var(--hair)"><div style="width:${q}%;height:100%;background:var(--acc)"></div></div><span>${p.done.toLocaleString()} of ${p.total.toLocaleString()} ${p.label}</span></div>`;}
@@ -427,7 +419,7 @@ function fpRender(){
  head.append(h('b',{style:'font:700 12px Consolas,monospace;letter-spacing:.06em;text-transform:uppercase'},'Fetch'),fdot(worst,12),h('span',{style:'flex:1;font-weight:700'},hl.title));
  const mk=(t,fn,on)=>h('button',{class:on?'on':'',onclick:fn},t);
  if(!FP.hidden){[['a','Bars'],['b','Columns'],['c','Gauges']].forEach(x=>head.append(mk(x[1],()=>{FP.layout=x[0];lput('fp.layout',x[0]);fpRender();},FP.layout===x[0])));
-  head.append(mk(FP.sound?'Sound on':'Sound off',()=>{FP.sound=!FP.sound;lput('fp.sound',FP.sound?'1':'0');if(FP.sound)fpPing();fpRender();}));}
+}
  head.append(mk(FP.hidden?'Show':'Hide',()=>{FP.hidden=!FP.hidden;FP.pinned=!FP.hidden;lput('fp.hidden',FP.hidden?'1':'0');fpRender();}));
  box.append(head);
  if(FP.hidden){el.append(box);return;}

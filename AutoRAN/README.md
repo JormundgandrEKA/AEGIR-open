@@ -51,7 +51,7 @@ current window against the limit (a dashed line marks the auto-stop at 50%), job
 A plain sentence says where things stand ("All clear. Your data will be local in about 6 minutes." or "Hugging Face is stopped for 12 minutes."). Layouts: bars, columns, gauges.
 
 - Starting a download shows an estimate first and asks you to confirm.
-- Any 429, 502 or 503 raises a notice in the panel and is kept as a note on disk; 429, 503 and cool-downs also play a short two-click alert (once per source and kind every 10 minutes; the Sound button mutes it).
+- Any 429, 502 or 503 raises a notice in the panel (the panel opens if it was collapsed) and is kept as a note on disk. There is no sound.
 - A source in trouble gets **Retry now** and **Schedule retry** (in 15 minutes or 1 hour; this works while AutoRAN stays open).
 - The safety margin is a setting: `governor.margin` in `shared/config/aegir.json` (default 0.5, also per host). How it works and the figures used: [../shared/README.md](../shared/README.md).
 
