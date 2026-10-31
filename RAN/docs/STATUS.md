@@ -26,7 +26,7 @@ how collected); catalogues are JSON Lines, latest line per key wins; no deletes,
 pulls go to `data/scratch/` and cannot enter the gold set; a gold-set pull needs a named query in `config/queries/`.
 
 **Guard rails for model use (section 3.3 of the design), all in code.** Rate limits shared across processes
-(`state/rate.json`, file lock); request budget (default 500); NCBI weekday-daytime refusal above 1,000 requests; API key
+(since 30 Oct the shared request governor: a rolling count in one state file, a 50% safety margin, back-off and cool-downs; see `../../shared/README.md`); request budget (default 500); NCBI weekday-daytime refusal above 1,000 requests; API key
 and email redacted from every URL, log and output (checked: not found in any stored file); retries with back-off (30/60/120 s
 for Europe PMC); fetched text printed only inside untrusted-text delimiters; truncated reads are retried.
 

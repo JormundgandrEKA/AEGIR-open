@@ -28,7 +28,7 @@ review engine itself is not here yet.
 ## Rules both programs keep
 
 - **Append-only.** Fetched files are never overwritten or deleted; each has a sidecar with url, time, checksum, grade and how it was collected.
-- **Polite.** Shared rate limits (in [`shared/config/aegir.json`](shared/config/aegir.json)), request budgets, back-off, and no workarounds for sources that refuse scripts.
+- **Polite.** A shared request governor keeps every source at half of its limit or less, backs off on 429, 502 and 503 errors, and tells the user (settings in [`shared/config/aegir.json`](shared/config/aegir.json)). Request budgets apply, and sources that refuse scripts are not worked around.
 - **Graded sources.** Every source has a licence grade; nothing below the floor is redistributed.
 - **No personal data.** Contact names, emails and phone numbers are never kept.
 - **No language model inside either tool.** Every result comes from a logged request or a plain rule or statistical model.

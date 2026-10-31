@@ -42,6 +42,17 @@ def bundled(name):
     return Path(base) / "defaults" / name if base else None
 
 
+def shared_state_dir():
+    """Where the rate-limit state and event notes live. One folder per user, so every program and every window of this computer shares it.
+    Windows: %LOCALAPPDATA%\\AEGIR\\state   elsewhere: ~/.local/state/aegir   (override with AEGIR_STATE_DIR)."""
+    env = os.environ.get("AEGIR_STATE_DIR")
+    if env:
+        return Path(env)
+    if os.name == "nt":
+        return Path(os.environ.get("LOCALAPPDATA") or Path.home() / "AppData" / "Local") / "AEGIR" / "state"
+    return Path.home() / ".local" / "state" / "aegir"
+
+
 def shared_config(name):
     """The config file shared by both tools (shared/config/), or None."""
     p = SHARED_CONFIG / name

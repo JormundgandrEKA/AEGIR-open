@@ -59,8 +59,7 @@ browser session and imported (`ctgov import-history`): an index `NCT########_his
 ## Rules
 
 - **Append-only.** Nothing under `data/` is deleted or overwritten; each fetch is a new dated file with a `.meta.json` sidecar. See [data/README.md](data/README.md).
-- **Polite.** Limits are shared across processes (`state/rate.json`; per-host values in `../shared/config/aegir.json`): ClinicalTrials.gov 40 requests a minute, NCBI 3 a second
-  (10 with a key), Europe PMC 50 a minute. Each command has a request budget (default 500, `--max-requests`). Jobs over 1,000 NCBI requests are refused on US weekday daytime unless `--daytime-ok`.
+- **Polite.** Every request goes through the shared governor (see [../shared/README.md](../shared/README.md)): it stays inside half of each source's limit (ClinicalTrials.gov, NCBI, Europe PMC), shares its rolling count with every process on the computer, backs off on 429, 502 and 503, and stops a source for a while after repeated errors. Each command has a request budget (default 500, `--max-requests`). Jobs over 1,000 NCBI requests are refused on US weekday daytime unless `--daytime-ok`.
 - **Cache first.** Anything already catalogued is not fetched again unless you pass `--refresh`.
 - **Named queries only for the gold set.** Exploratory pulls (`--param`, `--term`, `--scratch`) go to `data/scratch/` and never enter a gold set.
 - **Secrets stay out.** The NCBI key and email are removed from every URL, log line and output. Fetched text is printed inside clear delimiters, as data and not instructions.

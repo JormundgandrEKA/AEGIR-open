@@ -6,12 +6,13 @@ import time
 import traceback
 
 from . import core
+from aegir_core.http import Paused
 
 # stage -> (label, what it does, whether it needs the network)
 STAGES = {
     "fetch-delta": ("Fetch updates", "Pull trials changed since the last finished fetch from ClinicalTrials.gov (about 1 to 20 requests).", True),
-    "fetch-full": ("Fetch all trials", "First download from ClinicalTrials.gov: about 267 requests, 214 MB, about 10 minutes at the polite rate limit (8 minutes in the first run). Safe to stop and resume. No key needed.", True),
-    "labeller-data": ("Fetch stop-reason data", "Download the Open Targets curated stop reasons (about 38 requests, a couple of minutes). The labeller needs it.", True),
+    "fetch-full": ("Fetch all trials", "First download from ClinicalTrials.gov: about 267 requests, 214 MB, about 11 minutes inside half of the site's limit. Safe to stop and resume. No key needed.", True),
+    "labeller-data": ("Fetch stop-reason data", "Download the Open Targets curated stop reasons (about 38 requests, about 1 minute). The labeller needs it.", True),
     "normalise": ("Normalise", "Stored pages to one compact record per trial (CPU, about 70 s).", False),
     "label": ("Label", "Stop-reason labeller and outcome classes for every trial (CPU, about 45 s).", False),
     "categorize": ("Categorize", "Areas, phase, region, input state and the frozen split (CPU, about 10 s).", False),
@@ -64,7 +65,9 @@ class Jobs:
             s = ctx.summary(f"autoran {cmd}")
             job["summary"] = {"counts": s["counts"], "errors": s["errors"], "notes": s.get("notes", {}), "result": _short(res)}
             job["log"].append("finished: " + json.dumps(job["summary"], default=str)[:1500])
-            job["state"] = "failed" if s["errors"] else "done"
+            job["state"] = "paused" if s.get("notes", {}).get("stopped") == "paused" else ("failed" if s["errors"] else "done")
+        except Paused as e:
+            job["state"], job["log"] = "paused", job["log"] + [str(e) + ". Nothing is lost; press Retry in the Fetch panel, or run it again later."]
         except SystemExit as e:
             job["state"], job["log"] = "failed", job["log"] + ["stopped: " + str(e)]
         except Exception as e:                      # keep the app alive; show the reason

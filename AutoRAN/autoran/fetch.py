@@ -55,6 +55,7 @@ def fetch(ctx, cfg, kind="full", resume=True, max_pages=None):
     run, page, token, since = _open_run(ctx, kind, resume) if not ctx.dry_run else ("dry", 1, None, None)
     ts = rctgov.data_timestamp(ctx)
     total, n_studies, n_pages = None, 0, 0
+    done0 = 0 if ctx.dry_run else sum(p.get("n", 0) for p in ctx.store.records("autoran_pages.jsonl") if p.get("run") == run)
     while True:
         params = build_params(cfg, since=since, token=token, first=(page == 1))
         r = ctx.client.get(API, params)
@@ -81,6 +82,7 @@ def fetch(ctx, cfg, kind="full", resume=True, max_pages=None):
                                                  "total": total, "file": ctx.store.rel(path), "ts": iso_now()})
         n_studies += len(studies)
         n_pages += 1
+        _progress(ctx, "clinicaltrials.gov", "trials", done0 + n_studies, total or done0 + n_studies, int(cfg.get("page_size", 1000)))
         ctx.count("pages", 1)
         ctx.count("studies", len(studies))
         page += 1
@@ -93,6 +95,14 @@ def fetch(ctx, cfg, kind="full", resume=True, max_pages=None):
             break
     ctx.notes.update({"run": run, "total_reported": total, "data_timestamp": ts})
     return {"run": run, "pages": n_pages, "studies": n_studies, "total": total}
+
+
+def _progress(ctx, host, label, done, total, per=1):
+    """Tell the screen how far along we are. Never allowed to break a fetch."""
+    try:
+        ctx.client.gov.progress(host, label, done, total, per)
+    except Exception:
+        pass
 
 
 def _started(ctx, run):

@@ -15,7 +15,7 @@ human-checked side is [RÁN](../RAN/). **Read [DISCLAIMERS.md](DISCLAIMERS.md) b
 - **Build the exe yourself:** `powershell -ExecutionPolicy Bypass -File build\build.ps1` (after `setup.ps1 -Build`).
 
 On first run, with no data yet, the app opens on **Get started**: it downloads the registry to your computer (about 270 requests to clinicaltrials.gov and 40 to
-the Hugging Face dataset server, 10 to 15 minutes, no account or key needed, resumable), then labels, categorises, scores and measures. A small sample for a quick try:
+the Hugging Face dataset server, about 12 minutes inside half of each limit, no account or key needed, resumable), then labels, categorises, scores and measures. A small sample for a quick try:
 `autoran fetch --max-pages 2`, `labeller-data`, `normalise --partial`, `label`, `categorize`, `score`, `metrics` (about 2,000 trials, a few minutes).
 
 ## What you need
@@ -43,6 +43,17 @@ Pages: **Overview**, **Coverage**, **Labels and rules**, **Scorers**, **Browse**
 - **Review** supervises thousands of labels without reading each: sheets of 12 to 48 cards, every card correct unless flagged (X wrong, U unsure, J/K move, Enter submit), live precision with a 95% interval and an "enough" signal at plus or minus 3 points;
   **canary** cards (about one in twelve, deliberately wrong) measure how closely screens are read and never count toward precision; **review by rule** samples what one rule matched; **targeted samples** surface the least certain labels, rule-versus-model disagreements and completed trials with tiny enrolment.
 - A start-up problem shows a message box and writes `state/app.log`; `AutoRAN.exe --selftest` writes `state/selftest.json`.
+
+## Fetching safely (the Fetch panel)
+
+A **Fetch** panel sits at the top of every page, open by default and collapsing to a one-line strip when nothing is happening. It shows, for each source, the requests used in the
+current window against the limit (a dashed line marks the auto-stop at 50%), job progress, and a colour: green is fine, yellow is paused, red is stopped after repeated errors.
+A plain sentence says where things stand ("All clear. Your data will be local in about 6 minutes." or "Hugging Face is stopped for 12 minutes."). Layouts: bars, columns, gauges.
+
+- Starting a download shows an estimate first and asks you to confirm.
+- Any 429, 502 or 503 raises a notice in the panel and is kept as a note on disk; 429, 503 and cool-downs also play a short two-click alert (once per source and kind every 10 minutes; the Sound button mutes it).
+- A source in trouble gets **Retry now** and **Schedule retry** (in 15 minutes or 1 hour; this works while AutoRAN stays open).
+- The safety margin is a setting: `governor.margin` in `shared/config/aegir.json` (default 0.5, also per host). How it works and the figures used: [../shared/README.md](../shared/README.md).
 
 ## The pipeline (command line)
 

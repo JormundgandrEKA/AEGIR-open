@@ -5,7 +5,7 @@ import sys
 
 from . import __version__
 from . import core
-from aegir_core.http import BudgetExceeded, HostBlocked, WindowRefused
+from aegir_core.http import BudgetExceeded, HostBlocked, Paused, WindowRefused
 
 
 def _common():
@@ -82,6 +82,8 @@ def main(argv=None):
         result = commands.run(args.cmd, ctx, cfg, args)
     except BudgetExceeded as e:
         ctx.error(str(e)); ctx.notes["stopped"] = "budget"; result, code = {}, 2
+    except Paused as e:
+        ctx.error(str(e) + ". Nothing is lost: run the same command again later and it resumes."); ctx.notes["stopped"] = "paused"; code, result = 2, {}
     except WindowRefused as e:
         ctx.error(str(e)); code, result = 2, {}
     except HostBlocked as e:

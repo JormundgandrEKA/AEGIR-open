@@ -5,7 +5,7 @@ import sys
 
 from . import batches, ctgov, derive, epmc, labels, link, pmc, pubmed, reports
 from aegir_core.context import Ctx
-from aegir_core.http import BudgetExceeded, HostBlocked, WindowRefused
+from aegir_core.http import BudgetExceeded, HostBlocked, Paused, WindowRefused
 
 
 NL = chr(10)
@@ -204,6 +204,8 @@ def main(argv=None):
         ctx.notes["stopped"] = "budget"
         ctx.notes["estimate"] = f"{ctx.client.used} requests used before stopping"
         code = 2
+    except Paused as e:
+        ctx.error(str(e) + ". Nothing is lost: run the same command again later."); code, result = 2, {}
     except WindowRefused as e:
         ctx.error(str(e))
         ctx.notes["stopped"] = "ncbi_window"

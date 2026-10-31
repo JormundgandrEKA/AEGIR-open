@@ -60,8 +60,11 @@ pre{white-space:pre-wrap;word-break:break-word;font:12.5px/1.4 Consolas,monospac
 .small{font-size:11.5px;color:var(--dim)}
 svg text{font:11px Consolas,monospace;fill:#111}
 .heat td{text-align:right;font:11px Consolas,monospace;padding:1px 4px}
+#fp{position:sticky;top:34px;z-index:2;background:var(--bg)}
+.fpbox{border-bottom:2px solid var(--rule);padding:6px 14px 8px;max-height:45vh;overflow:auto;background:#fcfcfc}
 </style></head><body>
 <nav id="nav"><b>AutoRAN</b></nav>
+<section id="fp" aria-label="Fetch status"></section>
 <main id="main">Loading…</main>
 <div id="drawer"></div>
 <script>
@@ -290,7 +293,7 @@ async function run(main){
  const box=h('div'),logs=h('div');main.append(h('div',{class:'row'},dev,h('span',{id:'rnstat',class:'small'})),box,h('h2',null,'Jobs'),logs);
  async function draw(){const j=await api('/api/jobs');const st=await api('/api/status');
   box.replaceChildren(...Object.entries(j.stages).map(([k,v])=>h('div',{class:'row',style:'border-bottom:1px solid var(--hair);padding:3px 0'},
-    h('button',{disabled:j.running?'disabled':null,onclick:async()=>{try{await api('/api/run',{stage:k,device:dev.value});}catch(e){alert(e.message);}draw();}},v.label),
+    h('button',{disabled:j.running?'disabled':null,onclick:async()=>{await startStage(k,dev.value);draw();}},v.label),
     v.network?h('span',{class:'chip'},'network'):null,h('span',{class:'small'},v.about))));
   document.getElementById('rnstat').replaceChildren(j.running?'a job is running…':'idle',st.stale?h('button',{style:'margin-left:10px',onclick:async()=>{await api('/api/reload',{},'POST');location.reload();}},'Reload data (new results are ready)'):'');
   logs.replaceChildren(...(j.items.length?j.items.slice().reverse():[{stage:'',state:'',log:['no jobs yet']}]).map(x=>h('div',{style:'margin-bottom:8px'},
@@ -303,11 +306,11 @@ async function start(main){
  main.append(h('h2',null,'Welcome to AutoRAN'));
  main.append(h('div',null,'There is no trial data on this computer yet. AutoRAN does not ship with any: it downloads the registry data itself, then labels it, scores it and shows you the results. Everything runs locally.'));
  main.append(h('h2',null,'What the first run does'));
- ['Downloads every trial in scope from ClinicalTrials.gov (about 267 requests, 214 MB, about 10 minutes at the polite rate limit of 40 requests a minute). It can be stopped and resumed. No account or API key is needed.',
+ ['Downloads every trial in scope from ClinicalTrials.gov (about 267 requests, 214 MB, about 11 minutes, always inside half of each limit). It can be stopped and resumed. No account or API key is needed.',
   'Downloads the Open Targets curated stop reasons (about 38 requests) that the labeller learns from. A Hugging Face token is optional and only raises the rate limit.',
   'Normalises, labels, categorises, scores and measures: a few minutes on a CPU, less with a GPU. The app then reloads and fills the other pages.'].forEach(x=>main.append(h('div',{class:'small',style:'margin:2px 0'},'· '+x)));
  main.append(h('div',{class:'warn'},'Requirements: an internet connection, about 2 GB of free disk space for the data, and permission to use the data under the providers’ terms (see About). Optional: set a contact email under Settings first, so the registry can reach you if your requests cause trouble.'));
- const go2=h('button',{class:'primary',onclick:async()=>{try{await api('/api/run',{stage:'run-all',device:'auto'});location.hash='#run';}catch(e){alert(e.message);}}},'Fetch everything and build (first run)');
+ const go2=h('button',{class:'primary',onclick:async()=>{await startStage('run-all','auto');}},'Fetch everything and build (first run)');
  main.append(h('div',{class:'row',style:'margin-top:10px'},go2,h('a',{href:'#settings'},'Settings first'),h('a',{href:'#run'},'Pick individual steps')));
  main.append(h('div',{class:'small',style:'margin-top:8px'},'To try the pipeline quickly on a small sample instead, use the command line: autoran fetch --max-pages 2, then autoran labeller-data, autoran normalise --partial, label, categorize, score, metrics.'));}
 
@@ -335,7 +338,7 @@ async function settings(main){
    if(!Object.keys(body).length){msg.textContent='nothing changed';return;}
    try{await api('/api/settings',body);msg.textContent='Saved. Folder changes apply after you restart AutoRAN.';setTimeout(()=>location.reload(),900);}catch(e){msg.textContent='Not saved: '+e.message;}}},'Save'),' ',msg);
  main.append(h('h2',null,'Before you fetch'));
- ['Fetching downloads about 214 MB from clinicaltrials.gov at 40 requests a minute; it takes about 10 minutes and can be stopped and resumed. No account or key is needed.',
+ ['Fetching downloads about 214 MB from clinicaltrials.gov at a pace well inside its limit; it takes about 11 minutes and can be stopped and resumed. No account or key is needed.',
   'The Open Targets stop-reason download comes from the Hugging Face dataset server; a token is optional.',
   'You are responsible for using registry data under the providers’ own terms (see About).'].forEach(x=>main.append(h('div',{class:'small',style:'margin:2px 0'},'· '+x)));}
 
@@ -371,6 +374,90 @@ document.addEventListener('keydown',e=>{
   else if(k==='k'||e.key==='ArrowUp'||e.key==='ArrowLeft'){r.move(-1);e.preventDefault();}else if(k==='o'){r.open();}else if(e.key==='Enter'){r.submit();e.preventDefault();}
   else if(/^[1-9]$/.test(e.key)){r.pick(+e.key-1);}}});
 
+// ------------------------------------------------------------------ Fetch panel (always visible by default; collapses to a strip)
+const FP={layout:lget('fp.layout','a'),hidden:lget('fp.hidden','0')==='1',sound:lget('fp.sound','1')==='1',data:null,alerted:{},lastPing:0,t0:Date.now()/1000,confirm:null,toast:null,sched:{},lastStage:null,idleSince:null,pinned:false,err:null};
+function lget(k,d){try{const v=localStorage.getItem(k);return v==null?d:v;}catch(e){return d;}}
+function lput(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+const FCOL={green:'#2e8b3d',yellow:'#e0a100',red:'#c0192f'};
+const NET_STAGES=['fetch-full','fetch-delta','labeller-data','run-all'];
+function fdot(c,s){return h('span',{style:`display:inline-block;width:${s||10}px;height:${s||10}px;border-radius:50%;background:${FCOL[c]};vertical-align:middle`});}
+function fpct(a,b){return b>0?Math.max(0,Math.min(100,Math.round(100*a/b))):0;}
+function fmtS(s){return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2);}
+function fpPing(){
+ try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;FP.ac=FP.ac||new AC();const ac=FP.ac;if(ac.state==='suspended')ac.resume();
+  const burst=(t,dur,freq,q,gain,tone)=>{const n=Math.floor(ac.sampleRate*dur),b=ac.createBuffer(1,n,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);
+   const s=ac.createBufferSource();s.buffer=b;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=freq;f.Q.value=q;const g=ac.createGain();g.gain.value=gain;s.connect(f);f.connect(g);g.connect(ac.destination);s.start(t);
+   if(tone){const o=ac.createOscillator();o.type='square';o.frequency.value=tone;const og=ac.createGain();og.gain.setValueAtTime(gain*0.5,t);og.gain.exponentialRampToValueAtTime(0.001,t+dur);o.connect(og);og.connect(ac.destination);o.start(t);o.stop(t+dur);}};
+  const t=ac.currentTime+0.02;burst(t,0.09,900,1.2,0.9,170);burst(t+0.13,0.06,3200,2.5,0.7,0);}catch(e){}}
+function fpAlerts(evs){
+ let fresh=false;
+ (evs||[]).slice().reverse().forEach(e=>{if(e.ts<FP.t0||FP.alerted['id'+e.ts+e.host])return;FP.alerted['id'+e.ts+e.host]=1;
+  if(e.level!=='warn'&&e.level!=='error')return;
+  FP.toast=e;FP.hidden=false;fresh=true;
+  const key=e.host+'|'+e.kind,now=Date.now()/1000;                       // one ca-chik per host and kind every 10 minutes, and never more than one every 15 s
+  if(FP.sound&&(!FP.alerted[key]||now-FP.alerted[key]>600)&&now-FP.lastPing>15){fpPing();FP.lastPing=now;}
+  FP.alerted[key]=now;});
+ return fresh;}
+function fpQuota(x){const w=fpct(x.used,x.max),lp=fpct(x.line,x.max);return {w,lp};}
+function fpProg(x){const p=x.progress;if(!p)return '';const q=fpct(p.done,p.total);return `<div style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--dim);margin-top:3px"><div style="flex:1;height:6px;background:var(--soft);border:1px solid var(--hair)"><div style="width:${q}%;height:100%;background:var(--acc)"></div></div><span>${p.done.toLocaleString()} of ${p.total.toLocaleString()} ${p.label}</span></div>`;}
+function fpStatusText(x){if(x.cooldown_left)return 'Stopped '+fmtS(x.cooldown_left);if(x.hold_left>x.pause_left)return 'Waiting '+fmtS(x.hold_left)+' for the window to reset';if(x.pause_left)return 'Paused '+fmtS(x.pause_left);if(x.throttle<1)return 'Running at '+Math.round(x.throttle*100)+'% of normal';if(x.progress&&x.progress.done<x.progress.total)return 'Fetching';if(x.used>0)return 'Idle, '+x.used+' recent';return 'Idle';}
+function fpBarsA(hs){return hs.map(x=>{const q=fpQuota(x),c=FCOL[x.colour];
+ return `<div style="margin:0 0 12px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px"><b>${x.label}</b><span class="small">${fdot(x.colour,9).outerHTML} ${fpStatusText(x)}</span></div>
+ <div style="position:relative;height:16px;background:var(--soft);border:1px solid var(--rule)"><div style="position:absolute;left:0;top:0;bottom:0;width:${q.w}%;background:${c}"></div><div style="position:absolute;left:${q.lp}%;top:-3px;bottom:-3px;border-left:2px dashed var(--fg)"></div></div>
+ <div style="position:relative;height:15px;font-size:11px;color:var(--dim)"><span style="position:absolute;left:${q.lp}%;transform:translateX(-50%)">auto-stop ${x.line}</span><span style="position:absolute;right:0">limit ${x.max}${x.verified?'':' (assumed)'}</span><span>${x.used} used, ${Math.round(x.window_s/60)>=1?'per '+(x.window_s>=120?Math.round(x.window_s/60)+' min':'minute'):'per second'}</span></div>${fpProg(x)}</div>`;}).join('');}
+function fpBarsB(hs){return `<div style="display:grid;grid-template-columns:repeat(${Math.max(1,hs.length)},1fr);gap:12px">`+hs.map(x=>{const q=fpQuota(x),c=FCOL[x.colour];
+ return `<div style="text-align:center"><b>${x.label}</b><div style="position:relative;height:120px;width:54px;margin:6px auto;background:var(--soft);border:1px solid var(--rule)"><div style="position:absolute;left:0;right:0;bottom:0;height:${q.w}%;background:${c}"></div><div style="position:absolute;left:-3px;right:-3px;bottom:${q.lp}%;border-top:2px dashed var(--fg)"></div></div><div class="small">limit ${x.max}, auto-stop ${x.line}</div><div>${fdot(x.colour,9).outerHTML} ${fpStatusText(x)}</div>${fpProg(x)}</div>`;}).join('')+'</div>';}
+function fpArc(a0,a1){const p=a=>[60+47*Math.cos(Math.PI*(1-a)),60-47*Math.sin(Math.PI*(1-a))],s=p(a0),e=p(a1);return `M${s[0].toFixed(1)} ${s[1].toFixed(1)} A47 47 0 0 1 ${e[0].toFixed(1)} ${e[1].toFixed(1)}`;}
+function fpBarsC(hs){return `<div style="display:grid;grid-template-columns:repeat(${Math.max(1,hs.length)},1fr);gap:12px">`+hs.map(x=>{const f=Math.min(1,x.used/x.max),lf=x.line/x.max,t=(a,r)=>[(60+r*Math.cos(Math.PI*(1-a))).toFixed(1),(60-r*Math.sin(Math.PI*(1-a))).toFixed(1)],t1=t(lf,38),t2=t(lf,56),c=FCOL[x.colour];
+ return `<div style="text-align:center"><svg viewBox="0 0 120 72" width="100%" style="max-width:220px" role="img" aria-label="${x.label} quota"><path d="${fpArc(0,1)}" fill="none" stroke="#e6e6e6" stroke-width="12"/><path d="${fpArc(0,Math.max(f,0.001))}" fill="none" stroke="${c}" stroke-width="12"/><line x1="${t1[0]}" y1="${t1[1]}" x2="${t2[0]}" y2="${t2[1]}" stroke="#111" stroke-width="2"/><text x="60" y="56" text-anchor="middle" style="font-size:15px;font-weight:700">${x.used}</text><text x="60" y="68" text-anchor="middle" style="font-size:7px">of ${x.line} allowed</text></svg><b>${x.label}</b><div class="small">limit ${x.max}${x.verified?'':' (assumed)'}</div><div>${fdot(x.colour,9).outerHTML} ${fpStatusText(x)}</div>${fpProg(x)}</div>`;}).join('')+'</div>';}
+async function fpRetry(host,force){try{const r=await api('/api/fetch/retry',{host:host,force:!!force});if(!r.ok&&!force){if(confirm('This source is in a cool-down after repeated errors. Retrying early can extend it. Retry anyway?'))return fpRetry(host,true);return;}
+  if(FP.lastStage&&!(FP.data&&FP.data.jobs_running)){await api('/api/run',{stage:FP.lastStage,device:'auto'});}fpPoll();}catch(e){FP.err=e.message;fpRender();}}
+function fpSchedule(host,mins){if(!mins)return;const at=Date.now()+mins*60000;FP.sched[host]={at:at,stage:FP.lastStage||'run-all'};fpRender();}
+function fpTick(){const now=Date.now();Object.keys(FP.sched).forEach(k=>{const s=FP.sched[k];if(s&&now>=s.at){delete FP.sched[k];if(!(FP.data&&FP.data.jobs_running))startStage(s.stage,'auto',true);}});}
+async function startStage(stage,device,skipConfirm){
+ if(!skipConfirm&&NET_STAGES.includes(stage)){try{const est=await api('/api/fetch/estimate',{stage:stage});if(est.items&&est.items.length){FP.confirm={stage:stage,device:device||'auto',est:est};FP.hidden=false;fpRender();window.scrollTo(0,0);return;}}catch(e){}}
+ try{FP.lastStage=stage;FP.confirm=null;await api('/api/run',{stage:stage,device:device||'auto'});FP.hidden=false;FP.idleSince=null;fpPoll();}catch(e){alert(e.message);}}
+function fpRender(){
+ const el=$('fp');if(!el)return;const d=FP.data;el.replaceChildren();
+ if(!d){return;}
+ const hl=d.headline,hs=d.hosts.filter(x=>x.used>0||x.progress||x.colour!=='green'||x.host==='clinicaltrials.gov'||x.host==='datasets-server.huggingface.co');
+ const worst=d.hosts.some(x=>x.colour==='red')?'red':d.hosts.some(x=>x.colour==='yellow')?'yellow':'green';
+ const box=h('div',{class:'fpbox'});
+ const head=h('div',{style:'display:flex;align-items:center;gap:10px;flex-wrap:wrap'});
+ head.append(h('b',{style:'font:700 12px Consolas,monospace;letter-spacing:.06em;text-transform:uppercase'},'Fetch'),fdot(worst,12),h('span',{style:'flex:1;font-weight:700'},hl.title));
+ const mk=(t,fn,on)=>h('button',{class:on?'on':'',onclick:fn},t);
+ if(!FP.hidden){[['a','Bars'],['b','Columns'],['c','Gauges']].forEach(x=>head.append(mk(x[1],()=>{FP.layout=x[0];lput('fp.layout',x[0]);fpRender();},FP.layout===x[0])));
+  head.append(mk(FP.sound?'Sound on':'Sound off',()=>{FP.sound=!FP.sound;lput('fp.sound',FP.sound?'1':'0');if(FP.sound)fpPing();fpRender();}));}
+ head.append(mk(FP.hidden?'Show':'Hide',()=>{FP.hidden=!FP.hidden;FP.pinned=!FP.hidden;lput('fp.hidden',FP.hidden?'1':'0');fpRender();}));
+ box.append(head);
+ if(FP.hidden){el.append(box);return;}
+ box.append(h('div',{class:'small',style:'margin:2px 0 8px 22px'},hl.detail));
+ if(FP.toast){const t=FP.toast;box.append(h('div',{style:`border:1px solid ${FCOL[t.level==='error'?'red':'yellow']};border-left:6px solid ${FCOL[t.level==='error'?'red':'yellow']};padding:4px 8px;margin:0 0 8px;background:#fff`},h('b',null,'New: '),t.text,' ',h('button',{onclick:()=>{FP.toast=null;fpRender();}},'Dismiss')));}
+ if(FP.confirm){const c=FP.confirm,e=c.est;box.append(h('div',{style:'border:2px solid var(--acc);padding:8px 10px;margin:0 0 8px;background:#f2f6ff'},h('b',null,'Start this fetch?'),h('div',{style:'margin:4px 0'},e.text),h('div',{class:'small'},'Each source stays under '+Math.round(e.margin*100)+'% of its limit, so a second fetcher on this connection is safe. You can stop and resume at any time.'),
+  h('div',{class:'row'},h('button',{onclick:()=>startStage(c.stage,c.device,true)},'Start'),h('button',{onclick:()=>{FP.confirm=null;fpRender();}},'Not now'))));}
+ box.append(h('div',{html:(FP.layout==='b'?fpBarsB(hs):FP.layout==='c'?fpBarsC(hs):fpBarsA(hs))}));
+ box.append(h('div',{class:'small',style:'border-top:1px solid var(--hair);padding-top:4px;margin-top:2px'},'Solid fill: requests in the current window. Dashed line: auto-stop, at '+Math.round((d.hosts[0]?d.hosts[0].margin:0.5)*100)+'% of the limit. Green: fine. Yellow: paused. Red: stopped after repeated errors.'));
+ // notes: the persistent record, with actions on sources that need attention
+ const trouble=d.hosts.filter(x=>x.colour!=='green');
+ trouble.forEach(x=>{const col=FCOL[x.colour];const n=h('div',{style:`border:1px solid ${col};border-left:6px solid ${col};padding:5px 8px;margin-top:8px`});
+  n.append(h('div',null,x.last_event?x.last_event.text:(x.label+': '+fpStatusText(x))));
+  const a=h('div',{class:'row',style:'margin:4px 0 0'});a.append(h('button',{onclick:()=>fpRetry(x.host,false)},'Retry now'));
+  const sel=h('select',{onchange:()=>{fpSchedule(x.host,+sel.value);}},h('option',{value:'0'},'Schedule retry…'),h('option',{value:'15'},'In 15 minutes'),h('option',{value:'60'},'In 1 hour'));a.append(sel);
+  const s=FP.sched[x.host];if(s)a.append(h('span',{class:'small',style:'color:var(--good)'},'Will retry at '+new Date(s.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+' (needs AutoRAN to stay open)'));
+  n.append(a);box.append(n);});
+ const evs=(d.events||[]).filter(e=>e.level!=='info').slice(0,5);
+ if(evs.length){const lg=h('div',{style:'margin-top:8px'},h('div',{class:'small'},'Notes (kept on disk)'));evs.forEach(e=>lg.append(h('div',{class:'small',style:'padding:1px 0'},fdot(e.level==='error'?'red':'yellow',8),' '+new Date(e.ts*1000).toLocaleTimeString()+'  '+e.text)));box.append(lg);}
+ if(FP.err)box.append(h('div',{class:'warn bad'},FP.err));
+ el.append(box);}
+async function fpPoll(){
+ try{const d=await api('/api/fetch/status');FP.data=d;FP.err=null;const fresh=fpAlerts(d.events);
+  const active=d.jobs_running||d.hosts.some(x=>x.progress&&x.progress.done<x.progress.total),calm=d.headline.colour==='green'&&!active;
+  if(!calm||fresh){FP.idleSince=null;if(!FP.pinned&&(d.headline.colour!=='green'||active))FP.hidden=false;}                  // trouble or a running fetch opens the panel
+  else if(!FP.idleSince)FP.idleSince=Date.now();
+  else if(Date.now()-FP.idleSince>20000&&!FP.pinned&&!FP.confirm)FP.hidden=true;                                         // nothing to see for 20 s: collapse to the strip
+  fpTick();fpRender();}catch(e){}}
+function fpStart(){if(!$('fp'))return;fpPoll();setInterval(fpPoll,2000);}
+
 async function boot(){
  const main=$('main');
  await waitBridge();
@@ -388,5 +475,6 @@ async function boot(){
  go();}
 document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[target=_blank]');if(a&&hasBridge()){e.preventDefault();api('/api/open',{url:a.href}).catch(()=>{});}});
 boot();
+fpStart();
 </script></body></html>
 """

@@ -75,7 +75,10 @@ def load_cfg(root=None):
 def make_ctx(root=None, **kw):
     """A RAN context rooted in the AutoRAN folder (its own data/, state/ and config/)."""
     settings.apply_env()
-    return Ctx(Path(root or ROOT), **kw)
+    ctx = Ctx(Path(root or ROOT), **kw)
+    tok = bool(settings.get("hf_token"))                       # a Hugging Face token doubles the published limit
+    ctx.client.gov.has_token.update({"datasets-server.huggingface.co": tok, "huggingface.co": tok})
+    return ctx
 
 
 class Paths:

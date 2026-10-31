@@ -11,6 +11,7 @@ from pathlib import Path
 from unittest import mock
 
 HERE = Path(__file__).resolve().parent
+os.environ["AEGIR_STATE_DIR"] = tempfile.mkdtemp()          # the governor keeps its state per user; tests must not touch the real one
 sys.path.insert(0, str(HERE.parent))
 FIX = HERE / "fixtures"
 
@@ -28,6 +29,7 @@ def fixture(name):
 class Base(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
+        os.environ["AEGIR_STATE_DIR"] = str(self.tmp / "gov")      # fresh rate-limit state for every test
         shutil.copytree(HERE.parent / "config", self.tmp / "config",
                         ignore=shutil.ignore_patterns("*.local.json"))
         os.environ.pop("NCBI_API_KEY", None)
@@ -201,10 +203,14 @@ class TestClient(Base):
         finally:
             os.environ.pop("NCBI_API_KEY"), os.environ.pop("NCBI_EMAIL")
 
-    def test_cross_process_rate_file(self):
+    def test_governor_state_is_shared_and_saved(self):
         ctx = Ctx(self.tmp, sleep=lambda s: None)
-        ctx.client._acquire("clinicaltrials.gov")
-        self.assertIn("clinicaltrials.gov", json.loads((self.tmp / "state/rate.json").read_text()))
+        ctx.client.gov.acquire("clinicaltrials.gov")
+        state = json.loads((Path(os.environ["AEGIR_STATE_DIR"]) / "governor.json").read_text())
+        self.assertEqual(len(state["clinicaltrials.gov"]["hits"]), 1)
+        snap = {x["host"]: x for x in Ctx(self.tmp, sleep=lambda s: None).client.gov.snapshot()}["clinicaltrials.gov"]   # a second client sees the same count
+        self.assertEqual(snap["used"], 1)
+        self.assertEqual(snap["line"], 25)                                   # 50% of 50 a minute
 
     def test_window(self):
         from datetime import datetime, timezone

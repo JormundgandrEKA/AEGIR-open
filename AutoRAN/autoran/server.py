@@ -1,5 +1,6 @@
 """`autoran serve`: dashboard, findings browser, trial inspector and supervisor review tools. 127.0.0.1 only, Host-checked, stdlib."""
 import json
+import time
 import random
 import threading
 import webbrowser
@@ -312,6 +313,65 @@ QUESTIONS = {"positive_recruitment": "Did this trial stop because it could not r
              "negative_completed": "Is this a normal completion (not a hidden under-enrolment)?"}
 
 
+HF_HOST = "datasets-server.huggingface.co"
+CT_HOST = "clinicaltrials.gov"
+
+
+def fetch_needs(state, stage):
+    """{host: requests still to make} for a stage that uses the network, from what is already on disk."""
+    import math
+    cfg, ctx = state.cfg, state.ctx
+    paths = state.paths
+    page = int(cfg.get("page_size", 1000))
+    needs = {}
+    runs = ctx.store.latest("autoran_runs.jsonl", "run")
+    fulls = sorted((r for r in runs.values() if r["kind"] == "full"), key=lambda r: r["run"])
+    want_ct = stage in ("fetch-full", "run-all", "fetch-delta")
+    if want_ct:
+        if stage == "fetch-delta" or (stage == "run-all" and any(r["status"] == "done" for r in fulls)):
+            needs[CT_HOST] = 5                                      # a day's changes: a handful of pages
+        else:
+            total = max([r.get("total") or 0 for r in fulls] + [266916])
+            pages = math.ceil(total / page)
+            unfinished = [r for r in fulls if r["status"] != "done"]
+            have = 0
+            if unfinished:
+                have = sum(1 for p in ctx.store.records("autoran_pages.jsonl") if p.get("run") == unfinished[-1]["run"])
+            needs[CT_HOST] = max(1, pages - have)
+    if stage in ("labeller-data", "run-all") and not paths.latest("ot_reasons_*.jsonl"):
+        needs[HF_HOST] = math.ceil(3747 / int(cfg.get("opentargets", {}).get("page", 100)))
+    return needs
+
+
+def fetch_estimate(state, stage):
+    needs = fetch_needs(state, stage)
+    if not needs:
+        return {"stage": stage, "needs": {}, "items": [], "minutes": 0, "fits": True, "text": "This step makes no network requests, or everything is already downloaded."}
+    gov = state.ctx.client.gov
+    plan = gov.plan(needs)
+    parts = [f"{i['requests']} requests to {i['label']} ({i['minutes']} min at {i['per_minute']:g} a minute; its limit is {i['max']})" for i in plan["items"]]
+    text = "Needs " + ", then ".join(parts) + f". Data will be local in about {max(1, round(plan['minutes']))} min."
+    if not plan["fits"]:
+        text += f" That is longer than the {plan['target_minutes']}-minute target: another fetcher or a server pause may be slowing this host."
+    plan.update({"stage": stage, "needs": needs, "text": text})
+    return plan
+
+
+def fetch_status(state):
+    gov = state.ctx.client.gov
+    snap = gov.snapshot()
+    known = {s["host"] for s in snap}
+    for host in (CT_HOST, HF_HOST):                                 # show the usual sources even before their first request
+        if host not in known:
+            hc = gov.host_cfg(host)
+            snap.append({"host": host, "label": hc["label"], "verified": hc["verified"], "window_s": hc["window"], "max": hc["max"],
+                         "line": int(hc["max"] * hc["margin"]), "cap_now": max(1, int(hc["max"] * hc["margin"])), "used": 0, "colour": "green",
+                         "throttle": 1.0, "today": 0, "pause_left": 0, "hold_left": 0, "cooldown_left": 0, "errors_total": 0, "progress": None,
+                         "margin": hc["margin"], "last_event": None})
+    snap.sort(key=lambda h: (h["host"] != CT_HOST, h["host"] != HF_HOST, h["host"]))
+    return {"hosts": snap, "headline": gov.headline(snap), "events": gov.events(30), "now": time.time(), "jobs_running": state.jobs.running()}
+
+
 def gpu_info():
     try:
         from . import gpu
@@ -352,6 +412,8 @@ def dispatch(state, method, path, q, body):
                 return 200, state.jobs.status()
             if path == "/api/gpu":
                 return 200, gpu_info()
+            if path == "/api/fetch/status":
+                return 200, fetch_status(state)
             if path == "/api/status":              # browser mode; the desktop window answers this itself
                 return 200, {"ready": True, "empty": state.empty, "error": None, "message": "", "seconds": 0, "stale": state.stale,
                              "jobs_running": state.jobs.running()}
@@ -364,6 +426,10 @@ def dispatch(state, method, path, q, body):
             if path == "/api/settings":
                 from . import settings
                 return 200, settings.save(body)
+            if path == "/api/fetch/estimate":
+                return 200, fetch_estimate(state, str(body.get("stage", "")))
+            if path == "/api/fetch/retry":
+                return 200, {"ok": state.ctx.client.gov.retry_now(str(body["host"]), bool(body.get("force")))}
             if path == "/api/submit":
                 return 200, state.submit(body)
             if path == "/api/run":

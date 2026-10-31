@@ -125,3 +125,14 @@ Verified: the frozen exe loads the 266,916-trial index, renders every plot, and 
 the same routes headlessly (a background job ran, a second was refused, a plug-in rendered), not clicked through in the window. Not tested: a computer with no Python at all (CPU only there).
 
 Limits: Windows-only (WebView2); the exe is unsigned, so SmartScreen may warn; GPU runs are seeded but not bit-for-bit repeatable; `serve` (browser mode) still works and shares all code.
+
+## 11. The request governor (31 Oct)
+
+Why: to avoid 429, 502 and 503 errors and IP blocks, with a margin large enough that two fetchers (or another user on the same connection) cannot push a source over its limit.
+
+What: one governor in `shared/aegir_core/governor.py`, used by both programs. It keeps each source at 50% of its published limit (a setting), counts requests in a rolling window saved to disk and shared by every process, reads the server's own limit headers where they exist, slows down and pauses on 429/502/503, and opens a saved cool-down after three errors in ten minutes. AutoRAN shows it in a Fetch panel (bars, columns or gauges), says in one sentence how things stand, estimates and confirms before a download, offers Retry now and Schedule retry, and plays a short alert for new 429, 503 and cool-down events (once per source and kind per 10 minutes).
+
+Tests (fake servers in virtual time; nothing touched a real host): 17 tests in `shared/tests/test_governor.py`. A full ClinicalTrials.gov fetch (267 requests) takes 10.6 minutes at a peak of 25 a minute; two fetchers sharing the state finish 2 x 100 requests in 8 minutes; two fetchers on one connection with no shared state peak at exactly the limit (50) with no errors; a server stricter than assumed costs 2 errors before the governor learns; three 503s open a cool-down that survives a restart; a neighbour using 85% of the Hugging Face window delays the Open Targets fetch by under a minute, while one using 90% or more makes it wait for each window (45 minutes for 10 requests), which the panel says plainly.
+
+Limits: the ClinicalTrials.gov figure (50 a minute) is a community number, not a published one, and its API sends no rate-limit headers, so there it can only react to a 429; Hugging Face's header behaviour on the dataset server is unverified. Schedule retry works only while AutoRAN is open. The Fetch panel's sound was checked to run, not heard.
+

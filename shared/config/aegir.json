@@ -5,35 +5,6 @@
   "pubmed_batch": 200,
   "min_fulltext_grade": "D-",
   "min_redistribute_grade": "B-",
-  "rate": {
-    "clinicaltrials.gov": {
-      "per_minute": 40
-    },
-    "eutils.ncbi.nlm.nih.gov": {
-      "per_second_nokey": 3,
-      "per_second_key": 10
-    },
-    "www.ncbi.nlm.nih.gov": {
-      "per_second_nokey": 3,
-      "per_second_key": 10
-    },
-    "pmc.ncbi.nlm.nih.gov": {
-      "per_second_nokey": 3,
-      "per_second_key": 10
-    },
-    "default": {
-      "per_minute": 30
-    },
-    "www.ebi.ac.uk": {
-      "per_minute": 50
-    },
-    "datasets-server.huggingface.co": {
-      "per_minute": 20
-    },
-    "huggingface.co": {
-      "per_minute": 30
-    }
-  },
   "source_grades": {
     "ctgov_search": "A+",
     "ctgov_study": "A+",
@@ -42,17 +13,76 @@
     "pubmed_metadata": "A-",
     "epmc_licence": "B"
   },
-  "backoff": {
-    "www.ebi.ac.uk": [
-      30,
-      60,
-      120
+  "demo_output_dir": "data/demo",
+  "governor": {
+    "margin": 0.5,
+    "target_minutes": 15,
+    "hold_remaining": 0.1,
+    "strikes_to_trip": 3,
+    "strike_window_s": 600,
+    "cooldown_s": [
+      900,
+      1800,
+      3600,
+      7200
     ],
-    "datasets-server.huggingface.co": [
-      30,
-      60,
-      120
-    ]
-  },
-  "demo_output_dir": "data/demo"
+    "hosts": {
+      "clinicaltrials.gov": {
+        "label": "ClinicalTrials.gov",
+        "max": 50,
+        "per_s": 60,
+        "verified": false,
+        "note": "no published limit; about 50 a minute per address is the community figure; the API sends no rate-limit headers"
+      },
+      "datasets-server.huggingface.co": {
+        "label": "Hugging Face (Open Targets)",
+        "max": 500,
+        "max_with_token": 1000,
+        "per_s": 300,
+        "verified": true,
+        "note": "Hub API limit for anonymous users, per address, in 5-minute fixed windows; a token doubles it"
+      },
+      "huggingface.co": {
+        "label": "Hugging Face",
+        "max": 500,
+        "max_with_token": 1000,
+        "per_s": 300,
+        "verified": true
+      },
+      "eutils.ncbi.nlm.nih.gov": {
+        "label": "NCBI E-utilities",
+        "max": 3,
+        "max_with_key": 10,
+        "per_s": 1,
+        "verified": true
+      },
+      "www.ncbi.nlm.nih.gov": {
+        "label": "NCBI",
+        "max": 3,
+        "max_with_key": 10,
+        "per_s": 1,
+        "verified": true
+      },
+      "pmc.ncbi.nlm.nih.gov": {
+        "label": "PubMed Central",
+        "max": 3,
+        "max_with_key": 10,
+        "per_s": 1,
+        "verified": true
+      },
+      "www.ebi.ac.uk": {
+        "label": "Europe PMC",
+        "max": 10,
+        "per_s": 1,
+        "verified": false,
+        "note": "about 10 a second per address (forum answers, not official docs)"
+      },
+      "default": {
+        "label": "other host",
+        "max": 30,
+        "per_s": 60,
+        "verified": false
+      }
+    }
+  }
 }

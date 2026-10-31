@@ -130,6 +130,43 @@ class TestSettingsRoute(unittest.TestCase):
             os.environ.pop("NCBI_EMAIL", None)
             os.environ.pop("AUTORAN_ENV_SET_NCBI_EMAIL", None)
 
+class TestFetchPanelRoutes(unittest.TestCase):
+    def setUp(self):
+        import os, tempfile, types
+        from autoran import core, server
+        from autoran.jobs import Jobs
+        self.tmp = Path(tempfile.mkdtemp())
+        os.environ["AEGIR_STATE_DIR"] = str(self.tmp / "gov")
+        (self.tmp / "config").mkdir()
+        for f in (core.CODE_ROOT / "config").glob("*.json"):
+            (self.tmp / "config" / f.name).write_bytes(f.read_bytes())
+        ctx = core.make_ctx(self.tmp, sleep=lambda s: None)
+        self.state = types.SimpleNamespace(ctx=ctx, cfg=core.load_cfg(self.tmp), paths=core.Paths(self.tmp).ensure(), jobs=Jobs())
+        self.server = server
+
+    def test_estimate_for_a_first_fetch_fits_the_target(self):
+        code, est = self.server.dispatch(self.state, "POST", "/api/fetch/estimate", {}, {"stage": "run-all"})
+        self.assertEqual(code, 200)
+        self.assertEqual(est["needs"]["clinicaltrials.gov"], 267)
+        self.assertEqual(est["needs"]["datasets-server.huggingface.co"], 38)
+        self.assertTrue(est["fits"])
+        self.assertIn("Data will be local in about", est["text"])
+        code, none = self.server.dispatch(self.state, "POST", "/api/fetch/estimate", {}, {"stage": "label"})
+        self.assertEqual(none["needs"], {})
+
+    def test_status_headline_and_retry(self):
+        gov = self.state.ctx.client.gov
+        gov.progress("clinicaltrials.gov", "trials", 120_000, 266_916, per=1000)
+        code, st = self.server.dispatch(self.state, "GET", "/api/fetch/status", {}, None)
+        self.assertEqual(code, 200)
+        self.assertEqual({h["host"] for h in st["hosts"]} >= {"clinicaltrials.gov", "datasets-server.huggingface.co"}, True)
+        self.assertTrue(st["headline"]["title"].startswith("All clear. Your data will be local in about"))
+        gov.record("clinicaltrials.gov", 429, {"Retry-After": "30"})
+        code, st = self.server.dispatch(self.state, "GET", "/api/fetch/status", {}, None)
+        self.assertEqual(st["headline"]["colour"], "yellow")
+        self.assertTrue(st["events"] and st["events"][0]["kind"] == "429")
+        code, r = self.server.dispatch(self.state, "POST", "/api/fetch/retry", {}, {"host": "clinicaltrials.gov"})
+        self.assertTrue(r["ok"])
 
 
 if __name__ == "__main__":

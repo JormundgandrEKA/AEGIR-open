@@ -59,6 +59,10 @@ def fetch(ctx, cfg, resume=True):
         offset += len(got)
         n += 1
         ctx.count("requests_ok", 1)
+        try:
+            ctx.client.gov.progress("datasets-server.huggingface.co", "stop-reason rows", offset, total or offset, size)
+        except Exception:
+            pass
     paths = Paths(ctx.root).ensure()
     classes = [f for f in (features or []) if f not in LABEL_META]
     sp = oc["split"]
