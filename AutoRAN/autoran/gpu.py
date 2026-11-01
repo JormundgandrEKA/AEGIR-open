@@ -253,8 +253,12 @@ def bootstrap_gpu(y, s, resamples=1000, seed=28, pref="auto", chunk=125):
 
 
 def bootstrap_distribution(y, s, resamples=5000, seed=28, pref="auto", chunk=125):
-    """The bootstrap AUROC values themselves (a numpy array), one batched GPU job. Falls back to the CPU device if there is no GPU."""
-    np, torch = _torch()
+    """The bootstrap AUROC values themselves (a numpy array), one batched GPU job. Falls back to the CPU device if there is no GPU,
+    and to a binned numpy version if PyTorch is not installed at all."""
+    try:
+        np, torch = _torch()
+    except SystemExit:
+        return _binned_bootstrap_distribution(y, s, resamples, seed)
     dev = device(pref)
     yt = torch.tensor(y, dtype=torch.float32, device=dev)
     st = torch.tensor(s, dtype=torch.float32, device=dev)
@@ -271,6 +275,25 @@ def bootstrap_distribution(y, s, resamples=5000, seed=28, pref="auto", chunk=125
         ranks.scatter_(1, order, torch.arange(1, n + 1, device=dev, dtype=torch.float32).expand(b, n))
         out.append(((ranks * ys).sum(1) - n1 * (n1 + 1) / 2) / (n1 * (n - n1)).clamp_min(1))
     return torch.cat(out).cpu().numpy()
+
+
+def _binned_bootstrap_distribution(y, s, resamples=5000, seed=28, bins=400):
+    """No PyTorch: the same distribution from 400 quantile bins, resampling positives and negatives separately (a stratified bootstrap)."""
+    import numpy as np
+    y, s = np.asarray(y), np.asarray(s, dtype=np.float64)
+    edges = np.unique(np.quantile(s, np.linspace(0, 1, bins + 1)[1:-1]))
+    b = np.searchsorted(edges, s, side="right")
+    k = len(edges) + 1
+    pos = np.bincount(b[y == 1], minlength=k).astype(np.float64)
+    neg = np.bincount(b[y == 0], minlength=k).astype(np.float64)
+    P, N = int(pos.sum()), int(neg.sum())
+    if P == 0 or N == 0:
+        return np.full(resamples, np.nan)
+    rng = np.random.default_rng(seed)
+    pc = rng.multinomial(P, pos / P, size=resamples).astype(np.float64)
+    nc = rng.multinomial(N, neg / N, size=resamples).astype(np.float64)
+    below = np.cumsum(nc, axis=1) - nc                              # negatives in lower bins
+    return (pc * (below + 0.5 * nc)).sum(1) / (P * N)
 
 
 def summarize_gpu(y, s, resamples=1000, seed=28, pref="auto"):

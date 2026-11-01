@@ -89,7 +89,7 @@ class TestPlugins(unittest.TestCase):
     def test_builtin_plots_present_and_unknown_rejected(self):
         names = {p["name"] for p in plots.listing(self.tmp)["plots"]}
         self.assertIn("Scorers: AUROC with intervals", names)
-        self.assertIn("AUROC bootstrap distribution (computed on the GPU)", names)
+        self.assertIn("AUROC bootstrap distribution", names)
         with self.assertRaises(ValueError):
             plots.render(self.tmp, {}, "no such plot")
 

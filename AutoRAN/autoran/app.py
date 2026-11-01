@@ -116,7 +116,7 @@ def selftest():
         out["plugin_errors"] = r["data"]["plugin_errors"]
         r = api.call("GET", "/api/plot?name=" + out["plots"][0].replace(" ", "%20"))
         out["first_plot"] = {k: (len(v) if k == "png" else v) for k, v in r["data"].items() if k in ("png", "seconds", "device", "error")}
-        gname = [n for n in out["plots"] if "GPU" in n]
+        gname = [n for n in out["plots"] if "bootstrap" in n.lower()]
         if gname:
             r = api.call("GET", "/api/plot?name=" + gname[0].replace(" ", "%20") + "&device=auto")
             out["gpu_plot"] = {k: (len(v) if k == "png" else v) for k, v in r["data"].items() if k in ("png", "seconds", "device", "error")}

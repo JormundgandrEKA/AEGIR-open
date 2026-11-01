@@ -45,13 +45,14 @@ class PlotContext:
     def __init__(self, root, metrics, pref="auto"):
         self.root, self.metrics, self.pref = Path(root), metrics or {}, pref
         self._frame = None
+        import numpy
+        self.np = numpy
         try:
-            import numpy
             import torch
-            self.np, self.torch = numpy, torch
+            self.torch = torch
             self.device = torch.device("cuda" if (pref != "cpu" and torch.cuda.is_available()) else "cpu")
-        except ImportError:
-            self.np, self.torch, self.device = None, None, None
+        except ImportError:                                  # no PyTorch: plots still work on the CPU with numpy
+            self.torch, self.device = None, None
 
     def frame(self):
         if self._frame is None:
@@ -111,7 +112,7 @@ def render(root, metrics, name, pref="auto"):
         fig.savefig(buf, format="png", dpi=110, bbox_inches="tight")
         png = buf.getvalue()
         plt.close(fig)
-    except Exception as e:
+    except (Exception, SystemExit) as e:                    # a plot that wants PyTorch must report it, not end the window's thread
         plt.close("all")
         return {"name": name, "error": f"{type(e).__name__}: {e}", "trace": traceback.format_exc()[-1200:]}
     out = core.Paths(root).derived / "plots"
@@ -190,7 +191,7 @@ def _dist(ctx):
     return fig
 
 
-@plot("AUROC bootstrap distribution (computed on the GPU)", "5,000 bootstrap resamples of the best scorer's test AUROC as one batched job; uses CUDA when present, the CPU otherwise")
+@plot("AUROC bootstrap distribution", "5,000 bootstrap resamples of the best scorer's test AUROC; uses an NVIDIA GPU when PyTorch is available, the CPU otherwise")
 def _boot(ctx):
     from . import gpu
     best = max((k for k in ctx.metrics["scorers"] if k != "random"), key=lambda k: ctx.metrics["scorers"][k]["test"]["all"].get("auroc") or 0)
@@ -205,5 +206,5 @@ def _boot(ctx):
     lo, hi = float(ctx.np.quantile(au, 0.025)), float(ctx.np.quantile(au, 0.975))
     ax.axvline(lo, color="#111", ls="--")
     ax.axvline(hi, color="#111", ls="--")
-    ax.set_xlabel(f"AUROC, {best}, 5,000 resamples: 95% interval {lo:.3f} to {hi:.3f}  ({secs:.1f} s on {ctx.device})")
+    ax.set_xlabel(f"AUROC, {best}, 5,000 resamples: 95% interval {lo:.3f} to {hi:.3f}  ({secs:.1f} s on {ctx.device or 'the CPU'})")
     return fig

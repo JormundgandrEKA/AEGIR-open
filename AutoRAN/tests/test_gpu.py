@@ -64,3 +64,16 @@ class TestGpu(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestNoTorchFallback(unittest.TestCase):
+    def test_binned_bootstrap_matches_the_exact_auroc(self):
+        import random
+        from autoran import gpu, stats
+        rnd = random.Random(3)
+        y = [1 if rnd.random() < 0.05 else 0 for _ in range(6000)]
+        s = [(0.4 if v else 0.0) + rnd.random() for v in y]
+        au = gpu._binned_bootstrap_distribution(y, s, resamples=800, seed=1)
+        exact = stats.auroc(y, s)
+        self.assertAlmostEqual(float(au.mean()), exact, delta=0.01)
+        self.assertGreater(float(au.std()), 0.0)
