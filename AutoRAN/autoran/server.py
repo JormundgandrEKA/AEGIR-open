@@ -414,6 +414,9 @@ def dispatch(state, method, path, q, body):
                 return 200, gpu_info()
             if path == "/api/fetch/status":
                 return 200, fetch_status(state)
+            if path == "/api/gpu/check":
+                from . import gpucheck
+                return 200, gpucheck.status()
             if path == "/api/status":              # browser mode; the desktop window answers this itself
                 return 200, {"ready": True, "empty": state.empty, "error": None, "message": "", "seconds": 0, "stale": state.stale,
                              "jobs_running": state.jobs.running()}
@@ -426,6 +429,15 @@ def dispatch(state, method, path, q, body):
             if path == "/api/settings":
                 from . import settings
                 return 200, settings.save(body)
+            if path == "/api/gpu/scan":
+                from . import gpucheck
+                return 200, {"started": gpucheck.start_scan()}
+            if path == "/api/gpu/install":
+                from . import gpucheck
+                plan = gpucheck.install_plan()
+                if body.get("dry_run") or not plan["ok"]:
+                    return 200, {"plan": plan, "started": False}
+                return 200, {"plan": plan, "started": gpucheck.start_install(plan)}
             if path == "/api/fetch/estimate":
                 return 200, fetch_estimate(state, str(body.get("stage", "")))
             if path == "/api/fetch/retry":

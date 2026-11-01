@@ -136,3 +136,13 @@ Tests (fake servers in virtual time; nothing touched a real host): 17 tests in `
 
 Limits: the ClinicalTrials.gov figure (50 a minute) is a community number, not a published one, and its API sends no rate-limit headers, so there it can only react to a 429; Hugging Face's header behaviour on the dataset server is unverified. Schedule retry works only while AutoRAN is open.
 
+## 12. GPU check and PyTorch installer (1 Nov)
+
+Why: the small exe has no PyTorch, and pointing it at a folder by hand was unclear. Now AutoRAN checks the computer itself.
+
+What: `autoran/gpucheck.py` reads the card and driver from `nvidia-smi`, probes every Python on the PC (in parallel, about 6 s here) for a PyTorch that imports and sees CUDA, and decides: ready, found, incompatible (wrong Python version or CPU-only build), not found, or no GPU. A compatible PyTorch is used automatically; the answer is cached for a week. If none is usable, an installer runs pip into `%LOCALAPPDATA%\AEGIR\gpu_pack`, choosing the newest CUDA index the driver supports (cu130, cu128, cu126, ...). Settings has a Graphics card section; the top-bar badge opens it; `autoran gpu-check` and `gpu-install` do the same from the command line.
+
+Found while building: installing with PyPI as an extra index would have picked PyPI's newest torch (2.15.0), which on Windows is a CPU-only build, over the CUDA build (2.14.1+cu130). The installer now takes torch from the PyTorch index only (`--no-deps`) and its small dependencies from PyPI in a second step; a test pins this.
+
+On this PC the check finds the RTX 4070 (driver 595.59, CUDA up to 13.2) and two CUDA-ready PyTorch installs for Python 3.13 (2.11.0+cu128 and 2.14.1+cu126), so no install is needed here. Limits: the exe can only load a PyTorch built for its own Python version (3.13); the install is about 3 GB; Windows and NVIDIA only; installing needs a Python with pip somewhere on the PC.
+

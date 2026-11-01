@@ -17,6 +17,23 @@ def _dispatch(cmd, ctx, cfg, args, paths):
     if cmd == "fetch":
         from . import fetch
         return fetch.fetch(ctx, cfg, kind="delta" if args.delta else "full", resume=not args.new, max_pages=args.max_pages)
+    if cmd == "gpu-check":
+        from . import gpucheck
+        c = gpucheck.load_cache()
+        if getattr(args, "fresh", False) or not gpucheck.cache_is_fresh(c):
+            c = gpucheck.scan()
+        return {"verdict": c["verdict"], "gpu": c["smi"], "pythons": [{k: p.get(k) for k in ("exe", "python", "torch", "cuda_ok", "site")} for p in c["pythons"]]}
+    if cmd == "gpu-install":
+        from . import gpucheck
+        if not gpucheck.cache_is_fresh():
+            gpucheck.scan()
+        plan = gpucheck.install_plan()
+        if getattr(args, "dry_run", False) or not plan["ok"]:
+            return {"plan": plan, "ran": False}
+        if not getattr(args, "yes", False):
+            raise ValueError(f"this downloads about {plan['expected_gb']:g} GB into {plan['target']}; add --yes to go ahead (or --dry-run to see the commands)")
+        res = gpucheck.run_install(plan)
+        return {"state": res["state"], "message": res["message"], "log_tail": res["log"][-8:]}
     if cmd == "labeller-data":
         from . import opentargets
         f = opentargets.fetch(ctx, cfg)

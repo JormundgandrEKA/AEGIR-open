@@ -3,7 +3,7 @@
 #                                                                      and build\dist-lite\AutoRAN-lite-win64.zip for sharing
 #   powershell -ExecutionPolicy Bypass -File build\build.ps1 -Full    also bundles PyTorch + CUDA (about 4 GB); only for a machine with no Python of its own
 # Needs Python 3.11+ with the packages in requirements.txt and pyinstaller (run setup.ps1 -Build). Uses .venv\ if there is one, else `python` on PATH.
-# The small build runs on the CPU. For the GPU it uses an existing PyTorch install: Settings > "GPU pack folder", or a gpu_pack\ folder beside the exe.
+# The small build runs on the CPU. For the GPU it finds a PyTorch already on the computer, or installs one for itself (Settings > Graphics card).
 param([switch]$Full)
 $ErrorActionPreference = "Stop"
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path

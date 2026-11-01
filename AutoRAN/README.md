@@ -27,10 +27,11 @@ the Hugging Face dataset server, about 12 minutes inside half of each limit, no 
 | Disk | about 2 GB for the downloaded and derived data, plus about 170 MB for the app |
 | Memory | 8 GB of RAM recommended (the full index takes about 1.2 GB in the window) |
 | Graphics card (optional) | any recent NVIDIA card with CUDA support. It makes scoring and bootstrap intervals several times faster than the CPU; more card memory allows larger batches. About 3 GB of card memory is the peak when training on the full set. **Without one, everything still runs on the CPU**, just slower |
-| PyTorch (optional) | only for the GPU. Install it once in your main Python with a CUDA build that matches your driver (`setup.ps1 -Gpu`, or `pip install torch --index-url https://download.pytorch.org/whl/cu128`, about 3 GB) |
+| PyTorch (optional) | only for the GPU, and AutoRAN looks after it: it finds a usable one already on your computer or installs one for itself (see below). About 3 GB if installed |
 
-The small exe finds an existing PyTorch through **Settings > GPU pack folder** (the `site-packages` folder that contains `torch/`) or a `gpu_pack` folder beside the exe
-(`pip install --target gpu_pack torch --index-url ...`). From source it is found automatically. `--device auto` (default) uses the GPU when PyTorch and CUDA are present and the CPU otherwise.
+**GPU check.** AutoRAN checks your computer by itself: it reads the graphics card and driver (`nvidia-smi`), looks through every Python on the PC for a PyTorch that can see the GPU, and uses a compatible one with no setting. The result is saved for a week and shown in **Settings > Graphics card (GPU)**; the "GPU" badge in the top bar opens it.
+If none is usable, **Install PyTorch for AutoRAN** downloads the CUDA build your driver supports (about 3 GB, with a confirmation) into `%LOCALAPPDATA%\AEGIR\gpu_pack` using pip from any Python on the PC. It changes nothing else. PyTorch comes from pip (download.pytorch.org), not git. Only the NVIDIA driver is needed: CUDA itself comes inside the PyTorch package.
+The one limit: this AutoRAN runs on Python 3.13, so it can borrow only a PyTorch built for 3.13 (the check tells you if yours is for another version). On the command line: `autoran gpu-check [--fresh]`, `autoran gpu-install --dry-run`, `autoran gpu-install --yes`. `--device auto` (default) uses the GPU when it is ready and the CPU otherwise.
 
 ## The app
 
@@ -38,7 +39,7 @@ Pages: **Overview**, **Coverage**, **Labels and rules**, **Scorers**, **Browse**
 
 - **Run:** any pipeline step in the background on the CPU or GPU, with a log; Reload data when it finishes.
 - **Plots:** built-in plots plus your own: drop one `.py` file in `plugins/` (see `plugins/example_sponsor.py`) and press Refresh. A plug-in gets `ctx.frame()` (a pandas table of every trial, label, category and score), `ctx.metrics`, `ctx.torch` and `ctx.device`.
-- **Settings** (saved per user in `%APPDATA%\AutoRAN\settings.json`, outside the project; also `autoran settings --set name=value`): workspace folder for `data/` and `state/`, RÁN history folder, GPU pack folder, contact email
+- **Settings** (also the Graphics card section above; saved per user in `%APPDATA%\AutoRAN\settings.json`, outside the project; also `autoran settings --set name=value`): workspace folder for `data/` and `state/`, RÁN history folder, contact email
   (added to request User-Agents), optional Hugging Face token and NCBI key. Tokens are stored encrypted (Windows DPAPI) and never shown again or written to project files or logs. All optional.
 - **Review** supervises thousands of labels without reading each: sheets of 12 to 48 cards, every card correct unless flagged (X wrong, U unsure, J/K move, Enter submit), live precision with a 95% interval and an "enough" signal at plus or minus 3 points;
   **canary** cards (about one in twelve, deliberately wrong) measure how closely screens are read and never count toward precision; **review by rule** samples what one rule matched; **targeted samples** surface the least certain labels, rule-versus-model disagreements and completed trials with tiny enrolment.

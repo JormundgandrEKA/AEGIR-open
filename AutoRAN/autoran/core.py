@@ -49,13 +49,22 @@ ROOT = _find_root()
 
 
 def _torch_pack():
-    """The small exe has no PyTorch inside. If a folder with torch/ is available, make it importable: Settings > gpu_site, then gpu_pack/ beside
-    the exe or in the workspace. (pip install --target gpu_pack torch --index-url https://download.pytorch.org/whl/cu128). No effect when torch is bundled or absent."""
+    """The small exe has no PyTorch inside. Make one importable if it is already known, without starting any process:
+    Settings > gpu_site, a gpu_pack folder beside the exe or in the workspace, AutoRAN's own install in %LOCALAPPDATA%\\AEGIR\\gpu_pack,
+    then the PyTorch the last computer scan found (see gpucheck.py). No effect when PyTorch is bundled or nothing is known."""
     import importlib.util
     if importlib.util.find_spec("torch") is not None:
         return
     exe_dir = Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else CODE_ROOT
-    for c in (settings.get("gpu_site"), exe_dir / "gpu_pack", CODE_ROOT / "gpu_pack", ROOT / "gpu_pack"):
+    cands = [settings.get("gpu_site"), exe_dir / "gpu_pack", CODE_ROOT / "gpu_pack", ROOT / "gpu_pack"]
+    try:
+        from aegir_core.core import shared_state_dir
+        cands.append(shared_state_dir().parent / "gpu_pack")
+        cache = json.loads((shared_state_dir() / "gpu_probe.json").read_text(encoding="utf-8"))
+        cands.append((cache.get("verdict") or {}).get("site"))
+    except (OSError, ValueError):
+        pass
+    for c in cands:
         if c and (Path(c) / "torch" / "__init__.py").is_file():
             sys.path.append(str(c))
             return

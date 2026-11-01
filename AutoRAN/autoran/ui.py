@@ -98,7 +98,7 @@ function wilson(k,n){if(!n)return[0,1];const z=1.96,p=k/n,d=1+z*z/n,c=(p+z*z/(2*
 const PAGES=[['start','Get started'],['overview','Overview'],['coverage','Coverage'],['labels','Labels and rules'],['scorers','Scorers'],['browse','Browse'],['review','Review'],['plots','Plots'],['run','Run'],['settings','Settings'],['about','About']];
 function nav(){const n=$('nav');n.replaceChildren(h('b',null,'AutoRAN'));
  PAGES.filter(([k])=>S.empty?['start','run','settings','about'].includes(k):k!=='start').forEach(([k,l])=>n.append(h('a',{class:S.page===k?'on':'',href:'#'+k},l)));
- const m=S.m,g=S.gpu;n.append(h('span',null,(g&&g.cuda_available?'GPU '+g.device+' '+g.memory_gb+' GB':(g&&g.torch===null?'CPU only (no GPU pack, see Settings)':'CPU only'))+' · '+(m?fmt(m.pipeline.trials)+' trials · registry data '+(m.pipeline.data_timestamp||'?').slice(0,10):'')));}
+ const m=S.m,g=S.gpu;n.append(h('span',{style:'cursor:pointer',title:'Open the GPU check',onclick:()=>{location.hash='#settings';}},(g&&g.cuda_available?'GPU '+g.device+' '+g.memory_gb+' GB':(g&&g.torch===null?'CPU only (click to check your GPU)':'CPU only'))+' · '+(m?fmt(m.pipeline.trials)+' trials · registry data '+(m.pipeline.data_timestamp||'?').slice(0,10):'')));}
 async function go(){const k=(location.hash||'#overview').slice(1).split('?')[0];S.page=PAGES.some(p=>p[0]===k)?k:'overview';if(S.empty&&!['start','run','settings','about'].includes(S.page))S.page='start';if(!S.empty&&S.page==='start')S.page='overview';nav();closeDrawer();
  const main=$('main');const ld=h('div',{class:'small'},'Loading…');main.replaceChildren(ld);
  try{if(S.timer){clearInterval(S.timer);S.timer=null;}await ({start,overview,coverage,labels,scorers,browse,review,plots,run,settings,about}[S.page])(main);ld.remove();}catch(e){main.replaceChildren(h('div',{class:'warn bad'},'Error: '+e.message));}}
@@ -314,14 +314,58 @@ async function start(main){
  main.append(h('div',{class:'row',style:'margin-top:10px'},go2,h('a',{href:'#settings'},'Settings first'),h('a',{href:'#run'},'Pick individual steps')));
  main.append(h('div',{class:'small',style:'margin-top:8px'},'To try the pipeline quickly on a small sample instead, use the command line: autoran fetch --max-pages 2, then autoran labeller-data, autoran normalise --partial, label, categorize, score, metrics.'));}
 
+// ------------------------------------------------------------------ Graphics card section of Settings
+async function gpuSection(main){
+ main.append(h('h2',null,'Graphics card (GPU)'));
+ const box=h('div',{style:'border:1px solid var(--rule);padding:8px 10px;margin-bottom:10px'});main.append(box);
+ let timer=null,confirmPlan=null;
+ const dotc=s=>({ready:'green',found:'green',no_gpu:'green',incompatible:'yellow',not_found:'yellow'}[s]||'yellow');
+ async function draw(){
+  let st,info;
+  try{st=await api('/api/gpu/check');info=await api('/api/gpu');}catch(e){box.replaceChildren(h('div',{class:'warn bad'},e.message));return;}
+  const c=st.cache,v=c&&c.verdict,ins=st.install,busy=st.scan.state==='running'||ins.state==='running';
+  box.replaceChildren();
+  let state,text;
+  if(info&&info.cuda_available){state='ready';text='Ready. AutoRAN is using PyTorch '+info.torch+' on your '+info.device+'.';}
+  else if(st.scan.state==='running'){state='checking';text='Looking at your computer: the graphics card, the driver, and every Python for a usable PyTorch…';}
+  else if(v){state=v.state;text=v.text;}
+  else{state='unknown';text='Not checked yet.';}
+  box.append(h('div',{style:'display:flex;gap:8px;align-items:center;font-weight:700'},fdot(state==='checking'||state==='unknown'?'yellow':dotc(state),12),text));
+  if(c&&c.smi&&c.smi.gpu)box.append(h('div',{class:'small',style:'margin:4px 0 0 20px'},'Card: '+c.smi.gpu+', driver '+c.smi.driver+', '+Math.round(c.smi.memory_mb/1024)+' GB'+(c.smi.max_cuda?', supports CUDA up to '+c.smi.max_cuda:'')+'. CUDA itself comes inside PyTorch, so only the driver is needed.'));
+  else if(c&&c.smi)box.append(h('div',{class:'small',style:'margin:4px 0 0 20px'},c.smi.why||''));
+  if(c&&c.pythons&&c.pythons.length){const t=h('table',{style:'margin:8px 0;max-width:860px'},h('tr',null,['Python','PyTorch','Sees the GPU','Usable by this AutoRAN'].map(x=>h('th',null,x))));
+   c.pythons.forEach(p=>{const same=p.tag===st.bundled_tag,use=p.torch&&same&&p.cuda_ok;t.append(h('tr',null,h('td',{title:p.exe},p.python+' ('+p.exe.split('\\').slice(-3,-1).join('\\')+')'),h('td',null,p.torch||'none'),h('td',null,p.torch?(p.cuda_ok?'yes':'no'):''),h('td',null,use?'yes':(p.torch?(same?'no: cannot see the GPU':'no: needs Python '+st.bundled_tag.slice(2,3)+'.'+st.bundled_tag.slice(3)):''))));});
+   box.append(t);box.append(h('div',{class:'small'},'This AutoRAN runs on Python '+st.bundled_tag.slice(2,3)+'.'+st.bundled_tag.slice(3)+', so it can only borrow a PyTorch built for that version.'));}
+  const row=h('div',{class:'row'});
+  row.append(h('button',{onclick:async()=>{await api('/api/gpu/scan',{});schedule();draw();}},busy?'Checking…':'Check this computer'));
+  const canInstall=v&&v.can_install&&(v.state==='not_found'||v.state==='incompatible');
+  if(canInstall&&ins.state!=='running')row.append(h('button',{class:'primary',onclick:async()=>{const r=await api('/api/gpu/install',{dry_run:true});confirmPlan=r.plan;draw();}},'Install PyTorch for AutoRAN (about '+st.expected_gb+' GB)'));
+  if(v&&!v.can_install&&(v.state==='not_found'||v.state==='incompatible')&&c&&c.smi&&c.smi.gpu)row.append(h('span',{class:'small'},'No Python with pip was found. Install Python 3.11 or newer from python.org (tick Add to PATH), then check again.'));
+  box.append(row);
+  if(confirmPlan){const p=confirmPlan;box.append(h('div',{style:'border:2px solid var(--acc);background:#f2f6ff;padding:8px 10px;margin:6px 0'},h('b',null,p.ok?'Install PyTorch for AutoRAN?':'Cannot install yet'),
+   h('div',{style:'margin:4px 0'},p.ok?'Downloads about '+p.expected_gb+' GB from download.pytorch.org (the '+p.commands[0].index+' build for your driver) into '+p.target+', using Python '+p.python_version+' to run pip. It takes several minutes. Free disk space: '+p.free_gb+' GB. Nothing else on your computer is changed.':p.why),
+   h('div',{class:'row'},p.ok?h('button',{onclick:async()=>{confirmPlan=null;await api('/api/gpu/install',{dry_run:false});schedule();draw();}},'Install'):null,h('button',{onclick:()=>{confirmPlan=null;draw();}},p.ok?'Not now':'Close'))));}
+  if(ins.state!=='idle'){const col={running:'yellow',done:'green',failed:'red'}[ins.state];
+   box.append(h('div',{style:'margin-top:8px'},fdot(col,10),' '+ins.message));
+   box.append(h('div',{style:'height:8px;background:var(--soft);border:1px solid var(--hair);margin:4px 0;max-width:600px'},h('div',{style:'height:100%;width:'+Math.round(100*ins.progress)+'%;background:var(--acc)'})));
+   if(ins.log&&ins.log.length)box.append(h('pre',{style:'max-height:12em'},ins.log.slice(-12).join('\n')));}
+  if(!busy&&timer){clearInterval(timer);timer=null;try{S.gpu=await api('/api/gpu');nav();}catch(e){}}
+ }
+ function schedule(){if(!timer)timer=setInterval(()=>{if(S.page!=='settings'){clearInterval(timer);timer=null;return;}draw();},1500);}
+ await draw();
+ if(box.textContent.indexOf('Looking at your computer')>=0||box.textContent.indexOf('Installing PyTorch')>=0)schedule();
+}
+
 async function settings(main){
  const a=await api('/api/settings');
  main.append(h('h2',null,'Settings'));
+ await gpuSection(main);
+ main.append(h('h2',null,'Your settings'));
  main.append(h('div',{class:'small'},'Saved for you only, in '+a.settings_file+' (outside the project, never committed). Nothing here is needed to run AutoRAN; each field is optional. Tokens and keys are stored encrypted for this Windows user and are not shown again, only whether one is set.'));
  const rows=[
   ['workspace','Workspace folder','Where data/ and state/ are kept. Empty = the AutoRAN folder ('+a.program_folder+'). Needs a restart. Currently using: '+a.active_workspace,'text'],
   ['history_dir','RAN history folder','Optional. RAN’s browser-collected trial histories (adds a few more clean inputs). Used at the next normalise.','text'],
-  ['gpu_site','GPU pack folder','Optional, for the small AutoRAN.exe, which has no PyTorch inside. A folder that contains torch/ (a site-packages, or a folder made with pip install --target gpu_pack torch). A gpu_pack folder next to the exe is found automatically. Needs a restart.','text'],
+  ['gpu_site','GPU pack folder (advanced)','Normally not needed: AutoRAN finds a usable PyTorch itself, or installs one (see the Graphics card section above). Only to point at a PyTorch folder yourself: a folder that contains torch/. Needs a restart.','text'],
   ['contact_email','Contact email','Optional. Added to the User-Agent of requests so a registry operator can reach you: '+a.user_agent,'text'],
   ['hf_token','Hugging Face token','Optional. Raises the rate limit of the Open Targets download (datasets-server.huggingface.co). ClinicalTrials.gov needs no key.','password'],
   ['ncbi_api_key','NCBI API key','Optional. AutoRAN’s own fetches do not use NCBI; the key is passed on to RAN’s NCBI client if you use RAN features.','password']];

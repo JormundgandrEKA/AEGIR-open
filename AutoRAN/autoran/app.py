@@ -38,6 +38,11 @@ class Api:
                 st = server.State(ctx, cfg, "supervisor")
                 with self._lock:
                     self._state, self._error, self._message = st, None, f"{len(st.rows):,} trials loaded" if st.rows else "no data yet"
+                try:
+                    from . import gpucheck
+                    gpucheck.ensure_scanned()                    # PyTorch not usable yet and no fresh answer: look in the background
+                except Exception:
+                    pass
             except BaseException as e:           # surfaced in the window, not lost
                 with self._lock:
                     self._state, self._error = None, f"{type(e).__name__}: {e}"
@@ -96,12 +101,14 @@ def selftest():
     out = {"version": __version__, "frozen": bool(getattr(sys, "frozen", False)), "root": str(core.ROOT), "python": sys.version.split()[0]}
     try:
         from . import gpu, plots
-        from . import server as _srv
-        out["gpu"] = _srv.gpu_info()
+        from . import server as _srv, gpucheck
         t = time.time()
         api = Api()
         while api.status()["ready"] is False and not api.status()["error"] and time.time() - t < 240:
             time.sleep(0.5)
+        gpucheck.wait_for_scan()                         # a real session stays open long enough for the background check
+        out["gpu"] = _srv.gpu_info()
+        out["gpu_check"] = (gpucheck.load_cache() or {}).get("verdict", {}).get("state")
         out["load_seconds"] = round(time.time() - t, 1)
         out["status"] = api.status()
         r = api.call("GET", "/api/metrics")
