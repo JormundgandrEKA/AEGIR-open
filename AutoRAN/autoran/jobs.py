@@ -18,6 +18,7 @@ STAGES = {
     "categorize": ("Categorize", "Areas, phase, region, input state and the frozen split (CPU, about 10 s).", False),
     "score": ("Score", "Train and run the scorers. GPU adds gpu_logistic, gpu_logistic_text and gpu_mlp trained on the full train split.", False),
     "metrics": ("Metrics", "Recompute every number on screen. The bootstrap intervals run as one batched job on the GPU.", False),
+    "simulate": ("Simulate and test the risk model", "Risk model, negative controls, date-split replay, planted-effect recovery, scenario core (CPU, about 2 minutes). Never reads the sealed vault.", False),
     "frame": ("Parquet frame", "Write one Parquet table of every trial, label, category and score, for pandas, plots or R.", False),
     "export": ("Export silver set", "Write the silver set with its licence manifest (refuses anything below the grade floor).", False),
     "run-all": ("Run everything", "Delta fetch, then normalise, label, categorize, score and metrics, in order.", True),
@@ -60,7 +61,7 @@ class Jobs:
             cfg = core.load_cfg()
             cmd = {"fetch-delta": "fetch", "fetch-full": "fetch", "run-all": "run"}.get(stage, stage)
             args = argparse.Namespace(device=device, delta=stage == "fetch-delta", new=False, max_pages=None, scorer=None, grade_floor=None,
-                                      n=200, klass="positive_recruitment", seed=28, port=0, labeller="supervisor", no_browser=True)
+                                      n=200, klass="positive_recruitment", seed=28, port=0, labeller="supervisor", no_browser=True, seeds=6, boot=16, only=None)
             res = commands.run(cmd, ctx, cfg, args)
             s = ctx.summary(f"autoran {cmd}")
             job["summary"] = {"counts": s["counts"], "errors": s["errors"], "notes": s.get("notes", {}), "result": _short(res)}

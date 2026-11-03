@@ -77,6 +77,33 @@ class TestLabeller(unittest.TestCase):
                   "The study drug supply was exhausted", "Accrual was completed"]:
             self.assertFalse(self.ie(t), t)
 
+    def test_rule_fixes_from_the_aact_review(self):
+        # misses found in the AACT export: "inclusion" for enrolment, "not feasible" with a space, plural goals, "not been able to"
+        for t in ["Slow inclusion", "Low inclusion rate.", "Lack of inclusions", "Not feasible to enroll participants", "Enrollment goals were not able to be met",
+                  "Recruitment goals could not be met even after amendments", "We have not been able to enroll patients", "Hard to find patient",
+                  "Lack of study patients", "Closed due to prolonged enrollment timelines", "Study was recruited slowly", "We exhausted all ability to recruit from our study sites",
+                  "Slow recruitment� due to COVID", "The study was prematurely stopped since enrollment was much slower than initially expected", "Recruitment is slower"]:
+            self.assertTrue(self.ie(t), t)
+        # false hits removed: efficacy "limited", follow-up attrition, staff exhaustion, inclusion criteria, enough patients
+        for t in ["The overall clinical benefit of enrolled subjects was limited and further development stopped",
+                  "Analysis was not done because only 1 subject was able to come back for the 3 month follow up visit",
+                  "exhausted personel after a long recruiting period", "Inclusion criteria were changed", "The number of included patients is sufficient.",
+                  "Limited safety and immunological data could be accrued from incomplete regimens"]:
+            self.assertFalse(self.ie(t), t)
+
+    def test_disease_words_are_not_harm(self):
+        for t in ["Too few acute stroke patients available to meet enrollment requirements.", "high rate of drop-out", "Experimental treatment not feasible due to high rate of drop out"]:
+            self.assertNotIn("Safety_Sideeffects", L.classify_rules(t)[0], t)
+        for t in ["Recruitment terminated due to higher rate of thrombosis events than expected.", "Due to thrombosis", "Incidence of GI Perforation"]:
+            self.assertIn("Safety_Sideeffects", L.classify_rules(t)[0], t)
+
+    def test_model_classes_are_trusted_only_where_they_scored(self):
+        man = {"nb": L.NB().train([{"text": "x", "labels": ["No_Context"]}], L.CLASSES, min_count=1).dump(), "rule_table": {}, "choice_ie": "rules",
+               "metrics": {"nb": {"dev": {"per_class": {"Business_Administrative": {"f1": 0.79, "precision": 0.75, "support": 72}, "Interim_Analysis": {"f1": 0.05, "precision": 0.02, "support": 4},
+                                                                "Safety_Sideeffects": {"f1": 0.57, "precision": 0.56, "support": 17}, "Endpoint_Met": {"f1": 0.9, "precision": 1.0, "support": 6}}}}}}
+        self.assertEqual(Labeller(man, []).nb_ok, {"Business_Administrative", "Insufficient_Enrollment"})
+        self.assertEqual(Labeller({k: v for k, v in man.items() if k != "metrics"}, []).nb_ok, {"Insufficient_Enrollment"})
+
     def test_no_enrolment_next_to_another_cause_is_that_cause(self):
         cl, _, _ = L.classify_rules("Funding was never received so no patients were enrolled")
         self.assertIn("Business_Administrative", cl)
@@ -98,6 +125,16 @@ class TestLabeller(unittest.TestCase):
         nb = L.NB().train(rows, L.CLASSES, min_count=1)
         again = L.NB.load(json.loads(json.dumps(nb.dump())))
         self.assertEqual(nb.predict("slow enrollment")[0], again.predict("slow enrollment")[0])
+
+    def test_withdrawn_trials_are_recruitment_failures_only_when_nobody_came(self):
+        man = {"nb": L.NB().train([{"text": "x", "labels": ["No_Context"]}], L.CLASSES, min_count=1).dump(), "rule_table": {}, "choice_ie": "rules"}
+        lab = Labeller(man, [])
+        w = lambda t, kind: outcome_class({"status": "WITHDRAWN", "why_stopped": t, "enrollment": {"count": 0}}, lab.label(t), kind)
+        self.assertEqual(w("Failed to enroll any patients despite study modifications", "no_takers")[0], "positive_recruitment")
+        self.assertEqual(w("Need to obtain IDE prior to commencement of study", "approval_blocked")[0], "other_stop")
+        self.assertEqual(w("Study never started", "empty_record")[0], "unlabelled")
+        self.assertIn("withdrawn_before_enrollment", w("Funding was not acquired", "resources_pulled")[1])
+        self.assertEqual(outcome_class({"status": "WITHDRAWN", "why_stopped": "Slow accrual", "enrollment": {"count": 0}}, lab.label("Slow accrual"))[0], "other_stop")   # no kind given: never counted as a failure
 
     def test_outcome_classes(self):
         man = {"nb": L.NB().train([{"text": "x", "labels": ["No_Context"]}], L.CLASSES, min_count=1).dump(), "rule_table": {}, "choice_ie": "rules"}
@@ -185,6 +222,11 @@ class TestFetchParams(unittest.TestCase):
         cfg["scope"]["phases"] = ["PHASE2", "PHASE3"]
         self.assertIn("AREA[Phase]PHASE2 OR AREA[Phase]PHASE3", build_params(cfg)["filter.advanced"])
         self.assertIn("LastUpdatePostDate", build_params(cfg, since="2026-10-01")["filter.advanced"])
+        self.assertIn("StartDate", build_params(cfg)["filter.advanced"])                    # the default scope keeps its 2005 start
+        cfg["scope"].update(start_from=None, statuses=["COMPLETED", "TERMINATED", "WITHDRAWN", "SUSPENDED"])
+        wide = build_params(cfg)
+        self.assertNotIn("StartDate", wide["filter.advanced"])                              # no start limit: pre-2005 and withdrawn trials without a start date come in
+        self.assertIn("WITHDRAWN", wide["filter.overallStatus"])
 
 
 class TestExportAndCanaries(unittest.TestCase):

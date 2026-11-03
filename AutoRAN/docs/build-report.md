@@ -69,7 +69,7 @@ Site, sponsor and funding effects also predict failure, so this is not evidence 
 
 ## 6. The GPU
 
-Optional: PyTorch with CUDA on an NVIDIA card. Everything also runs on the CPU, only slower.
+Optional: PyTorch with CUDA on a compatible graphics card. Everything also runs on the CPU, only slower.
 - `--device cuda` trains `gpu_logistic`, `gpu_logistic_text` and `gpu_mlp` on the whole train split (172k rows, 5,199 positives) with early stopping on dev AUROC and Platt calibration on dev.
   Each takes seconds on a recent card; peak card memory is about 3.1 GB.
 - The bootstrap (1,000 resamples, AUROC and AUPRC) runs as batched sorts, about 4 times faster than the CPU path for the same work. The GPU intervals agree with the CPU ones to plus or minus 0.003; point estimates are identical.
@@ -144,5 +144,94 @@ What: `autoran/gpucheck.py` reads the card and driver from `nvidia-smi`, probes 
 
 Found while building: installing with PyPI as an extra index would have picked PyPI's newest torch (2.15.0), which on Windows is a CPU-only build, over the CUDA build (2.14.1+cu130). The installer now takes torch from the PyTorch index only (`--no-deps`) and its small dependencies from PyPI in a second step; a test pins this.
 
-On this PC the check finds the RTX 4070 (driver 595.59, CUDA up to 13.2) and two CUDA-ready PyTorch installs for Python 3.13 (2.11.0+cu128 and 2.14.1+cu126), so no install is needed here. Limits: the exe can only load a PyTorch built for its own Python version (3.13); the install is about 3 GB; Windows and NVIDIA only; installing needs a Python with pip somewhere on the PC.
+On the development PC the check finds the card and two CUDA-ready PyTorch installs for Python 3.13, so no install was needed there. Limits: the exe can only load a PyTorch built for its own Python version (3.13); the install is about 3 GB; Windows and NVIDIA only; installing needs a Python with pip somewhere on the PC.
 
+
+## 13. Label tree, rule fixes and the AACT training data (3 Nov)
+
+Why: David supplied the AACT export (609,546 studies, 47,520 written stop reasons) and two protocol corpora, kept outside the repository. Goal: a more confident autonomous labeller, with human review able to train it.
+
+What changed (`autoran/labeller.py`, `autoran/taxonomy.py`, `tools/aact_workbench.py`):
+- **Rules.** Recruitment rules fixed ("inclusion" as enrolment, a space bug in "not feasible", plurals, "not been able to", slow/slower). Weak classes split into strong and weak parts: bare "safety" was right 30% of the time, "interim" 5%, "never started" was filed under Business. A weak word never beats a concrete one. Bare "no participants" is no longer a recruitment failure on its own.
+- **Tree.** Super-label > class > sub-label, plus `stage` (registry fields only), `withdrawn_kind` and `land_mine`. Not yet written into the pipeline's label files.
+- **Scope.** `scope.start_from` may be null and `scope.statuses` may include WITHDRAWN and SUSPENDED. Defaults are unchanged. A withdrawn trial counts as a recruitment failure only when a viable study found no takers.
+
+Measured on the curated set (train used for reading errors, dev for checking, test read once): see the hand-off message. The curated labels are noisy (for example "Sponsor decision" is sometimes Business and Logistics), so per-class scores for the small classes are capped and move by whole cases.
+
+Limits: sub-labels and land-mine flags have no gold labels; they are rule-made and were checked by reading samples and by tests, and need human review. The statistical model (NB) was not retrained.
+
+### 13b. Gold review and the tree in the label files (3 Nov, later)
+
+- **Gold review** (`autoran/gold.py`, the Gold review page, `autoran gold-draw`, `autoran gold-summary`): one case at a time with the registry reason, the before and after classes and the rules that changed; verdict yes (the after call is right), no (wrong) or other (not wrong, but classified poorly), with an optional note and undo. Verdicts append to `data/labels/gold/gold_verdicts.csv`; the drawn cases are in `gold_sample_<stamp>.json`. A sample is 100 cases, 70 the labeller is least sure about (drawn from seven kinds of change so one kind cannot fill it) and 30 it is fairly sure about, mixed and not marked on the card. Texts in the frozen Open Targets test part are never drawn.
+- **Tree** fields (`tree`: supers, sublabels, stage, land_mine, withdrawn_kind) are now written into every label row for stopped trials and shown in the trial inspector.
+- **Found by reading the first samples:** the statistical model's non-recruitment classes were being written into labels whenever the rules found nothing (for example "Interim_Analysis, Success, Ethical" on "Too few stroke patients"). The model's classes are now used only where it scored F1 >= 0.6 and precision >= 0.6 on at least 15 dev cases (Covid19, staff moved, business, negative). Disease words (stroke, injury, thrombosis) no longer count as harm unless an incidence or cause is stated.
+- Existing label files were written before these fixes; run `autoran label` to refresh them.
+
+### 13c. Several causes, several checks (3 Nov, evening)
+
+David's 100 gold verdicts (60 yes, 21 no, 19 other; the 30 trusted controls 29 yes) showed three things: recruitment is often a second, real cause beside funding or design; the word "safety" and the phrase "risk/benefit" were over-used; and losing every class is worse than a debatable one. His notes were treated as tentative and compared with published coding work:
+
+- Williams et al. 2015 (PLOS ONE, 905 terminated trials) coded one primary reason, found several in about 6%, let trial data override other reasons, and kept "risk-benefit" as one overall scientific-data reason rather than a safety finding. Briel et al. 2016 (J Clin Epidemiol) found 28 interrelated reasons for recruitment failure, led by an overestimated number of eligible patients, mostly preventable at design time. Kasenda et al. 2014 (JAMA): poor recruitment 9.9% of 1,017 trials, administrative 3.8%, futility 3.6%.
+- Agreed with David: several causes kept (recruitment beside funding), design as a cause of low enrolment, risk/benefit is not harm (now a Negative sub-label), a clause that says what the reason was not (not related to tolerability) must not add that class.
+- Kept differently: "no significant benefit to justify full accrual" stays Negative, as in Williams, not Ethical. "Stopped at an interim analysis" is a sub-label of the result (the 3,747 curated labels put Interim_Analysis on only about 1 in 7 such texts, where it means paused for an analysis).
+
+New: `causes.py` reads a reason clause by clause with the link between clauses (cause, effect, context, together) and keeps order, edges and the stated primary; `vote.py` reads each reason six ways (rules, clauses, naive Bayes, logistic on words, logistic on characters, a lexicon from the literature), stacks them per class on out-of-fold scores, and needs at least two readers to agree before a class is included. `autoran voter-build` trains it (dev only; `--test` reads the frozen test once). Dev: macro F1 over classes with 10+ cases 0.69 for the vote against 0.47 for the best single reader on all classes (0.46 to 0.47 for rules, clauses and model); exact label-set match 0.56 against 0.53 for rules alone.
+
+Review of the queue: the note-derived constraints (docs/gold_expectations_3nov.json, written from the same notes, so not independent) were satisfied 24% at review time, 65% by the current rules, 87% by the vote. Of David's 60 yes cases, 16 now change (mostly a second cause added); of the 30 controls, 26 stay. Known regressions: Safety dropped on "liver injury in another study", spurious Business or Logistics added to two IRB reasons, "paused for a bioanalytical issue" lost its class. The stacker also learns the curated set's habit of adding Logistics beside Business.
+
+### 13d. Review and Gold review merged; literature read in full (3 Nov, evening)
+- The Gold review page is gone. **Review** now has two modes on one page: *Scan a screen* (flag exceptions, measures precision) and *One case at a time* (yes / no / other with a note, saved to the same CSV as before). `#gold` links open the second mode. The `/api/gold/*` routes, `gold.py`, `autoran gold-draw` and `gold-summary` keep their names.
+- Registry titles that were escaped twice (for example `Parkinson&Apos;s`) are now cleaned for display only (`server.tidy_title`); stored text and the frozen split are untouched.
+- `docs/literature.md`: facts taken from the Kasenda and Briel PDFs, where they override earlier choices, and the limits of each source. `taxonomy.BRIEL` / `risk_domains` map recruitment sub-labels to Briel's four domains as a prior for the later risk model, not as a finding about a trial.
+- 82 tests pass. Not rebuilt: the installed app is still 0.1.5.
+
+### 13e. Risk model, simulation harness, sealed vault, blind review (3 Nov, night)
+Built against `AEGIR/docs/adversarial-review-and-design-principles.md` (informs, does not direct). Claim level for everything below: **association, exploratory, silver labels** (A3, A11).
+
+**What exists**
+- `autoran/risk.py`: 90 yes/no protocol factors (the same `design()` serves real and simulated trials), one risk per way to fail (recruitment, any stop, and the tree's super-labels), ridge logistic with bootstrap stability, interactions kept only if held-out log-loss improves, `explain` (raising, lowering, missing protective, each as change in risk if flipped), factor `clusters` (factors that travel together: the "prime mover" shows up here, not in the model).
+- **Sealed vault** (`risk.vault_mask`): a random 10% by salted hash plus every 2019–2020 start; 54,283 of 266,916 trials. The salt lives in `state/vault_salt.txt`; looks go to `state/vault_looks.jsonl` (`risk.log_vault_look`). Nothing here reads the vault; no look has been taken.
+- `autoran/sim.py` and `autoran simulate`: stochastic recruitment core (calibrated to Kasenda), planted-effect recovery, negative controls, date-split replay, what-if check. Output: `data/derived/sim/sim_<stamp>.json`. About two minutes on this computer.
+- **Review, blind mode** (A11): about half the cases (fixed per case by hash) hide every machine field until the reviewer ticks their own classes and locks them. The CSV gains `blind`, `own`, `own_matches_after` (old files are migrated on the next write). The summary shows the anchoring check (yes rate blind vs open; how often your own blind answer matched the machine's).
+
+**Measured** (train starts to 2014, score 2016–2018, no vault, no frozen test split)
+| | AUROC (95% interval) | AUPRC (guessing level) | top 5% precision (lift) |
+|---|---|---|---|
+| prospective registrations (headline) | 0.715 (0.698–0.732) | 0.133 (0.057) | 17.5% (3.1x) |
+| retrospective | 0.768 (0.744–0.791) | 0.093 (0.023) | 11.8% (5.2x) |
+| all | 0.750 (0.736–0.763) | 0.116 (0.039) | 16.1% (4.2x) |
+- Reproduces the design-side figures (0.717 prospective, 0.753 retrospective, 0.744 all) within their intervals. Calibration error 0.011 on the headline subset.
+- Beyond "who runs it" (sites, sponsor class, start era, country): +0.115 (0.095–0.133) AUROC on the headline subset. Who-runs-it alone: 0.600. Criteria count alone: 0.577.
+- By stratum (prospective): industry 0.728, other sponsors 0.696; Phase 1 0.800, Phase 4 0.581 (weak), not applicable 0.669. Area ranges 0.61 (mental disorders) to 0.77 (skin and connective tissue). Phase 4 and mental disorders are where the model is weakest.
+- Other heads (same split, silver labels): resources 0.759, science 0.746, results 0.818, harm and compliance 0.754 (125 test failures, wide interval 0.71–0.79). **Outside events cannot be tested on a date split** (COVID is 2020 onward, inside the vault years): 30 training failures.
+- The relabel with 0.1.6 raised recruitment failures from 7,486 to 9,033 (+21%). David's review found the 12 additions he checked correct; the rest of the increase is unchecked.
+
+**Negative controls** (5.4): passed. Shuffled outcomes, eight times: mean 0.490, spread 0.037 (range 0.436–0.538); no term or interaction survived. (A first single-shuffle check failed at 0.571 because one shuffle is noisy on a small dev set; I replaced it with an empirical null, not a looser limit.) Placebo outcome (last digit of the NCT number): 0.506. Twelve random columns: **one** flagged at 5% false-discovery control, at the edge of what I said I would accept. The bootstrap-spread test may be a little liberal.
+
+**Planted-effect recovery** (8 seeds, real factor rows, 10 true effects, 3 true interactions, a hidden prime mover):
+- True effect sign correct 94%; estimated against true effect correlation 0.89; found at 5% FDR 80%.
+- Null factors falsely flagged 6%. Factors that only share the hidden prime mover: **flagged 100%.** This is what "associated with" means and why nothing here is level 3.
+- Interactions are **rarely recovered** (recall 6%, precision 13%). Treat any interaction the model reports as a hypothesis.
+- Label noise up to 15% (random misses) barely moved these numbers. That says nothing about *systematic* labeller bias, which is the real risk.
+
+**Simulator core** (scenario tool only): reproduces four of five Kasenda anchors (recruitment stops 10.3% vs 9.9%; median fraction of target 0.49 vs 0.41; industry/investigator ratio 0.39 vs 0.32; piloted trials 2.4% vs <3%). It **misses the any-stop rate** (42% vs 24.9%). Its levers (pilot with consent: -75%, 8+ sites: -22%, criteria cap: -11%) are what the simulator's own mechanism does, because pilots remove prevalence overestimation by construction. G4 (the backtest) is **not started and blocked**: planned enrolment at registration is not in the data.
+
+**What-if** (level 1): model-implied vs stratified observed change for 8 protocol levers agreed in direction for 5 of 8 (disagreed: multi-country, narrow age span, long eligibility text). Agreement of two readings of the same observational data is not evidence that changing a lever changes outcomes.
+
+**D-point notes** (handoff 8, section 7)
+- **D1 granular causes:** built heads per super-label beside the single-recruitment view; labels are silver and unaudited beyond recruitment. Risk: sub-label heads other than recruitment have no gold.
+- **D2 human weight:** built blind review with an anchoring check; nothing retires the human. Risk: no domain-expert sample yet.
+- **D3 simulation as proving ground:** built the core as labelled scenario analysis with a calibration table and a no-persona control (no personas exist). Risk: the simulator can only agree with itself until G4 passes.
+- **D6 augury of factors:** built association effects with intervals, FDR control, a negative-control suite and a minimum-case guard on interactions; interactions are mostly not recovered. Risk: prime movers are invisible to the model.
+- **D9 protocol corpora:** used locally for research only; never packaged, committed or released. Wherever they are used: grade recorded in each derived record, document date checked against the trial start, and the selection they introduce reported.
+- Not yet done from the checklist: error correlation and effective number of independent readers (A5) for the six-reader vote; prospective ledger (G6); expert audit (G2, 200 per main class).
+
+### 13f. Dashboard refresh and the Simulate page (3 Nov, night)
+- Score and metrics re-run on the 0.1.6 labels (second look at the frozen test split; the first was the earlier read). Best scorer (logistic) on test: AUROC 0.7525, 1,845 failures in 49,454 trials; dev 0.7579. The clean-input subset has only 30 test failures, so its interval is wide. The dashboard reads the newest metrics file.
+- **Simulate page** (new, first pass): validation gates G0–G6 with status; headline table (prospective first) with AUPRC against its guessing level, precision at a 5% review budget, calibration error and a calibration plot; strata; other ways to fail; negative controls with pass/fail; planted-effect recovery; simulator calibration table and scenario table under a scenario-analysis label; what-if agreement; factor effects with bootstrap stability and the factors that travel together; a **protocol explorer** (pick what a protocol has, get an estimated risk and what raises it, lowers it, and which recruitment levers it lacks). A Run button starts the `simulate` job (about two minutes, never reads the vault).
+- Explorer fixes found by testing it: unset choices count as "none", a combination no real trial has, so each choice now starts at its most common value; start era defaults to 2015–2019 because recent starts have had little time to fail; advice is limited to recruitment levers (sites, criteria, eligibility length, age span, countries), not scientific choices such as arms or outcomes. Interactions that involve a start era are labelled as change over time.
+- Known limit: the explorer's risk is an association from registration-time facts, discrimination about 0.72 on prospective trials. It is a prompt to look, not a forecast.
+
+### 13g. Version 0.1.7 (3 Nov, night)
+The executable now carries everything on the test server: the Review page with blind mode, the Simulate page (gates, headline, strata, other ways to fail, negative controls, planted-effect recovery, simulator scenario and backtest, what-if, factor effects, protocol explorer, the registry source ledger with its Mercury report, and the protocol-document ledger when a local results file exists), and the `simulate` job. `--selftest` now records a fingerprint of the page (`ui_sha256`), markers for the new sections, the Simulate API state and the gate statuses, so a built executable can be compared with the source it came from.
+Gate G4 (the simulator backtest) is **not passed**: calibrated on trials starting up to 2015, the simulator scores AUROC 0.52 on 2016–2018 trials against 0.80 for registry factors.

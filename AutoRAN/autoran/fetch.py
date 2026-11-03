@@ -13,7 +13,9 @@ TERMS = "https://clinicaltrials.gov/about-site/terms-conditions"
 
 def build_params(cfg, since=None, token=None, first=False):
     sc = cfg["scope"]
-    adv = f"AREA[StudyType]INTERVENTIONAL AND AREA[StartDate]RANGE[{sc['start_from']},MAX]"
+    adv = "AREA[StudyType]INTERVENTIONAL"
+    if sc.get("start_from"):                                   # null/empty = no start-date limit (also keeps withdrawn trials that never got a start date)
+        adv += f" AND AREA[StartDate]RANGE[{sc['start_from']},MAX]"
     if sc["phases"] != "all":
         adv += " AND (" + " OR ".join(f"AREA[Phase]{p}" for p in sc["phases"]) + ")"
     if since:

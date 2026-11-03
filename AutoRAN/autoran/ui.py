@@ -62,6 +62,17 @@ svg text{font:11px Consolas,monospace;fill:#111}
 .heat td{text-align:right;font:11px Consolas,monospace;padding:1px 4px}
 #fp{position:sticky;top:34px;z-index:2;background:var(--bg)}
 .fpbox{border-bottom:2px solid var(--rule);padding:6px 14px 8px;max-height:45vh;overflow:auto;background:#fcfcfc}
+
+.astro{margin:14px 0;padding:14px 16px;max-width:980px;border:5px solid transparent;border-radius:22px!important;background:linear-gradient(#fffaf0,#fff0fb) padding-box,linear-gradient(120deg,#ff5fa2,#ffb347,#fff35f,#5fe38a,#5fb8ff,#b07bff) border-box;font-family:"Comic Sans MS","Chalkboard SE","Comic Neue",cursive;position:relative;overflow:hidden}
+.astro h2{margin:0 0 4px;border:0;font:700 22px "Comic Sans MS","Chalkboard SE",cursive;color:#7a1fa2;display:inline-block;transform-origin:left center;animation:wob 3.2s ease-in-out infinite}
+.astro .small{font-family:inherit;color:#5a3a6a}
+.astro .bubble{display:inline-block;background:#fff;border:3px dashed #b07bff;border-radius:18px!important;padding:6px 12px;margin:6px 0;font-weight:700;color:#4b1d6b;transform:rotate(-1deg)}
+.astro svg text{font-family:"Comic Sans MS","Chalkboard SE",cursive}
+.twk{animation:twk 1.8s ease-in-out infinite}.twk:nth-child(2n){animation-delay:.6s}.twk:nth-child(3n){animation-delay:1.1s}
+@keyframes wob{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg) scale(1.03)}}
+@keyframes twk{0%,100%{opacity:.25}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.astro h2,.twk{animation:none}}
+.lgd{display:inline-block;margin:0 10px 2px 0;white-space:nowrap}.lgd i{display:inline-block;width:11px;height:11px;margin-right:4px;vertical-align:-1px}
 </style></head><body>
 <nav id="nav"><b>AutoRAN</b></nav>
 <section id="fp" aria-label="Fetch status"></section>
@@ -95,13 +106,13 @@ function stackBar(c,max){const tot=c.n||1,sc=(c.n/max)*100;
 function wilson(k,n){if(!n)return[0,1];const z=1.96,p=k/n,d=1+z*z/n,c=(p+z*z/(2*n))/d,hh=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n))/d;return[Math.max(0,c-hh),Math.min(1,c+hh)];}
 
 // ------------------------------------------------------------------ pages
-const PAGES=[['start','Get started'],['overview','Overview'],['coverage','Coverage'],['labels','Labels and rules'],['scorers','Scorers'],['browse','Browse'],['review','Review'],['plots','Plots'],['run','Run'],['settings','Settings'],['about','About']];
+const PAGES=[['start','Get started'],['overview','Overview'],['coverage','Coverage'],['labels','Labels and rules'],['scorers','Scorers'],['browse','Browse'],['review','Review'],['simulate','Simulate'],['plots','Plots'],['run','Run'],['settings','Settings'],['about','About']];
 function nav(){const n=$('nav');n.replaceChildren(h('b',null,'AutoRAN'));
  PAGES.filter(([k])=>S.empty?['start','run','settings','about'].includes(k):k!=='start').forEach(([k,l])=>n.append(h('a',{class:S.page===k?'on':'',href:'#'+k},l)));
  const m=S.m,g=S.gpu;n.append(h('span',{style:'cursor:pointer',title:'Open the GPU check',onclick:()=>{location.hash='#settings';}},(g&&g.cuda_available?'GPU '+g.device+' '+g.memory_gb+' GB':(g&&g.torch===null?'CPU only (click to check your GPU)':'CPU only'))+' · '+(m?fmt(m.pipeline.trials)+' trials · registry data '+(m.pipeline.data_timestamp||'?').slice(0,10):'')));}
-async function go(){const k=(location.hash||'#overview').slice(1).split('?')[0];S.page=PAGES.some(p=>p[0]===k)?k:'overview';if(S.empty&&!['start','run','settings','about'].includes(S.page))S.page='start';if(!S.empty&&S.page==='start')S.page='overview';nav();closeDrawer();
+async function go(){let k=(location.hash||'#overview').slice(1).split('?')[0];if(k==='gold'){k='review';S.reviewMode='cases';}S.page=PAGES.some(p=>p[0]===k)?k:'overview';if(S.empty&&!['start','run','settings','about'].includes(S.page))S.page='start';if(!S.empty&&S.page==='start')S.page='overview';nav();closeDrawer();
  const main=$('main');const ld=h('div',{class:'small'},'Loading…');main.replaceChildren(ld);
- try{if(S.timer){clearInterval(S.timer);S.timer=null;}await ({start,overview,coverage,labels,scorers,browse,review,plots,run,settings,about}[S.page])(main);ld.remove();}catch(e){main.replaceChildren(h('div',{class:'warn bad'},'Error: '+e.message));}}
+ try{if(S.timer){clearInterval(S.timer);S.timer=null;}await ({start,overview,coverage,labels,scorers,browse,review,simulate,plots,run,settings,about}[S.page])(main);ld.remove();}catch(e){main.replaceChildren(h('div',{class:'warn bad'},'Error: '+e.message));}}
 window.addEventListener('hashchange',go);
 
 async function overview(main){
@@ -222,7 +233,7 @@ async function openTrial(nct){const d=$('drawer');d.classList.add('open');d.repl
  const aud=h('div',{class:'row'},'Is the label right?',...[['agree','A agree'],['disagree','D disagree'],['unsure','U unsure']].map(([v,l])=>h('button',{onclick:async()=>{await api('/api/submit',{class:t.class,source:'inspector',seconds:0,cards:[{nct:t.nct,verdict:v}]});t.audit=v;S.audit=await api('/api/audit-summary');openTrial(t.nct);}},l)),t.audit?h('span',{class:'chip'},'your verdict: '+t.audit):null);
  d.replaceChildren(h('div',{class:'row'},h('b',{class:'m'},t.nct),klass,h('button',{onclick:closeDrawer,style:'margin-left:auto'},'Close [Esc]')),
   h('div',{class:'q'},t.title),h('div',{class:'small'},(t.sponsor||'')+' · '+t.phase+' · '+(t.areas||[]).join(', ')+' · '+(t.region||'')),
-  h('h2',null,'Label'),h('div',{class:'kv'},...[['Class',NAME[t.class]],['Stop class',t.stop_class||'-'],['Source / confidence',t.label_source+' · '+(t.status==='TERMINATED'?t.conf.toFixed(2):'-')],['Rules fired',(t.rules||[]).join(', ')||'-'],['Labeller agreement',t.disagree?'rules and model DISAGREE':'agree'],['Status',t.status]].flatMap(([a,b])=>[h('div',null,a),h('div',{class:'m'},b)])),
+  h('h2',null,'Label'),h('div',{class:'kv'},...[['Class',NAME[t.class]],['Stop class',t.stop_class||'-'],['Source / confidence',t.label_source+' · '+(t.status==='TERMINATED'?t.conf.toFixed(2):'-')],['Rules fired',(t.rules||[]).join(', ')||'-'],['Labeller agreement',t.disagree?'rules and model DISAGREE':'agree'],['Finer labels',t.tree?((t.tree.sublabels||[]).join(', ')||'-')+(t.tree.land_mine?' · flag: '+t.tree.land_mine:'')+(t.tree.withdrawn_kind?' · withdrawn: '+t.tree.withdrawn_kind:''):'-'],['Status',t.status]].flatMap(([a,b])=>[h('div',null,a),h('div',{class:'m'},b)])),
   h('div',{class:'q',style:'margin-top:6px'},'Registry stop reason'),highlight(t.why_stopped,t.evidence),aud,
   h('h2',null,'Caveats'),...(t.caveats.length?t.caveats:['None.']).map(c=>h('div',{class:'warn'},c)),
   h('h2',null,'Design and dates'),h('div',{class:'kv'},...[['Dates',Object.entries(t.dates).map(([k,v])=>k.replace('_',' ')+' '+(v||'-')).join(' · ')],['Enrolment',(t.enrollment_info.count==null?'-':t.enrollment_info.count)+' '+(t.enrollment_info.type||'').toLowerCase()],['Sites / countries',t.sites+' sites · '+(t.countries||[]).slice(0,6).join(', ')],['Design',t.allocation+' · '+t.masking+' · '+t.n_arms+' arms · '+t.n_primary+' primary outcomes'],['Conditions',(t.conditions||[]).join('; ')],['Input state',t.input_state+' · '+t.registration]].flatMap(([a,b])=>[h('div',null,a),h('div',{class:'m'},b)])),
@@ -236,8 +247,13 @@ async function openTrial(nct){const d=$('drawer');d.classList.add('open');d.repl
 const SOURCES=[['random','positive_recruitment','Random recruitment failures'],['uncertain','positive_recruitment','Least certain recruitment failures'],['random','other_stop','Random other stops'],['random','unlabelled','Random “no usable reason”'],['disagree','positive_recruitment','Rules vs model disagreements'],['suspect_negative','negative_completed','Completed with tiny enrolment (hidden failures?)'],['random','negative_completed','Random completed']];
 async function review(main){
  const cfg=Object.assign({source:'random',class:'positive_recruitment',n:24},S.reviewSet||{});S.reviewSet=null;
+ const mode=S.reviewMode||'screen';
+ const tab=(m,l,about)=>h('button',{class:m===mode?'primary':'',title:about,onclick:()=>{S.reviewMode=m;S.page='x';go();}},l);
+ main.append(h('h2',null,'Review'),h('div',{class:'row'},tab('screen','Scan a screen','Judge many labels at a glance and flag the exceptions. Measures precision.'),tab('cases','One case at a time','Give a yes / no / other verdict on each changed label, saved to a CSV. Measures how far a change can be trusted.')));
+ if(mode==='cases'){window.__rv=null;await cases(main);return;}
+ window.__gd=null;
  let cards=[],cur=0,t0=Date.now(),sheet=null;
- main.append(h('h2',null,'Review: scan a screen, flag the exceptions'));
+ main.append(h('h3',null,'Scan a screen, flag the exceptions'));
  main.append(h('div',{class:'small'},'Every card counts as CORRECT unless you flag it. Click a card or press X to flag it wrong, U for unsure, J/K to move, O to open the trial, Enter to submit the screen and load the next. About one card in twelve is a deliberately wrong “canary”: flag it too, so the tool can show how closely screens are being read. Canaries never count toward precision.'));
  const src=h('select',{onchange:()=>{const [s,c]=src.value.split('|');cfg.source=s;cfg.class=c;if(s!=='rule')delete cfg.rule;load();}},SOURCES.map(([s,c,l])=>h('option',{value:s+'|'+c},l)));
  if(cfg.source==='rule')src.append(h('option',{value:'rule|'+cfg.class},'Rule: '+cfg.rule));src.value=cfg.source+'|'+cfg.class;
@@ -269,6 +285,156 @@ async function review(main){
    h('div',null,h('div',{class:'small'},'Reviewer attention'),h('div',{class:'m',style:'font-weight:700'},S.audit.canary_catch_rate==null?'-':pct(S.audit.canary_catch_rate,0)+' canaries caught'),h('div',{class:'small'},S.audit.seconds_per_card==null?'':S.audit.seconds_per_card+' s per card'))));}
  window.__rv={flag:(v)=>flag(cur,v),move:(d)=>{cur=Math.max(0,Math.min(cards.length-1,cur+d));draw();const el=grid.children[cur];if(el)el.scrollIntoView({block:'nearest'});},open:()=>cards[cur]&&openTrial(cards[cur].nct),submit,pick:(i)=>{if(i<cards.length){cur=i;flag(i,'disagree');}}};
  await load();}
+
+
+// ------------------------------------------------------------------ Simulate: risk model, tests, scenario core, protocol explorer
+async function simulate(main){
+ main.append(h('h2',null,'Simulate and test'));
+ const d=await api('/api/sim'),rep=d.report;
+ const tbl=(heads,rows,num)=>{const t=h('table',{style:'max-width:980px'},h('tr',null,heads.map((x,i)=>h('th',{class:(num||[]).includes(i)?'n':''},x))));rows.forEach(r=>t.append(h('tr',null,r.map((c,i)=>h('td',{class:(num||[]).includes(i)?'n':''},c==null?'':c)))));return t;};
+ const ci=a=>a?f3(a[0])+' to '+f3(a[1]):'';
+ const sec=(t,about)=>{main.append(h('h2',null,t));if(about)main.append(h('div',{class:'small',style:'max-width:900px;margin-bottom:4px'},about));};
+ main.append(h('div',{class:'warn'},h('b',null,'Exploratory. '),'Everything here is association in registry data, with machine-made (silver) labels. It does not show that changing a protocol changes outcomes. The simulator is scenario analysis: it shows how the simulator responds, not real-world value. The sealed vault is never read.'));
+ const info=h('span',{class:'small'},rep?('Last run: '+rep.finished+' · '+fmt(rep.rows_used)+' trials used · '+fmt(rep.vault_rows_excluded)+' sealed in the vault · '+rep.file):'Not run yet.');
+ const poll=async()=>{const j=await api('/api/jobs');if(j.running){setTimeout(poll,2000);return;}S.page='x';go();};
+ main.append(h('div',{class:'row'},h('button',{class:'primary',onclick:async()=>{await startStage('simulate','auto');setTimeout(poll,2500);}},'Run the tests (about 2 minutes)'),info));
+ sec('Validation gates','A claim made before its gate is passed is exploratory wherever it appears.');
+ main.append(tbl(['Gate','Claim it unlocks','Status','Note'],(d.gates||[]).map(g=>[g.gate,g.claim,h('span',{class:'chip '+(g.status==='passed'||g.status==='measured'?'neg':g.status==='pilot only'?'oth':'unl')},g.status),g.note])));
+ if(!rep){main.append(h('div',{style:'margin-top:10px'},'No results yet. Press Run the tests.'));return;}
+ const rp=rep.replay;
+ sec('Headline: how well can registration-time facts predict recruitment failure?','Trained on trials that started up to 2014, scored on 2016 to 2018. Never the vault or the frozen test split. Prospectively registered trials are the headline because they are the realistic use. Retrospective registrations leak hindsight and score higher.');
+ main.append(tbl(['Group','Trials','Failures','AUROC (95% interval)','AUPRC','Guessing level','Top 5%: precision (lift)','Calibration error','Who-runs-it only','Gain over that (95% interval)'],
+  Object.entries(rp.groups).map(([k,v])=>[k,fmt(v.n),fmt(v.positives),f3(v.full.auroc)+' ('+ci(v.full.auroc_ci)+')',f3(v.full.auprc),f3(v.full.auprc_guessing_level),pct(v.full.top5.precision)+' ('+v.full.top5.lift+'x)',f3(v.full.ece),f3(v.who_runs_it_only.auroc),'+'+f3(v.gain_over_who_runs_it.auroc)+' ('+ci(v.gain_over_who_runs_it.ci)+')']),[1,2,3,4,5,6,7,8,9]));
+ main.append(h('div',{class:'small'},'“Who-runs-it only” uses sites, sponsor class, start era and country. A protocol claim has to beat it. AUPRC is read against its guessing level, because at a low base rate most alarms are false.'));
+ const cal=rp.calibration_prospective||[];
+ if(cal.length){const mx=Math.max(...cal.map(c=>Math.max(c.pred,c.obs)))*1.1||0.1,W=220,sx=v=>10+v/mx*(W-20),sy=v=>W-10-v/mx*(W-20);
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('width',W);svg.setAttribute('height',W);svg.setAttribute('style','border:1px solid var(--hair);margin:6px 0');
+  svg.innerHTML='<line x1="10" y1="'+(W-10)+'" x2="'+(W-10)+'" y2="10" stroke="#999" stroke-dasharray="3"/>'+cal.map(c=>'<circle cx="'+sx(c.pred)+'" cy="'+sy(c.obs)+'" r="4" fill="#0040ff"/>').join('');
+  main.append(h('div',{class:'row'},svg,h('div',{class:'small',style:'max-width:520px'},'Calibration on prospective trials: each dot is a tenth of trials, predicted failure rate across, observed rate up. On the dashed line the stated risk is the true rate.')));}
+ sec('By sponsor, phase and area (prospective trials)','Where the model is weak is as important as where it is strong.');
+ main.append(tbl(['Stratum','Trials','Failures','AUROC','95% interval'],Object.entries(rp.by_stratum_prospective).map(([k,v])=>[k.replace('area=','area: ').replace('sponsor=','sponsor: ').replace('phase=','phase: '),fmt(v.n),fmt(v.positives),f3(v.auroc),ci(v.auroc_ci)]),[1,2,3]));
+ if(rep.ledger)ledgerSection(main,rep.ledger,d.protocol_ledger);
+ sec('Other ways to fail','One risk per super-label of the label tree, same split, silver labels. Counts decide whether to believe a row.');
+ main.append(tbl(['Way to fail','Failures to learn from','Failures to test on','AUROC','95% interval','AUPRC','Guessing level'],Object.entries(rep.heads).map(([k,v])=>v.note?[k,fmt(v.train_positives),fmt(v.test_positives),'',v.note,'','']:[k,fmt(v.train_positives),fmt(v.test_positives),f3(v.auroc),ci(v.auroc_ci),f3(v.auprc),f3(v.guessing_level)]),[1,2,3,5,6]));
+ const nc=rep.negative_controls;
+ sec('Negative controls','If one fails there is leakage or a bug. Run with every new model.');
+ main.append(tbl(['Control','Result','Expected','Verdict'],[
+  ['Outcomes shuffled (8 times)','mean AUROC '+f3(nc.shuffled_labels.dev_auroc_mean)+' (range '+f3(nc.shuffled_labels.dev_auroc_range[0])+' to '+f3(nc.shuffled_labels.dev_auroc_range[1])+'); '+nc.shuffled_labels.terms_flagged_fdr+' terms and '+nc.shuffled_labels.interactions_kept_max+' interactions survived','about 0.5; none survive',h('span',{class:'chip '+(Math.abs(nc.shuffled_labels.dev_auroc_mean-0.5)<0.03&&nc.shuffled_labels.terms_flagged_fdr<=1?'neg':'pos')},Math.abs(nc.shuffled_labels.dev_auroc_mean-0.5)<0.03&&nc.shuffled_labels.terms_flagged_fdr<=1?'pass':'FAIL')],
+  ['12 random columns',nc.random_columns.fake_flagged_fdr+' of 12 flagged','0 or 1',h('span',{class:'chip '+(nc.random_columns.fake_flagged_fdr<=1?'neg':'pos')},nc.random_columns.fake_flagged_fdr<=1?(nc.random_columns.fake_flagged_fdr===1?'pass (at the edge)':'pass'):'FAIL')],
+  ['Placebo outcome (last digit of the NCT number)','AUROC '+f3(nc.placebo_outcome.dev_auroc),'about 0.5',h('span',{class:'chip '+(Math.abs(nc.placebo_outcome.dev_auroc-0.5)<0.03?'neg':'pos')},Math.abs(nc.placebo_outcome.dev_auroc-0.5)<0.03?'pass':'FAIL')]]));
+ const rc=rep.recovery.by_label_noise;
+ sec('Can it find effects we plant?','Known effects, and a hidden common cause, are planted into real trial factors. Label noise is the share of true failures the labeller missed.');
+ main.append(tbl(['Label noise','Right direction','Planted effects found','Null factors wrongly flagged','Factors sharing a hidden cause flagged','Interactions found right','Interactions recalled'],Object.entries(rc).map(([q,v])=>[pct(+q,0),pct(v.sign_correct,0),pct(v.true_effects_found_fdr,0),pct(v.null_factors_flagged_fdr,0),pct(v.prime_mover_factors_flagged_fdr,0),pct(v.pair_precision,0),pct(v.pair_recall,0)]),[1,2,3,4,5,6]));
+ main.append(h('div',{class:'small',style:'max-width:900px'},rep.recovery.reading+' Interactions are rarely recovered: treat any reported interaction as a hypothesis. Random label noise says nothing about systematic labeller bias.'));
+ const sm=rep.simulator;
+ sec('Simulator (scenario analysis)','A cheap stochastic core: sites open late, patients arrive at random rates, reviews and funding can end a trial. Tuned to published rates from Kasenda et al. 2014. It is not validated against real outcomes (gate G4).');
+ const A=sm.calibration.achieved,T=sm.calibration.anchors,nm={recruitment_stop_rate:'Stopped for poor recruitment',any_stop_rate:'Stopped for any reason',median_fraction_at_recruitment_stop:'Median share of target reached when stopped for recruitment',industry_over_investigator_recruitment_stop:'Industry rate over investigator rate',piloted_recruitment_stop_rate_max:'Piloted trials stopped for recruitment (upper bound)'};
+ main.append(tbl(['Published rate','Published','Simulator'],Object.keys(T).map(k=>[nm[k],f3(T[k]),f3(A[k])])));
+ main.append(h('div',{class:'small'},'It reproduces four of the five. The any-stop rate is too high.'));
+ main.append(h('div',{class:'warn',style:'margin-top:6px'},sm.scenario.label));
+ main.append(tbl(['Change (same simulated trials, only this differs)','Stopped for recruitment','Relative change'],[['None (control)',pct(sm.scenario.control_recruitment_stop_rate),'']].concat(Object.entries(sm.scenario.levers).map(([k,v])=>[k,pct(v.recruitment_stop_rate),(v.relative_change>0?'+':'')+pct(v.relative_change,0)])),[1,2]));
+ if(d.backtest){const bt=d.backtest,b=bt.backtest_era_B,c=bt.calibration_era_A,eq=bt.extraction_quality_completed_trials['documents dated at or before the start'];
+  sec('Simulator backtest (gate G4): '+bt.gate_G4_verdict,'The simulator is tuned on trials starting up to 2015, using each trial’s real planned size, sites, sponsor type and criteria count, then predicts which 2016 to 2018 trials failed to recruit. Planned sizes come from protocol documents dated at or before the trial start. Scored against the registry-factor model on the same trials.');
+  main.append(tbl(['Predictor','AUROC on '+fmt(b.n)+' real trials ('+fmt(b.failures)+' failures)'],Object.entries(b.auroc).map(([k,v])=>[k,f3(v)]),[1]));
+  main.append(h('div',{class:'small',style:'max-width:900px;margin-top:4px'},'Simulator minus registry factors: '+b.simulator_vs_registry.gain.toFixed(3)+' ('+ci(b.simulator_vs_registry.ci)+'). Adding the simulator to the registry factors: '+b.simulator_adds_to_registry.gain.toFixed(3)+' ('+ci(b.simulator_adds_to_registry.ci)+'). Tuned on era A it matches the overall rate ('+pct(c.simulated.rate)+' simulated, '+pct(c.observed.rate)+' observed) but ranks trials wrongly: its highest-risk eighth is predicted '+pct(b.calibration_simulator[b.calibration_simulator.length-1].pred,0)+' and observed '+pct(b.calibration_simulator[b.calibration_simulator.length-1].obs,1)+'. Bigger planned sizes were less likely to fail in the real data (AUROC '+f3(b.auroc['planned sample size alone (bigger = riskier)'])+' for bigger = riskier), the opposite of the simulator’s mechanism. The simulator stays a scenario tool.'));
+  main.append(h('div',{class:'small',style:'max-width:900px;margin-top:4px'},'Planned sample size read from the protocol text, on completed trials with a dated-before-start document ('+fmt(eq.n)+'): correlation with registered enrolment '+eq.pearson_log10+' (log scale), median actual over planned '+eq.median_actual_over_planned+', '+pct(eq.share_within_25pct,0)+' within 25%, '+pct(eq.share_within_factor_2,0)+' within a factor of 2. Recruitment failures reached a median '+pct(bt.attainment_actual_over_planned.recruitment_failures[2],0)+' of the planned size (Kasenda: 41%).'));}
+ const wi=rep.whatif;
+ sec('Does the model agree with a simpler look? (level 1)',wi.reading);
+ main.append(tbl(['Protocol choice','Trials with it','Model: change in risk if removed','Stratified observed change if removed','Same direction'],wi.rows.map(r=>[r.lever,fmt(r.n_with),(r.model_implied_change_if_removed*100).toFixed(2)+' pts',(r.stratified_observed_change_if_removed*100).toFixed(2)+' pts',h('span',{class:'chip '+(r.same_direction?'neg':'pos')},r.same_direction?'yes':'no')]),[1,2,3]));
+ if(rep.effects){const ef=rep.effects;
+  sec('Factor effects on recruitment failure','Adjusted for all other factors. Odds ratio above 1 means more failure. “Stable” = the 95% bootstrap interval excludes 1. Evidence level: '+ef.level+'.');
+  main.append(tbl(['Factor','Odds ratio','95% interval','Stable','Failure rate with','Without','Trials with it'],ef.terms.filter(t=>t.support==null||t.support>=200).slice(0,30).map(t=>[t.term,f3(t.odds_ratio),t.lo==null?'':f3(t.lo)+' to '+f3(t.hi),t.stable==null?'':h('span',{class:'chip '+(t.stable?'neg':'')},t.stable?'stable':'not stable'),t.rate_with==null?'':pct(t.rate_with),t.rate_without==null?'':pct(t.rate_without),t.support==null?'':fmt(t.support)]),[1,4,5,6]));
+  if(ef.interactions.length)main.append(h('div',{class:'small'},'Interactions kept because they improved the held-out fit: '+ef.interactions.join('; ')+'. Any that involve a start era describe change over time, not a protocol choice. Treat all of them as hypotheses.'));
+  if(ef.clusters.groups.length){main.append(h('h3',null,'Factors that travel together'));main.append(h('div',{class:'small',style:'max-width:900px'},'A shared underlying cause (sponsor resources, institutional commitment) shows up as factors that appear together. The model cannot separate them.'));ef.clusters.groups.forEach(g=>main.append(h('div',{class:'small'},'· '+g.join(', '))));}}
+ // protocol explorer
+ const fg=await api('/api/sim/factors');
+ sec('Try a protocol','Tick what the protocol has; anything not ticked counts as absent. Each choice starts at the most common value; the start era starts at 2015 to 2019, where outcomes are mature (trials that started recently have had little time to fail, so a recent era always looks safer than it is). The estimate is an association in registry data, not a forecast for one trial.');
+ if(!fg.ready){main.append(h('div',{class:'small'},'The explorer needs the model saved by a run. Press Run the tests.'));return;}
+ const pick={},ticks=new Set(),out=h('div',{style:'margin-top:8px;max-width:900px'});
+ const form=h('div',{class:'row',style:'align-items:flex-start;gap:14px'});
+ fg.pick_one.forEach(g=>{const sel=h('select',{onchange:()=>{pick[g.group]=sel.value||null;}},h('option',{value:''},'(not set)'),...g.options.map(o=>h('option',{value:o},o)));if(g.default){sel.value=g.default;pick[g.group]=g.default;}form.append(h('label',{class:'small'},g.group,h('br'),sel));});
+ main.append(form);
+ fg.tick.forEach(g=>main.append(h('details',null,h('summary',null,g.group),h('div',{class:'row'},...g.options.map(o=>h('label',{style:'margin-right:10px;white-space:nowrap'},h('input',{type:'checkbox',onchange:e=>{e.target.checked?ticks.add(o):ticks.delete(o);}}),' '+o))))));
+ const lst=(t,rows,key)=>rows.length?h('div',null,h('b',null,t),...rows.map(r=>h('div',{class:'small'},'· '+r.factor+': '+(r.change_if_flipped>0?'+':'')+(r.change_if_flipped*100).toFixed(2)+' points if '+(r.present?'removed':'added')+' (alone)'+(r.modifiable?'':' · context, not a protocol choice')))):'';
+ main.append(h('div',{class:'row'},h('button',{class:'primary',onclick:async()=>{
+   const on=[...ticks,...Object.values(pick).filter(Boolean)];
+   try{const r=await api('/api/sim/explain',{on});
+    out.replaceChildren(h('div',{style:'font-size:20px;font-weight:700'},pct(r.risk,1)+' estimated chance of recruitment failure',h('span',{class:'small',style:'font-weight:400'},'  (all comparable trials: '+pct(r.base_rate,1)+')')),
+     lst('Raising the risk',r.raising),lst('Lowering the risk',r.lowering),lst('Protective factors this protocol lacks',r.missing_protective),
+     h('div',{class:'small',style:'margin-top:6px'},r.level+'. '+r.note));
+   }catch(e){out.replaceChildren(h('div',{class:'warn bad'},e.message));}}},'Estimate')));
+ main.append(out);
+}
+
+
+// ------------------------------------------------------------------ source ledger and the Astrology Corner
+const KCOL={protocol:'#0040ff',who:'#7a3fb8',trend:'#00897b',hindsight:'#d9480f',incidental:'#8a8a8a',control:'#bdbdbd',joke:'#e0409a',doc:'#0b6b2e'};
+const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function ledgerChart(rows,kinds,title){
+ const W=940,L=330,P=250,G=70,rh=21,top=44,H=top+rows.length*rh+34;
+ const ctl=rows.filter(r=>r.kind==='control');
+ const nfA=ctl.length?Math.max(...ctl.map(r=>r.alone_ci[1])):0.5, nfU=ctl.length?Math.max(...ctl.map(r=>Math.max(Math.abs(r.unique_ci[0]),Math.abs(r.unique_ci[1])))):0;
+ const aLo=0.46,aHi=Math.max(0.7,...rows.map(r=>r.alone_ci[1]+0.01));
+ const uLo=Math.min(-0.006,...rows.map(r=>r.unique_ci[0]-0.002)),uHi=Math.max(0.01,...rows.map(r=>r.unique_ci[1]+0.003));
+ const xa=v=>L+(v-aLo)/(aHi-aLo)*P, xu=v=>L+P+G+(v-uLo)/(uHi-uLo)*P;
+ let s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" style="max-width:100%;height:auto;border:1px solid var(--hair);background:#fff">';
+ s+='<text x="'+L+'" y="16" font-size="12" font-weight="700">Alone: AUROC (0.5 = chance)</text><text x="'+(L+P+G)+'" y="16" font-size="12" font-weight="700">Unique: AUROC lost without it</text>';
+ s+='<text x="'+L+'" y="30" font-size="10.5" fill="#666">grey band = the best a control family managed by luck</text>';
+ s+='<rect x="'+xa(0.5)+'" y="'+top+'" width="'+Math.max(1,xa(nfA)-xa(0.5))+'" height="'+(rows.length*rh)+'" fill="#e9e9e9"/>';
+ s+='<rect x="'+xu(-nfU)+'" y="'+top+'" width="'+Math.max(1,xu(nfU)-xu(-nfU))+'" height="'+(rows.length*rh)+'" fill="#e9e9e9"/>';
+ s+='<line x1="'+xa(0.5)+'" x2="'+xa(0.5)+'" y1="'+top+'" y2="'+(top+rows.length*rh)+'" stroke="#111"/><line x1="'+xu(0)+'" x2="'+xu(0)+'" y1="'+top+'" y2="'+(top+rows.length*rh)+'" stroke="#111"/>';
+ rows.forEach((r,i)=>{const y=top+i*rh+rh/2,c=KCOL[r.kind]||'#333';
+  s+='<text x="'+(L-8)+'" y="'+(y+4)+'" font-size="11.5" text-anchor="end" fill="'+(r.constant_in_test?'#999':'#111')+'">'+esc(r.family.length>52?r.family.slice(0,50)+'…':r.family)+'</text>';
+  if(r.constant_in_test){s+='<text x="'+(L+6)+'" y="'+(y+4)+'" font-size="10.5" fill="#999">no variation in this test set</text>';return;}
+  s+='<rect x="'+xa(Math.min(0.5,r.alone_auroc))+'" y="'+(y-6)+'" width="'+Math.abs(xa(r.alone_auroc)-xa(0.5))+'" height="12" fill="'+c+'"><title>'+esc(r.family)+': alone '+r.alone_auroc.toFixed(3)+' ('+r.alone_ci[0].toFixed(3)+' to '+r.alone_ci[1].toFixed(3)+')</title></rect>';
+  s+='<line x1="'+xa(r.alone_ci[0])+'" x2="'+xa(r.alone_ci[1])+'" y1="'+y+'" y2="'+y+'" stroke="#111" stroke-width="1.4"/>';
+  s+='<rect x="'+xu(Math.min(0,r.unique_gain))+'" y="'+(y-6)+'" width="'+Math.max(1,Math.abs(xu(r.unique_gain)-xu(0)))+'" height="12" fill="'+c+'"><title>'+esc(r.family)+': unique '+r.unique_gain.toFixed(4)+' ('+r.unique_ci[0].toFixed(4)+' to '+r.unique_ci[1].toFixed(4)+')</title></rect>';
+  s+='<line x1="'+xu(r.unique_ci[0])+'" x2="'+xu(r.unique_ci[1])+'" y1="'+y+'" y2="'+y+'" stroke="#111" stroke-width="1.4"/>';});
+ s+='<text x="'+xa(0.5)+'" y="'+(H-14)+'" font-size="10" text-anchor="middle">0.5</text><text x="'+xa(aHi)+'" y="'+(H-14)+'" font-size="10" text-anchor="end">'+aHi.toFixed(2)+'</text>';
+ s+='<text x="'+xu(0)+'" y="'+(H-14)+'" font-size="10" text-anchor="middle">0</text><text x="'+xu(uHi)+'" y="'+(H-14)+'" font-size="10" text-anchor="end">+'+uHi.toFixed(3)+'</text></svg>';
+ const wrap=h('div');wrap.innerHTML=s;return wrap;}
+function ledgerSection(main,ledger,pled){
+ const sec=(t,a)=>{main.append(h('h2',null,t));if(a)main.append(h('div',{class:'small',style:'max-width:900px;margin-bottom:4px'},a));};
+ sec('Where the information comes from','Every kind of source measured the same way, protocol choices and silly ones alike. Bars are AUROC with 95% intervals. Anything no taller than the grey band is not distinguishable from luck. Kept even when useless: trends are worth knowing about and correcting for.');
+ const st=Object.keys(ledger.settings);let cur=st[0],grp='prospective (headline)';const holder=h('div');
+ const bar=h('div',{class:'row'});
+ const draw=()=>{bar.replaceChildren(...st.map(k=>h('button',{class:k===cur?'primary':'',onclick:()=>{cur=k;draw();}},k)),h('span',{class:'small'},' on '),...Object.keys(ledger.settings[cur].groups).map(g=>h('button',{class:g===grp?'primary':'',onclick:()=>{grp=g;draw();}},g)));
+  const sv=ledger.settings[cur],gv=sv.groups[grp]||sv.groups[Object.keys(sv.groups)[0]];
+  const rows=gv.rows.filter(r=>r.kind!=='joke').slice().sort((a,b)=>b.alone_auroc-a.alone_auroc);
+  holder.replaceChildren(h('div',{class:'small'},'Train: '+sv.train+' · test: '+sv.test+' · '+fmt(gv.n)+' trials, '+fmt(gv.failures)+' failures · everything together: AUROC '+f3(gv.full_model_auroc)),ledgerChart(rows,ledger.kinds),
+   h('div',{class:'small',style:'margin-top:4px'},...Object.entries(ledger.kinds).filter(([k])=>k!=='joke').map(([k,v])=>h('span',{class:'lgd'},h('i',{style:'background:'+KCOL[k]}),v))));};
+ draw();main.append(bar,holder,h('div',{class:'small',style:'max-width:900px'},ledger.reading));
+ if(pled)protocolLedger(main,pled);
+ astroCorner(main,ledger);}
+function astroCorner(main,ledger){
+ const M=ledger.mercury,o=M.overall,box=h('div',{class:'astro'});
+ const stars=[...Array(14)].map((_,i)=>'<text class="twk" x="'+(20+i*62+(i%3)*9)+'" y="'+(16+(i*37)%46)+'" font-size="'+(12+(i%4)*3)+'" fill="#e8b400">'+(i%2?'*':'+')+'</text>').join('');
+ const planet='<g transform="translate(60,62)"><circle r="26" fill="url(#mg)" stroke="#7a1fa2" stroke-width="3"/><circle cx="-8" cy="-6" r="5" fill="#00000022"/><circle cx="9" cy="8" r="3.5" fill="#00000022"/><path d="M-44,30 C-20,60 30,60 50,26" fill="none" stroke="#e0409a" stroke-width="4" stroke-dasharray="7 5"/><path d="M50,26 l-12,-3 m12,3 l-3,12" stroke="#e0409a" stroke-width="4" fill="none"/></g>';
+ const verdict=o.p<0.05?'The stars are ... mildly suspicious (p = '+o.p+')':'The stars say: ¯\\_(ツ)_/¯ (p = '+o.p+')';
+ box.append(h('h2',null,'The Mercury Retrograde Report'));
+ const hd=h('div');hd.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 110" width="900" style="max-width:100%;height:auto"><defs><radialGradient id="mg" cx="35%" cy="30%"><stop offset="0" stop-color="#ffe6a8"/><stop offset="1" stop-color="#d98a3d"/></radialGradient></defs>'+stars+planet+'<text x="130" y="58" font-size="16" fill="#4b1d6b" font-weight="700">"My trial started during a retrograde. Is that why it failed?"</text><text x="130" y="82" font-size="12.5" fill="#7a5a8a">Computed from the orbits of Mercury and Earth, not looked up. '+Math.round(100*M.share_of_trials_in_retrograde)+'% of trials start in one.</text></svg>';
+ box.append(hd);
+ box.append(h('div',{class:'bubble'},verdict));
+ box.append(h('div',{style:'margin:4px 0'},'Started in a retrograde: ',h('b',null,pct(o.rate_retro,2)+' failed to recruit'),' ('+fmt(o.failures_retro)+' of '+fmt(o.n_retro)+'). Otherwise: ',h('b',null,pct(o.rate_not,2)),' ('+fmt(o.failures_not)+' of '+fmt(o.n_not)+'). Rate ratio ',h('b',null,o.rr+' ('+o.rr_ci[0]+' to '+o.rr_ci[1]+')'),'.'));
+ const yrs=Object.entries(M.by_year),W=900,rowh=22,H=34+yrs.length*rowh+26,lo=0.4,hi=2.6,xs=v=>150+(Math.log(Math.max(lo,Math.min(hi,v)))-Math.log(lo))/(Math.log(hi)-Math.log(lo))*700;
+ let s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" style="max-width:100%;height:auto"><text x="150" y="16" font-size="12" font-weight="700" fill="#4b1d6b">Each year on its own: rate ratio (retrograde / not), 1 = the planet does nothing</text>';
+ s+='<line x1="'+xs(1)+'" x2="'+xs(1)+'" y1="26" y2="'+(H-22)+'" stroke="#b07bff" stroke-width="3" stroke-dasharray="6 5"/>';
+ yrs.forEach(([y,v],i)=>{const yy=40+i*rowh,sig=v.p<0.05;
+  s+='<text x="140" y="'+(yy+4)+'" font-size="12" text-anchor="end">'+y+'</text><line x1="'+xs(v.rr_ci[0])+'" x2="'+xs(v.rr_ci[1])+'" y1="'+yy+'" y2="'+yy+'" stroke="'+(sig?'#e0409a':'#8a6aa8')+'" stroke-width="3" stroke-linecap="round"/><circle cx="'+xs(v.rr)+'" cy="'+yy+'" r="'+(sig?7:5)+'" fill="'+(sig?'#e0409a':'#7a1fa2')+'" stroke="#fff" stroke-width="2"><title>'+y+': '+v.rr+' ('+v.rr_ci[0]+' to '+v.rr_ci[1]+'), p '+v.p+'</title></circle>'+(sig?'<text x="'+(xs(v.rr_ci[1])+10)+'" y="'+(yy+4)+'" font-size="12" fill="#e0409a">p '+v.p+' !</text>':'');});
+ s+='<text x="'+xs(0.5)+'" y="'+(H-6)+'" font-size="10.5" text-anchor="middle">0.5</text><text x="'+xs(1)+'" y="'+(H-6)+'" font-size="10.5" text-anchor="middle">1</text><text x="'+xs(2)+'" y="'+(H-6)+'" font-size="10.5" text-anchor="middle">2</text></svg>';
+ const ch=h('div');ch.innerHTML=s;box.append(ch);
+ const jr=[];Object.entries(ledger.settings).forEach(([k,sv])=>{const g=sv.groups['prospective (headline)']||Object.values(sv.groups)[0];const r=g.rows.find(r=>r.kind==='joke');if(r)jr.push(k.split(' (')[0]+': AUROC '+r.alone_auroc.toFixed(3)+' ('+r.alone_ci[0].toFixed(3)+' to '+r.alone_ci[1].toFixed(3)+'), unique '+(r.unique_gain>=0?'+':'')+r.unique_gain.toFixed(4));});
+ box.append(h('div',{class:'small',style:'margin-top:4px'},'As a predictor on prospective trials, the planet alone scores — '+jr.join(' · ')+'. Chance is 0.5.'));
+ box.append(h('div',{class:'small',style:'margin-top:6px'},M.note+' Used nowhere in AutoRAN. It is here because it was asked for, and because it shows what luck looks like next to the real sources above.'));
+ main.append(box);}
+function protocolLedger(main,pl){
+ main.append(h('h2',null,'Where the information comes from: protocol documents'));
+ main.append(h('div',{class:'small',style:'max-width:900px'},pl.reading));
+ const vs=Object.keys(pl.variants);let cur=vs[0];const holder=h('div'),bar=h('div',{class:'row'});
+ const draw=()=>{bar.replaceChildren(...vs.map(k=>h('button',{class:k===cur?'primary':'',onclick:()=>{cur=k;draw();}},k)));
+  const v=pl.variants[cur],rows=v.rows.slice().sort((a,b)=>b.alone_auroc-a.alone_auroc);
+  holder.replaceChildren(h('div',{class:'small'},v.about+' · '+fmt(v.n)+' test documents, '+fmt(v.failures)+' failures · registry factors alone: AUROC '+f3(v.baseline_auroc)+' · registry plus every document family: '+f3(v.full_auroc)),ledgerChart(rows,pl.kinds));};
+ draw();main.append(bar,holder);}
 
 async function plots(main){
  main.append(h('h2',null,'Plots'));
@@ -356,6 +522,72 @@ async function gpuSection(main){
  if(box.textContent.indexOf('Looking at your computer')>=0||box.textContent.indexOf('Installing PyTorch')>=0)schedule();
 }
 
+// ------------------------------------------------------------------ Review, second mode: one case at a time, yes / no / other, saved to a CSV
+async function cases(main){
+ const box=h('div');main.append(box);
+ const pretty=c=>c.replace(/_/g,' ');
+ const SUPERS={"Participants": ["Insufficient_Enrollment"], "Resources": ["Business_Administrative", "Logistics_Resources", "Study_Staff_Moved"], "Science": ["Study_Design", "Another_Study", "Insufficient_Data"], "Results": ["Negative", "Endpoint_Met", "Success", "Interim_Analysis"], "Harm and compliance": ["Safety_Sideeffects", "Regulatory", "Ethical_Reason"], "Outside events": ["Covid19"], "Uninformative": ["Invalid_Reason", "No_Context"]};
+ const chip=(c,kind)=>h('span',{style:'display:inline-block;margin:2px 6px 2px 0;padding:2px 8px;border:2px solid '+(kind==='add'?'var(--good)':kind==='del'?'var(--bad)':'var(--hair)')+';'+(kind==='del'?'text-decoration:line-through;':'')+(kind==='add'?'font-weight:700;':'')},(kind==='add'?'+ ':kind==='del'?'− ':'')+pretty(c));
+ let busy=false;
+ async function act(path,body){if(busy)return;busy=true;try{const st=await api(path,body||{});draw(st);}catch(e){box.prepend(h('div',{class:'warn bad'},e.message));}finally{busy=false;}}
+ function draw(st){
+  box.replaceChildren();window.__gd=null;
+  if(!st.sample){
+   box.append(h('div',{style:'max-width:760px'},h('p',null,'Give a verdict on cases where AutoRAN changed its mind, plus some it is sure about. Each verdict is saved to a CSV you can open in a spreadsheet. Nothing about the labels changes.'),
+    h('p',null,'A sample is 100 cases: the 70 the labeller is least sure about and 30 it is fairly sure about, mixed together. The card never says which is which.'),
+    h('div',{class:'row'},h('button',{class:'primary',onclick:()=>{box.append(h('div',{class:'small'},'Drawing the sample… this reads every stopped trial and can take half a minute.'));act('/api/gold/draw',{n_concerning:70,n_control:30});}},'Draw 100 cases'))));
+   return;}
+  const done=st.done,n=st.n;
+  box.append(h('div',{class:'row',style:'align-items:center;gap:14px'},h('b',null,done+' of '+n+' done'),
+   h('div',{style:'flex:1;max-width:360px;height:8px;background:var(--soft);border:1px solid var(--hair)'},h('div',{style:'height:100%;width:'+Math.round(100*done/Math.max(1,n))+'%;background:var(--acc)'})),
+   h('span',{class:'small'},'yes '+st.counts.yes+' · no '+st.counts.no+' · other '+st.counts.other),
+   h('button',{disabled:done?null:'disabled',onclick:()=>act('/api/gold/undo')},'Undo last (Z)')));
+  box.append(h('div',{class:'small',style:'margin:2px 0 10px'},'Saved to ',h('span',{class:'mono'},st.file)));
+  const c=st.next;
+  if(!c){
+   const sm=st.summary||{};
+   box.append(h('h3',null,'All done. Thank you.'));
+   const t=h('table',{style:'max-width:620px'},h('tr',null,['Group','Cases','Yes','No','Other','Yes rate'].map(x=>h('th',null,x))));
+   [['concern','The labeller was unsure'],['control','The labeller was sure']].forEach(([k,l])=>{const s=sm[k];if(s)t.append(h('tr',null,h('td',null,l),h('td',{class:'n'},s.n),h('td',{class:'n'},s.yes),h('td',{class:'n'},s.no),h('td',{class:'n'},s.other),h('td',{class:'n'},s.yes_rate==null?'':Math.round(100*s.yes_rate)+'%')));});
+   const bl=sm.blind||{},op=sm.open||{},ow=sm.own_answer_matches_machine||{};
+   if(bl.n||op.n)box.append(h('div',{class:'small',style:'margin:6px 0'},'Anchoring check: yes rate when you wrote your own answer first (blind) '+(bl.yes_rate==null?'-':Math.round(100*bl.yes_rate)+'%')+' of '+(bl.n||0)+', when you saw the machine’s first (open) '+(op.yes_rate==null?'-':Math.round(100*op.yes_rate)+'%')+' of '+(op.n||0)+'. Your own blind answer matched the machine’s exactly in '+(ow.rate==null?'-':Math.round(100*ow.rate)+'%')+' of '+(ow.n||0)+' cases. A much higher open yes rate suggests the machine’s answer is steering you.'));
+   box.append(t,h('div',{class:'small'},'If the sure group is not nearly all yes, the labeller is overconfident. The CSV has every verdict, the before and after calls and the rules that changed.'),
+    h('div',{class:'row'},h('button',{onclick:()=>{if(confirm('Draw a new sample of 100? Cases you already judged are skipped.'))act('/api/gold/draw',{n_concerning:70,n_control:30,seed:Date.now()%100000});}},'Draw another 100')));
+   return;}
+  if(c.blind&&!c.after){
+   const own=new Set();
+   const groups=h('div',null,...Object.entries(SUPERS).map(([sup,cs])=>h('div',{style:'margin:4px 0'},h('span',{class:'small',style:'display:inline-block;min-width:150px'},sup),...cs.map(k=>h('label',{style:'margin-right:12px;white-space:nowrap'},h('input',{type:'checkbox',onchange:e=>{e.target.checked?own.add(k):own.delete(k);}}),' '+pretty(k))))));
+   box.append(h('div',{style:'border:2px solid var(--acc);padding:12px 14px;max-width:820px'},
+    h('div',{class:'small'},'Blind case: the machine’s answer is hidden. Write your own first ('+c.nct_id+', '+c.status.toLowerCase()+')'),
+    h('div',{style:'font-size:17px;line-height:1.45;margin:6px 0 12px'},c.why_stopped),
+    h('div',{class:'small'},'Tick every reason the text gives. Tick nothing if it gives no usable reason.'),groups,
+    h('div',{class:'row',style:'margin-top:10px'},h('button',{class:'primary',onclick:async()=>{if(busy)return;busy=true;try{await api('/api/gold/reveal',{item:c.item,own:[...own]});draw(await api('/api/gold'));}catch(e){box.prepend(h('div',{class:'warn bad'},e.message));}finally{busy=false;}}},'Lock my answer and show the machine’s'))));
+   window.__gd=null;return;}
+  const note=h('input',{type:'text',placeholder:'Optional note (why?)',style:'width:100%;max-width:640px;margin:6px 0'});
+  const verdict=v=>{act('/api/gold/verdict',{item:c.item,verdict:v,note:note.value});};
+  box.append(h('div',{style:'border:2px solid var(--rule);padding:12px 14px;max-width:820px'},
+   h('div',{class:'small'},'Why the trial was stopped, as written in the registry ('+c.nct_id+', '+c.status.toLowerCase()+')'),
+   h('div',{style:'font-size:17px;line-height:1.45;margin:6px 0 12px'},c.why_stopped),
+   c.blind?h('div',{class:'small',style:'margin-bottom:6px'},'Your own answer, locked before you saw the machine’s: ',h('b',null,(c.own&&c.own.length)?c.own.map(pretty).join(', '):'no class')):'',
+   h('div',{class:'small'},'Before (last run)'),h('div',null,c.before.length?c.before.map(x=>chip(x,c.removed.includes(x)?'del':'')):h('span',{class:'small'},'no class')),
+   h('div',{class:'small',style:'margin-top:6px'},'After (now)'),h('div',null,c.after.length?c.after.map(x=>chip(x,c.added.includes(x)?'add':'')):h('span',{class:'small'},'no class')),
+   (c.rules_added.length||c.rules_removed.length)?h('div',{class:'small mono',style:'margin-top:8px'},'Rules changed: ',c.rules_added.map(r=>'+'+r).concat(c.rules_removed.map(r=>'−'+r)).join('  ')):h('div',{class:'small',style:'margin-top:8px'},(c.added.length||c.removed.length)?'No rule changed. The difference comes from the statistical model (decided by: '+(c.source_after==='nb'?'the model':c.source_after)+'; before: '+(c.source_before==='nb'?'the model':c.source_before)+').':'No rule changed; the call is the same.'),
+   (c.votes&&Object.keys(c.votes).length)?h('div',{class:'small',style:'margin-top:6px'},'Checks that agreed (of 6): '+Object.keys(c.votes).map(k=>pretty(k)+' '+(c.agree[k]||0)+' ('+Object.entries(c.votes[k]).filter(([d,v])=>v>=0.5).map(([d])=>d.replace('_',' ')).join(', ')+')').join(' · ')):'',
+   (c.story&&c.story.edges&&c.story.edges.length)?h('div',{class:'small',style:'margin-top:4px'},'Cause and effect read from the text: '+c.story.edges.map(e=>pretty(e.cause)+' → '+pretty(e.effect)+' ('+e.via+')').join('; ')):'',
+   (c.story&&c.story.not_about&&c.story.not_about.length)?h('div',{class:'small',style:'margin-top:4px'},'Said not to be the reason: '+c.story.not_about.map(pretty).join(', ')):'',
+   (c.tree&&(c.tree.sublabels||[]).length)?h('div',{class:'small',style:'margin-top:4px'},'Finer labels: '+c.tree.sublabels.map(pretty).join(', ')+(c.tree.land_mine?' · flag: '+pretty(c.tree.land_mine):'')+(c.tree.withdrawn_kind?' · withdrawn: '+pretty(c.tree.withdrawn_kind):'')):'',
+   note));
+  box.append(h('div',{class:'row',style:'margin-top:10px;gap:10px'},
+   h('button',{class:'primary',style:'min-width:120px;padding:10px 18px;font-size:15px',onclick:()=>verdict('yes')},'Yes (Y)'),
+   h('button',{style:'min-width:120px;padding:10px 18px;font-size:15px',onclick:()=>verdict('no')},'No (N)'),
+   h('button',{style:'min-width:120px;padding:10px 18px;font-size:15px',onclick:()=>verdict('other')},'Other (O)')));
+  box.append(h('div',{class:'small',style:'margin-top:8px;max-width:760px'},h('b',null,'Yes'),': the After classification is right. ',h('b',null,'No'),': it is wrong. ',h('b',null,'Other'),': not wrong, but classified poorly (neither a good change nor a bad one). Keys: Y, N, O, and Z to undo.'));
+  window.__gd={verdict,undo:()=>act('/api/gold/undo')};
+ }
+ draw(await api('/api/gold'));
+}
+
+
 async function settings(main){
  const a=await api('/api/settings');
  main.append(h('h2',null,'Settings'));
@@ -413,6 +645,7 @@ async function about(main){
 document.addEventListener('keydown',e=>{
  if(['INPUT','TEXTAREA','SELECT'].includes((e.target.tagName||'')))return;
  if(e.key==='Escape'){closeDrawer();return;}
+ if(S.page==='review'&&window.__gd){const k=e.key.toLowerCase();if(k==='y'){window.__gd.verdict('yes');e.preventDefault();}else if(k==='n'){window.__gd.verdict('no');e.preventDefault();}else if(k==='o'){window.__gd.verdict('other');e.preventDefault();}else if(k==='z'){window.__gd.undo();e.preventDefault();}return;}
  if(S.page==='review'&&window.__rv&&!$('drawer').classList.contains('open')){const r=window.__rv,k=e.key.toLowerCase();
   if(k==='x'){r.flag('disagree');e.preventDefault();}else if(k==='u'){r.flag('unsure');e.preventDefault();}else if(k==='j'||e.key==='ArrowDown'||e.key==='ArrowRight'){r.move(1);e.preventDefault();}
   else if(k==='k'||e.key==='ArrowUp'||e.key==='ArrowLeft'){r.move(-1);e.preventDefault();}else if(k==='o'){r.open();}else if(e.key==='Enter'){r.submit();e.preventDefault();}

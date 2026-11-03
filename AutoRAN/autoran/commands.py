@@ -34,6 +34,20 @@ def _dispatch(cmd, ctx, cfg, args, paths):
             raise ValueError(f"this downloads about {plan['expected_gb']:g} GB into {plan['target']}; add --yes to go ahead (or --dry-run to see the commands)")
         res = gpucheck.run_install(plan)
         return {"state": res["state"], "message": res["message"], "log_tail": res["log"][-8:]}
+    if cmd == "gold-draw":
+        from . import gold
+        return gold.draw(ctx, cfg, args.concerning, args.control, args.seed)
+    if cmd == "gold-summary":
+        from . import gold
+        st = gold.state(paths)
+        return {k: st[k] for k in ("file", "sample", "counts", "done", "n")} | ({"summary": st["summary"]} if "summary" in st else {})
+    if cmd == "voter-build":
+        from . import labelstage
+        return labelstage.build_voter(ctx, cfg, with_test=getattr(args, "test", False))
+    if cmd == "simulate":
+        from . import sim
+        res = sim.run_all(paths, seeds=args.seeds, boot=args.boot, only=args.only, log=lambda m: print(m, flush=True))
+        return {"file": res["file"], "parts": [k for k in ("simulator", "negative_controls", "replay", "heads", "recovery", "whatif", "effects", "ledger") if k in res]}
     if cmd == "labeller-data":
         from . import opentargets
         f = opentargets.fetch(ctx, cfg)

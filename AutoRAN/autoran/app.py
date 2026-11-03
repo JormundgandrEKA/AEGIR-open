@@ -127,7 +127,17 @@ def selftest():
         if gname:
             r = api.call("GET", "/api/plot?name=" + gname[0].replace(" ", "%20") + "&device=auto")
             out["gpu_plot"] = {k: (len(v) if k == "png" else v) for k, v in r["data"].items() if k in ("png", "seconds", "device", "error")}
-        out["ok"] = bool(out["metrics_ok"] and out["trials_ok"] and "error" not in out["first_plot"])
+        import hashlib
+        from . import ui as _ui, sim as _sim
+        out["ui_sha256"] = hashlib.sha256(_ui.HTML.encode("utf-8")).hexdigest()           # so a built exe can be compared with the source it came from
+        out["ui_has"] = {k: (k in _ui.HTML) for k in ("Simulator backtest", "Mercury Retrograde Report", "ledgerSection", "Try a protocol", "Scan a screen")}
+        r = api.call("GET", "/api/sim")
+        rep = (r["data"] or {}).get("report")
+        out["sim_api"] = {"status": r["status"], "report": bool(rep), "ledger": bool(rep and rep.get("ledger")), "mercury": bool(rep and (rep.get("ledger") or {}).get("mercury")),
+                          "protocol_ledger": (r["data"] or {}).get("protocol_ledger") is not None, "backtest": (r["data"] or {}).get("backtest") is not None,
+                          "gates": {g["gate"]: g["status"] for g in (r["data"] or {}).get("gates") or []}}
+        out["gates_in_code"] = {g: st for g, _c, st, _n in _sim.GATES}
+        out["ok"] = bool(out["metrics_ok"] and out["trials_ok"] and "error" not in out["first_plot"] and out["sim_api"]["status"] == 200)
     except BaseException as e:
         out["ok"], out["error"] = False, f"{type(e).__name__}: {e}"
         out["trace"] = traceback.format_exc()[-1500:]

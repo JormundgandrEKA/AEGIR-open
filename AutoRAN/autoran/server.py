@@ -1,5 +1,7 @@
 """`autoran serve`: dashboard, findings browser, trial inspector and supervisor review tools. 127.0.0.1 only, Host-checked, stdlib."""
+import html
 import json
+import re
 import time
 import random
 import threading
@@ -9,9 +11,20 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from . import __version__, audit, labeller as L, stats
+from . import __version__, audit, gold, labeller as L, risk, sim, stats, taxonomy
 from .core import Paths, iter_jsonl, read_gz_json
 from .metrics import load_metrics
+
+_ENTITY = re.compile(r"&(?:[a-z]+|#\d+|#x[0-9a-f]+);", re.I)
+
+
+def tidy_title(t):
+    """Registry titles are sometimes escaped twice (`Parkinson&Apos;s`). Display only: stored text and the frozen split are untouched."""
+    for _ in range(2):
+        if not t or not _ENTITY.search(t):
+            break
+        t = re.sub(r"&apos;", "'", html.unescape(t), flags=re.I)
+    return t
 from .opentargets import normalise_reason
 from .scorers import Logistic, input_view, load_scores
 from .ui import HTML
@@ -126,7 +139,7 @@ class State:
         return out
 
     def row_json(self, r, with_scores=True):
-        d = {"nct": r[0], "title": r[1], "status": r[2], "class": r[3], "stop_class": r[4], "label_source": r[5], "conf": r[6] / 1000,
+        d = {"nct": r[0], "title": tidy_title(r[1]), "status": r[2], "class": r[3], "stop_class": r[4], "label_source": r[5], "conf": r[6] / 1000,
              "disagree": bool(r[7]), "phase": r[8], "areas": r[9], "year": r[10], "sponsor_class": r[11], "region": r[12],
              "input_state": r[13], "registration": r[14], "split": r[15], "why_stopped": r[16], "span": r[17], "rules": r[18],
              "enrollment": r[19], "sites": r[22], "criteria": r[23], "audit": (self.audited.get(r[0]) or {}).get("verdict")}
@@ -173,7 +186,9 @@ class State:
                   "provenance": {"page": r[20], "pos": r[21], "grade": "A+", "source": "ClinicalTrials.gov API v2 (current record)",
                                  "data_timestamp": (self.metrics or {}).get("pipeline", {}).get("data_timestamp")},
                   "links": {"study": f"https://clinicaltrials.gov/study/{nct}", "history": f"https://clinicaltrials.gov/study/{nct}?tab=history"},
-                  "caveats": self.caveats(r)})
+                  "caveats": self.caveats(r),
+                  "tree": (lambda t: {k: t.get(k) for k in ("supers", "sublabels", "stage", "land_mine", "withdrawn_kind")})(
+                      taxonomy.classify_tree(r[F["why"]], r[F["status"]], r[F["enr"]])) if r[F["why"]] else None})
         return d
 
     def caveats(self, r):
@@ -225,7 +240,7 @@ class State:
                     cand = self.rows[rnd.randrange(len(self.rows))]
                     host = cand if cand[2] == "TERMINATED" else None
                 cards.insert(min(len(cards), (k + 1) * CANARY_EVERY - 1 - k), {
-                    "nct": cc["nct"], "title": host[1], "status": "TERMINATED", "class": "other_stop", "stop_class": cc["stop_class"],
+                    "nct": cc["nct"], "title": tidy_title(host[1]), "status": "TERMINATED", "class": "other_stop", "stop_class": cc["stop_class"],
                     "why_stopped": cc["why_stopped"], "label_source": "rules", "conf": 0.9, "span": None, "rules": [], "phase": host[8],
                     "areas": host[9], "year": host[10], "enrollment": None, "disagree": False, "audit": None, "evidence": None})
         return {"source": src, "class": klass, "seed": seed, "population": len(pool), "cards": cards,
@@ -395,6 +410,29 @@ def dispatch(state, method, path, q, body):
                 return (200, d) if d else (404, {"error": "not found"})
             if path == "/api/sheet":
                 return 200, state.sheet(q)
+            if path == "/api/sim":
+                rep, f = sim.latest(state.paths)
+                if rep is None:
+                    return 200, {"report": None, "gates": [{"gate": g, "claim": c, "status": st, "note": n} for g, c, st, n in sim.GATES]}
+                rep = dict(rep)
+                ms = sorted((state.paths.data / "derived" / "sim").glob("model_recruitment_*.json"))
+                rep["file"] = f.name
+                rep["model_ready"] = bool(ms)
+                pf = sorted((state.paths.data / "derived" / "sim").glob("ledger_protocol_*.json"))
+                bf = sorted((state.paths.data / "derived" / "sim").glob("enrolment_check_*.json"))
+                return 200, {"report": rep, "gates": [{"gate": g, "claim": c, "status": st, "note": n} for g, c, st, n in sim.GATES],
+                             "protocol_ledger": json.loads(pf[-1].read_text(encoding="utf-8")) if pf else None, "backtest": json.loads(bf[-1].read_text(encoding="utf-8")) if bf else None}
+            if path == "/api/sim/factors":
+                ms = sorted((state.paths.data / "derived" / "sim").glob("model_recruitment_*.json"))
+                if not ms:
+                    return 200, {"ready": False}
+                d = json.loads(ms[-1].read_text(encoding="utf-8"))
+                fg = risk.factor_groups(d["names"])
+                for g in fg["pick_one"]:                 # a real trial always has one value in each of these, so start from the most common one
+                    g["default"] = "start 2015-2019" if "start 2015-2019" in g["options"] else max(g["options"], key=lambda o: (d["raw"].get(o) or {}).get("support", 0))
+                return 200, dict(fg, ready=True, base_rate=d["base"], n=d["n"])
+            if path == "/api/gold":
+                return 200, gold.state(state.paths)
             if path == "/api/audit-summary":
                 return 200, state.audit_summary()
             if path == "/api/rules":
@@ -442,6 +480,32 @@ def dispatch(state, method, path, q, body):
                 return 200, fetch_estimate(state, str(body.get("stage", "")))
             if path == "/api/fetch/retry":
                 return 200, {"ok": state.ctx.client.gov.retry_now(str(body["host"]), bool(body.get("force")))}
+            if path == "/api/sim/explain":
+                ms = sorted((state.paths.data / "derived" / "sim").glob("model_recruitment_*.json"))
+                if not ms:
+                    raise ValueError("no model yet: run Simulate first")
+                import numpy as np
+                model = risk.RiskModel.load(json.loads(ms[-1].read_text(encoding="utf-8")))
+                on = set(body.get("on") or [])
+                bad = [n for n in on if n not in model.names]
+                if bad:
+                    raise ValueError("unknown factor: " + bad[0])
+                x = np.array([1 if n in on else 0 for n in model.names], np.uint8)
+                out = model.explain(x, k=6)
+                out["base_rate"] = model.base
+                out["level"] = sim.LEVEL[1]
+                out["note"] = ("Association in registry data, silver labels. On prospectively registered trials the model's discrimination is moderate (AUROC about 0.72), "
+                               "so read this as a prompt to look, not a forecast of this trial.")
+                return 200, out
+            if path == "/api/gold/draw":
+                gold.draw(state.ctx, state.cfg, int(body.get("n_concerning", 70)), int(body.get("n_control", 30)), int(body.get("seed", 28)))
+                return 200, gold.state(state.paths)
+            if path == "/api/gold/reveal":
+                return 200, gold.reveal(state.paths, str(body["item"]), list(body.get("own") or []))
+            if path == "/api/gold/verdict":
+                return 200, gold.record(state.paths, str(body["item"]), str(body["verdict"]), str(body.get("note", "")))
+            if path == "/api/gold/undo":
+                return 200, gold.undo(state.paths)
             if path == "/api/submit":
                 return 200, state.submit(body)
             if path == "/api/run":

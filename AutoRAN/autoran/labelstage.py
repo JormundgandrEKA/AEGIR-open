@@ -3,7 +3,7 @@ then label every trial with an outcome class and a stop class. One JSON manifest
 import json
 import math
 
-from . import __version__, labeller as L
+from . import __version__, labeller as L, taxonomy, vote
 from .core import Paths, iso_now, iter_jsonl, utc_stamp, write_jsonl
 from .normalise import load_trials
 from .opentargets import load, normalise_reason
@@ -79,10 +79,17 @@ def load_labeller(paths):
     return json.loads(f.read_text(encoding="utf-8")), f
 
 
-class Labeller:
-    """Applies the three tiers to one whyStopped text."""
+def load_voter(paths):
+    """The newest trained voter (autoran voter-build), or None: then the three-tier labeller below is used."""
+    f = paths.latest("voter_*.npz")
+    return vote.Voter.load(f) if f else None
 
-    def __init__(self, manifest, ot_rows):
+
+class Labeller:
+    """Applies the tiers to one whyStopped text: exact curated match, then the six-reader vote if a voter was built, else rules plus naive Bayes."""
+
+    def __init__(self, manifest, ot_rows, voter=None):
+        self.voter = voter
         self.m = manifest
         self.nb = L.NB.load(manifest["nb"])
         self.exact = {}
@@ -90,6 +97,10 @@ class Labeller:
             self.exact.setdefault(normalise_reason(r["text"]), r["labels"])
         self.rule_prec = {rid: (v["precision"] if v["precision"] is not None else 0.5) for rid, v in manifest["rule_table"].items()}
         self.choice = manifest["choice_ie"]
+        # the model's other classes are mostly noise (it calls "Interim_Analysis" on nearly everything): trust it only where it scored
+        # F1 >= 0.6 and precision >= 0.6 on at least 15 dev cases
+        dev = ((manifest.get("metrics") or {}).get("nb") or {}).get("dev", {}).get("per_class", {})
+        self.nb_ok = {c for c, v in dev.items() if (v.get("f1") or 0) >= 0.6 and (v.get("precision") or 0) >= 0.6 and (v.get("support") or 0) >= 15} | {"Insufficient_Enrollment"}
 
     def label(self, raw):
         text = normalise_reason(raw)
@@ -98,6 +109,14 @@ class Labeller:
         if text in self.exact:
             cl = list(self.exact[text])
             return {"stop_classes": cl, "label_source": "exact", "confidence": 1.0, "rule_ids": [], "span": None, "disagree": False}
+        if self.voter is not None:
+            res = self.voter.predict([raw], return_votes=True)[0]
+            cl = sorted(c for c, v in res.items() if v["include"])
+            r_cl, r_ids, span = L.classify_rules(raw)
+            conf = max([res[c]["p"] for c in cl] or [0.0])
+            dis = any(v["contested"] for v in res.values() if v["p"] >= 0.2)
+            return {"stop_classes": cl, "label_source": "vote", "confidence": round(conf, 3), "rule_ids": r_ids, "span": span, "disagree": dis,
+                    "votes": {c: res[c]["votes"] for c in cl}, "agree": {c: res[c]["agree"] for c in cl}}
         r_cl, r_ids, span = L.classify_rules(raw)
         n_cl, sc = self.nb.predict(raw)
         r_ie, n_ie = "Insufficient_Enrollment" in r_cl, "Insufficient_Enrollment" in n_cl
@@ -105,7 +124,7 @@ class Labeller:
         classes = sorted(set(r_cl) - {"Insufficient_Enrollment"})
         src = "rules"
         if not r_cl and n_cl:
-            classes, src = sorted(set(n_cl) - {"Insufficient_Enrollment"}), "nb"
+            classes, src = sorted((set(n_cl) & self.nb_ok) - {"Insufficient_Enrollment"}), "nb"
         if ie:
             classes = sorted(set(classes) | {"Insufficient_Enrollment"})
         conf = max([self.rule_prec.get(i, 0.5) for i in r_ids] or [0.0]) if src == "rules" else \
@@ -116,7 +135,7 @@ class Labeller:
                 "disagree": r_ie != n_ie}
 
 
-def outcome_class(rec, lab):
+def outcome_class(rec, lab, withdrawn_kind=None):
     st = rec["status"]
     if st == "COMPLETED":
         n = (rec.get("enrollment") or {}).get("count")
@@ -132,6 +151,20 @@ def outcome_class(rec, lab):
                 return "other_stop", ["covid_confounded_recruitment_stop"]
             return "positive_recruitment", []
         return "other_stop", []
+    if st in ("WITHDRAWN", "SUSPENDED"):                       # only present when the scope asks for them (config scope.statuses)
+        cl = set(lab["stop_classes"])
+        if not (rec["why_stopped"] or "").strip():
+            return "unlabelled", ["no_why_stopped"]
+        if not cl or cl <= UNINFORMATIVE:
+            return "unlabelled", ["uninformative_why_stopped"]
+        cav = ["withdrawn_before_enrollment"] if st == "WITHDRAWN" else ["suspended_not_terminated"]
+        if st == "WITHDRAWN":
+            # a withdrawn trial enrolled nobody; it counts as a recruitment failure only when a viable study found no takers,
+            # not when a protocol, approval, funding or a decision stopped it first
+            return ("positive_recruitment", cav) if withdrawn_kind == "no_takers" else ("other_stop", cav)
+        if "Insufficient_Enrollment" in cl:
+            return ("other_stop", cav + ["covid_confounded_recruitment_stop"]) if "Covid19" in cl else ("positive_recruitment", cav)
+        return "other_stop", cav
     return "unlabelled", ["status_out_of_scope"]
 
 
@@ -145,7 +178,7 @@ def label(ctx, cfg):
         build(ctx, cfg)
         got = load_labeller(paths)
     manifest, mfile = got
-    lab = Labeller(manifest, load(paths))
+    lab = Labeller(manifest, load(paths), load_voter(paths))
     trials = load_trials(paths)
     stamp = utc_stamp()
     out = paths.derived / f"labels_{stamp}.jsonl"
@@ -153,13 +186,16 @@ def label(ctx, cfg):
 
     def rows():
         for rec in trials.values():
-            tl = lab.label(rec["why_stopped"]) if rec["status"] == "TERMINATED" else {
+            tl = lab.label(rec["why_stopped"]) if rec["status"] in ("TERMINATED", "WITHDRAWN", "SUSPENDED") else {
                 "stop_classes": [], "label_source": "none", "confidence": 0.0, "rule_ids": [], "span": None, "disagree": False}
-            klass, cav = outcome_class(rec, tl)
+            stopped = rec["status"] in ("TERMINATED", "WITHDRAWN", "SUSPENDED") and (rec["why_stopped"] or "").strip()
+            tr = taxonomy.classify_tree(rec["why_stopped"], rec["status"], (rec.get("enrollment") or {}).get("count")) if stopped else None
+            klass, cav = outcome_class(rec, tl, tr.get("withdrawn_kind") if tr else None)
             counts[klass] = counts.get(klass, 0) + 1
             yield {"nct_id": rec["nct_id"], "class": klass, "stop_classes": tl["stop_classes"], "label_source": tl["label_source"],
                    "confidence": tl["confidence"], "rule_ids": tl["rule_ids"], "evidence_span": tl["span"],
                    "labeller_disagree": tl["disagree"], "caveats": cav + CAVEATS.get(klass, []),
+                   "tree": {k: tr[k] for k in ("supers", "sublabels", "stage", "land_mine")} | ({"withdrawn_kind": tr["withdrawn_kind"]} if "withdrawn_kind" in tr else {}) if tr else None,
                    "labeller_file": mfile.name, "autoran_version": __version__, "labelled_at": iso_now()}
     n = write_jsonl(out, rows())
     ctx.store.append("autoran_stages.jsonl", {"stage": "label", "file": ctx.store.rel(out), "n": n, "counts": counts, "ts": iso_now()})
@@ -173,3 +209,43 @@ def load_labels(paths):
     if not f:
         raise FileNotFoundError("no labels yet; run `autoran label`")
     return {r["nct_id"]: r for r in iter_jsonl(f)}
+
+
+def build_voter(ctx, cfg, with_test=False):
+    """Fit the six-reader vote on the curated train part, tune thresholds on dev, then refit on train + dev and save it.
+    The frozen test part is read only when `with_test` is true, and then only to score the train-only fit."""
+    import numpy as np
+    paths = Paths(ctx.root).ensure()
+    rows = load(paths)
+    if not rows:
+        raise FileNotFoundError("no Open Targets data; run `autoran labeller-data` first")
+    train = [r for r in rows if r["split"] == "train"]
+    dev = [r for r in rows if r["split"] == "dev"]
+    v = vote.Voter().fit(train, dev)
+
+    def score(part):
+        P = v.predict_proba_rows(part)
+        per = {}
+        for c in L.CLASSES:
+            y = np.array([c in r["labels"] for r in part])
+            if not y.sum():
+                continue
+            p = P[c] >= v.thresh[c]
+            tp, fp, fn = int((p & y).sum()), int((p & ~y).sum()), int(((~p) & y).sum())
+            per[c] = {"f1": round(2 * tp / max(1, 2 * tp + fp + fn), 4), "precision": round(tp / max(1, tp + fp), 4), "recall": round(tp / max(1, tp + fn), 4), "support": int(y.sum())}
+        pred = v.predict([r["text"] for r in part])
+        return {"per_class": per, "macro_f1": round(float(np.mean([x["f1"] for x in per.values()])), 4),
+                "exact": round(float(np.mean([set(p) == set(r["labels"]) for p, r in zip(pred, part)])), 4), "n": len(part)}
+    meta = {"version": __version__, "built": iso_now(), "sizes": {"train": len(train), "dev": len(dev)}, "dev": score(dev), "thresholds": v.thresh, "test_read": bool(with_test)}
+    if with_test:
+        meta["test"] = score([r for r in rows if r["split"] == "test"])
+    prod = vote.Voter().fit(train + dev, None, tune=False)
+    prod.thresh = dict(v.thresh)
+    prod.nb.thresh = dict(v.nb.thresh)
+    out = paths.derived / f"voter_{utc_stamp()}.npz"
+    prod.save(out, meta)
+    ctx.store.append("autoran_stages.jsonl", {"stage": "voter", "file": ctx.store.rel(out), "ts": iso_now(), "dev_macro_f1": meta["dev"]["macro_f1"], "test_read": bool(with_test)})
+    ctx.notes["dev_macro_f1"] = meta["dev"]["macro_f1"]
+    if with_test:
+        ctx.notes["test_macro_f1"] = meta["test"]["macro_f1"]
+    return {"file": str(out), "dev": {k: meta["dev"][k] for k in ("macro_f1", "exact")}, **({"test": {k: meta["test"][k] for k in ("macro_f1", "exact")}} if with_test else {})}
