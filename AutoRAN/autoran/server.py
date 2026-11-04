@@ -11,7 +11,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
-from . import __version__, audit, gold, labeller as L, risk, sim, stats, taxonomy
+from . import __version__, audit, evidence, gold, labeller as L, risk, sim, stats, taxonomy
 from .core import Paths, iter_jsonl, read_gz_json
 from .metrics import load_metrics
 
@@ -410,6 +410,10 @@ def dispatch(state, method, path, q, body):
                 return (200, d) if d else (404, {"error": "not found"})
             if path == "/api/sheet":
                 return 200, state.sheet(q)
+            if path == "/api/evidence":
+                return 200, evidence.summary(state.paths)
+            if path == "/api/evidence/correlation":
+                return 200, evidence.correlation(state.paths, (q.get("setting") or ["registry"])[0]) or {}
             if path == "/api/sim":
                 rep, f = sim.latest(state.paths)
                 if rep is None:
@@ -419,9 +423,19 @@ def dispatch(state, method, path, q, body):
                 rep["file"] = f.name
                 rep["model_ready"] = bool(ms)
                 pf = sorted((state.paths.data / "derived" / "sim").glob("ledger_protocol_*.json"))
+                sf = sorted((state.paths.data / "derived" / "sim").glob("ledger_scaled_2*.json"))
+                scaled = None
+                if sf:
+                    full = json.loads(sf[-1].read_text(encoding="utf-8"))
+                    scaled = {"summary": full["summary"], "mlp": full["mlp_summary"], "kinds": full["kinds"], "stamp": full["stamp"],
+                              "sets": [{"window": x["window"], "train_n": x["train_n"], "test_n": x["test_n"], "test_failures": x["test_failures"], "test_prospective_n": x["test_prospective_n"],
+                                        "test_prospective_failures": x["test_prospective_failures"]} for x in full["sets"]],
+                              "per_set_unique": {g: {f: [x["rows"][g][f]["unique"] for x in full["sets"] if f in x["rows"][g]] for f in full["families"]} for g in ("prospective (headline)", "all")}}
+                syn = sorted((state.paths.data / "derived" / "synth").glob("analysis_2*_with_key.json"))
                 bf = sorted((state.paths.data / "derived" / "sim").glob("enrolment_check_*.json"))
                 return 200, {"report": rep, "gates": [{"gate": g, "claim": c, "status": st, "note": n} for g, c, st, n in sim.GATES],
-                             "protocol_ledger": json.loads(pf[-1].read_text(encoding="utf-8")) if pf else None, "backtest": json.loads(bf[-1].read_text(encoding="utf-8")) if bf else None}
+                             "protocol_ledger": json.loads(pf[-1].read_text(encoding="utf-8")) if pf else None, "backtest": json.loads(bf[-1].read_text(encoding="utf-8")) if bf else None, "scaled": scaled,
+                             "synthetic": json.loads(syn[-1].read_text(encoding="utf-8")) if syn else None}
             if path == "/api/sim/factors":
                 ms = sorted((state.paths.data / "derived" / "sim").glob("model_recruitment_*.json"))
                 if not ms:
@@ -480,6 +494,8 @@ def dispatch(state, method, path, q, body):
                 return 200, fetch_estimate(state, str(body.get("stage", "")))
             if path == "/api/fetch/retry":
                 return 200, {"ok": state.ctx.client.gov.retry_now(str(body["host"]), bool(body.get("force")))}
+            if path == "/api/evidence/combine":
+                return 200, evidence.combine(state.paths, str(body.get("setting", "registry")), list(body.get("families") or []), str(body.get("subset", "prospective")), bool(body.get("include_baseline", True)))
             if path == "/api/sim/explain":
                 ms = sorted((state.paths.data / "derived" / "sim").glob("model_recruitment_*.json"))
                 if not ms:

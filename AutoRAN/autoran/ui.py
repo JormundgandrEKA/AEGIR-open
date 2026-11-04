@@ -73,6 +73,7 @@ svg text{font:11px Consolas,monospace;fill:#111}
 @keyframes twk{0%,100%{opacity:.25}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.astro h2,.twk{animation:none}}
 .lgd{display:inline-block;margin:0 10px 2px 0;white-space:nowrap}.lgd i{display:inline-block;width:11px;height:11px;margin-right:4px;vertical-align:-1px}
+.pres nav,.pres #fp{display:none}.pres main{font-size:16px}.pres .tile .v{font-size:30px}.pres .small{font-size:14px}#presx{position:fixed;top:8px;right:8px;z-index:9;display:none}.pres #presx{display:block}
 </style></head><body>
 <nav id="nav"><b>AutoRAN</b></nav>
 <section id="fp" aria-label="Fetch status"></section>
@@ -82,7 +83,7 @@ svg text{font:11px Consolas,monospace;fill:#111}
 "use strict";
 const $=id=>document.getElementById(id);
 function h(tag,attrs,...kids){const e=document.createElement(tag);
- for(const k in (attrs||{})){if(k==='class')e.className=attrs[k];else if(k.startsWith('on'))e.addEventListener(k.slice(2),attrs[k]);else if(k==='html')e.innerHTML=attrs[k];else e.setAttribute(k,attrs[k]);}
+ for(const k in (attrs||{})){if(attrs[k]==null||attrs[k]===false)continue;if(k==='class')e.className=attrs[k];else if(k.startsWith('on'))e.addEventListener(k.slice(2),attrs[k]);else if(k==='html')e.innerHTML=attrs[k];else e.setAttribute(k,attrs[k]);}
  for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(String(c)));}return e;}
 const hasBridge=()=>!!(window.pywebview&&window.pywebview.api&&window.pywebview.api.call);
 async function api(p,b,method){
@@ -106,13 +107,13 @@ function stackBar(c,max){const tot=c.n||1,sc=(c.n/max)*100;
 function wilson(k,n){if(!n)return[0,1];const z=1.96,p=k/n,d=1+z*z/n,c=(p+z*z/(2*n))/d,hh=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n))/d;return[Math.max(0,c-hh),Math.min(1,c+hh)];}
 
 // ------------------------------------------------------------------ pages
-const PAGES=[['start','Get started'],['overview','Overview'],['coverage','Coverage'],['labels','Labels and rules'],['scorers','Scorers'],['browse','Browse'],['review','Review'],['simulate','Simulate'],['plots','Plots'],['run','Run'],['settings','Settings'],['about','About']];
+const PAGES=[['start','Get started'],['overview','Overview'],['evidence','Evidence'],['coverage','Coverage'],['labels','Labels and rules'],['scorers','Scorers'],['browse','Browse'],['review','Review'],['simulate','Simulate'],['plots','Plots'],['run','Run'],['settings','Settings'],['about','About']];
 function nav(){const n=$('nav');n.replaceChildren(h('b',null,'AutoRAN'));
  PAGES.filter(([k])=>S.empty?['start','run','settings','about'].includes(k):k!=='start').forEach(([k,l])=>n.append(h('a',{class:S.page===k?'on':'',href:'#'+k},l)));
  const m=S.m,g=S.gpu;n.append(h('span',{style:'cursor:pointer',title:'Open the GPU check',onclick:()=>{location.hash='#settings';}},(g&&g.cuda_available?'GPU '+g.device+' '+g.memory_gb+' GB':(g&&g.torch===null?'CPU only (click to check your GPU)':'CPU only'))+' · '+(m?fmt(m.pipeline.trials)+' trials · registry data '+(m.pipeline.data_timestamp||'?').slice(0,10):'')));}
 async function go(){let k=(location.hash||'#overview').slice(1).split('?')[0];if(k==='gold'){k='review';S.reviewMode='cases';}S.page=PAGES.some(p=>p[0]===k)?k:'overview';if(S.empty&&!['start','run','settings','about'].includes(S.page))S.page='start';if(!S.empty&&S.page==='start')S.page='overview';nav();closeDrawer();
  const main=$('main');const ld=h('div',{class:'small'},'Loading…');main.replaceChildren(ld);
- try{if(S.timer){clearInterval(S.timer);S.timer=null;}await ({start,overview,coverage,labels,scorers,browse,review,simulate,plots,run,settings,about}[S.page])(main);ld.remove();}catch(e){main.replaceChildren(h('div',{class:'warn bad'},'Error: '+e.message));}}
+ try{if(S.timer){clearInterval(S.timer);S.timer=null;}await ({start,overview,evidence,coverage,labels,scorers,browse,review,simulate,plots,run,settings,about}[S.page])(main);ld.remove();}catch(e){main.replaceChildren(h('div',{class:'warn bad'},'Error: '+e.message));}}
 window.addEventListener('hashchange',go);
 
 async function overview(main){
@@ -333,6 +334,8 @@ async function simulate(main){
  main.append(h('div',{class:'small'},'It reproduces four of the five. The any-stop rate is too high.'));
  main.append(h('div',{class:'warn',style:'margin-top:6px'},sm.scenario.label));
  main.append(tbl(['Change (same simulated trials, only this differs)','Stopped for recruitment','Relative change'],[['None (control)',pct(sm.scenario.control_recruitment_stop_rate),'']].concat(Object.entries(sm.scenario.levers).map(([k,v])=>[k,pct(v.recruitment_stop_rate),(v.relative_change>0?'+':'')+pct(v.relative_change,0)])),[1,2]));
+ if(d.scaled)scaledSection(main,d.scaled);
+ if(d.synthetic)syntheticSection(main,d.synthetic);
  if(d.backtest){const bt=d.backtest,b=bt.backtest_era_B,c=bt.calibration_era_A,eq=bt.extraction_quality_completed_trials['documents dated at or before the start'];
   sec('Simulator backtest (gate G4): '+bt.gate_G4_verdict,'The simulator is tuned on trials starting up to 2015, using each trial’s real planned size, sites, sponsor type and criteria count, then predicts which 2016 to 2018 trials failed to recruit. Planned sizes come from protocol documents dated at or before the trial start. Scored against the registry-factor model on the same trials.');
   main.append(tbl(['Predictor','AUROC on '+fmt(b.n)+' real trials ('+fmt(b.failures)+' failures)'],Object.entries(b.auroc).map(([k,v])=>[k,f3(v)]),[1]));
@@ -368,12 +371,13 @@ async function simulate(main){
 
 
 // ------------------------------------------------------------------ source ledger and the Astrology Corner
-const KCOL={protocol:'#0040ff',who:'#7a3fb8',trend:'#00897b',hindsight:'#d9480f',incidental:'#8a8a8a',control:'#bdbdbd',joke:'#e0409a',doc:'#0b6b2e'};
+const KCOL={protocol:'#0040ff',who:'#7a3fb8',trend:'#00897b',hindsight:'#d9480f',incidental:'#8a8a8a',control:'#bdbdbd',joke:'#e0409a',doc:'#0b6b2e',derived:'#b45f06'};
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-function ledgerChart(rows,kinds,title){
+function ledgerChart(rows,kinds,title,floors){
  const W=940,L=330,P=250,G=70,rh=21,top=44,H=top+rows.length*rh+34;
  const ctl=rows.filter(r=>r.kind==='control');
- const nfA=ctl.length?Math.max(...ctl.map(r=>r.alone_ci[1])):0.5, nfU=ctl.length?Math.max(...ctl.map(r=>Math.max(Math.abs(r.unique_ci[0]),Math.abs(r.unique_ci[1])))):0;
+ let nfA=ctl.length?Math.max(...ctl.map(r=>r.alone_ci[1])):0.5, nfU=ctl.length?Math.max(...ctl.map(r=>Math.max(Math.abs(r.unique_ci[0]),Math.abs(r.unique_ci[1])))):0;
+ if(floors){nfA=floors.alone;nfU=floors.unique;}
  const aLo=0.46,aHi=Math.max(0.7,...rows.map(r=>r.alone_ci[1]+0.01));
  const uLo=Math.min(-0.006,...rows.map(r=>r.unique_ci[0]-0.002)),uHi=Math.max(0.01,...rows.map(r=>r.unique_ci[1]+0.003));
  const xa=v=>L+(v-aLo)/(aHi-aLo)*P, xu=v=>L+P+G+(v-uLo)/(uHi-uLo)*P;
@@ -435,6 +439,233 @@ function protocolLedger(main,pl){
   const v=pl.variants[cur],rows=v.rows.slice().sort((a,b)=>b.alone_auroc-a.alone_auroc);
   holder.replaceChildren(h('div',{class:'small'},v.about+' · '+fmt(v.n)+' test documents, '+fmt(v.failures)+' failures · registry factors alone: AUROC '+f3(v.baseline_auroc)+' · registry plus every document family: '+f3(v.full_auroc)),ledgerChart(rows,pl.kinds));};
  draw();main.append(bar,holder);}
+
+
+function scaledSection(main,sc){
+ main.append(h('h2',null,'Scaled run: what sticks across ten test windows'));
+ main.append(h('div',{class:'small',style:'max-width:900px;margin-bottom:4px'},'Ten rolling-origin sets: each is trained only on trials that started two or more years before its two-year test window (2008–09 up to 2017–18). Bar = mean unique gain across the sets, dots = each set. A family “sticks” (rule fixed in advance) when its unique gain is positive in at least 8 of 10 sets and above the 95th percentile of 30 random-number families. Overlapping families share credit, so a family that duplicates another can look empty here while being informative alone.'));
+ let grp='prospective (headline)';const holder=h('div'),bar=h('div',{class:'row'});
+ const draw=()=>{bar.replaceChildren(...Object.keys(sc.summary).map(g=>h('button',{class:g===grp?'primary':'',onclick:()=>{grp=g;draw();}},g)));
+  const sm=sc.summary[grp],rows=sm.rows.slice().sort((a,b)=>b.mean_unique-a.mean_unique),per=sc.per_set_unique[grp];
+  const W=940,L=370,P=380,rh=20,top=40,H=top+rows.length*rh+30;const all=Object.values(per).flat();
+  const lo=Math.min(-0.006,...all)-0.001,hi=Math.max(0.012,...all)+0.001,xs=v=>L+(v-lo)/(hi-lo)*P;
+  let s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" style="max-width:100%;height:auto;border:1px solid var(--hair);background:#fff">';
+  s+='<text x="'+L+'" y="16" font-size="12" font-weight="700">Unique AUROC gain (mean of 10 sets; dots = each set)</text><text x="'+L+'" y="30" font-size="10.5" fill="#666">grey band: up to the 95th percentile of 30 random families ('+sm.noise_floor_unique_95th.toFixed(5)+')</text>';
+  s+='<rect x="'+xs(Math.min(0,sm.noise_floor_unique_95th))+'" y="'+top+'" width="'+Math.max(1,Math.abs(xs(sm.noise_floor_unique_95th)-xs(0)))+'" height="'+(rows.length*rh)+'" fill="#e9e9e9"/><line x1="'+xs(0)+'" x2="'+xs(0)+'" y1="'+top+'" y2="'+(top+rows.length*rh)+'" stroke="#111"/>';
+  const chipc={sticks:'#0b6b2e',suggestive:'#9a6700','not shown':'#999'};
+  rows.forEach((r,i)=>{const y=top+i*rh+rh/2,c=KCOL[r.kind]||'#333';
+   s+='<text x="'+(L-8)+'" y="'+(y+4)+'" font-size="11" text-anchor="end" fill="'+chipc[r.status]+'">'+esc(r.family.length>56?r.family.slice(0,54)+'…':r.family)+'</text>';
+   s+='<rect x="'+xs(Math.min(0,r.mean_unique))+'" y="'+(y-5)+'" width="'+Math.max(1,Math.abs(xs(r.mean_unique)-xs(0)))+'" height="10" fill="'+c+'" opacity="'+(r.status==='sticks'?1:r.status==='suggestive'?0.6:0.3)+'"><title>'+esc(r.family)+': mean unique '+r.mean_unique+', positive in '+r.sets_positive+' of '+r.sets+' ('+r.status+'), alone '+r.mean_alone+'</title></rect>';
+   (per[r.family]||[]).forEach(v=>{s+='<circle cx="'+xs(v)+'" cy="'+y+'" r="2.4" fill="#111" opacity=".55"/>';});
+   s+='<text x="'+(L+P+10)+'" y="'+(y+4)+'" font-size="10.5" fill="'+chipc[r.status]+'">'+r.status+' · '+r.sets_positive+'/'+r.sets+'</text>';});
+  s+='<text x="'+xs(0)+'" y="'+(H-10)+'" font-size="10" text-anchor="middle">0</text><text x="'+xs(hi)+'" y="'+(H-10)+'" font-size="10" text-anchor="end">+'+hi.toFixed(3)+'</text></svg>';
+  const w=h('div');w.innerHTML=s;
+  const m=sc.mlp[grp],tot=sc.sets.reduce((a,x)=>a+x.test_n,0),totf=sc.sets.reduce((a,x)=>a+x.test_failures,0);
+  holder.replaceChildren(h('div',{class:'small'},fmt(tot)+' trial-tests in ten windows ('+fmt(totf)+' failures; trials in two overlapping windows count twice). A small neural network on the same inputs scored AUROC '+f3(m.network_mean)+' against '+f3(m.ridge_mean)+' for the ridge model, better in '+m.network_better_in_sets+' of '+m.sets+' sets: a bigger learner did not help.'),w);};
+ draw();main.append(bar,holder);}
+function syntheticSection(main,sy){
+ main.append(h('h2',null,'Twelve synthetic protocols (capability check only)'));
+ main.append(h('div',{class:'warn'},'Synthetic data written by the same model that analysed them. Four were designed to fail, four to be ordinary, four with risk engineered down. This shows whether the machinery reads the intended differences, not accuracy. Never mixed with real figures, never used in validation.'));
+ const cat={weak:'chip pos',average:'chip oth',strong:'chip neg'},rows=sy.documents.slice().sort((a,b)=>b.stack_risk-a.stack_risk);
+ const t=h('table',{style:'max-width:980px'},h('tr',null,['Document','Designed as','Registry-factor risk','Stack risk (registry + document families)','Checklist items present','Planned per site per month','Simulator stop probability (scenario)'].map(x=>h('th',null,x))));
+ rows.forEach(d=>t.append(h('tr',null,h('td',{class:'m'},d.id),h('td',null,h('span',{class:cat[d.category]},d.category)),h('td',{class:'n'},pct(d.registry_factor_risk,1)),h('td',{class:'n'},pct(d.stack_risk,1)),h('td',{class:'n'},d.briel_distinct_items+' of 14'),h('td',{class:'n'},d.required_per_site_per_month),h('td',{class:'n'},pct(d.simulator_stop_probability,0)))));
+ main.append(t);
+ if(sy.reading)main.append(h('div',{class:'small',style:'max-width:900px;margin-top:4px'},sy.reading));}
+
+
+// ------------------------------------------------------------------ Evidence: every local test in one place, with a factor combiner
+const GCOL={registry:'#0040ff',baseline:'#8a8a8a',model:'#7a3fb8',documents:'#0b6b2e',simulator:'#b00020'};
+function tableEl(heads,rows,num){const t=h('table',{style:'max-width:1000px'},h('tr',null,heads.map((x,i)=>h('th',{class:(num||[]).includes(i)?'n':''},x))));rows.forEach(r=>t.append(h('tr',null,r.map((c,i)=>h('td',{class:(num||[]).includes(i)?'n':''},c==null?'':c)))));return t;}
+function svgBox(s){const w=h('div');w.innerHTML=s;return w;}
+function saveFile(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+function exportBar(holder,name,rows){return h('span',{class:'small'},h('button',{onclick:()=>{const s=holder.querySelector('svg');if(s)saveFile(name+'.svg',new XMLSerializer().serializeToString(s),'image/svg+xml');}},'Save chart (SVG)'),' ',rows?h('button',{onclick:()=>saveFile(name+'.csv',rows.map(r=>r.map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(',')).join('\n'),'text/csv')},'Save table (CSV)'):'');}
+function lineChart(o){
+ const W=o.w||420,H=o.h||310,L=48,B=40,T=16,R=14,pw=W-L-R,ph=H-T-B,x0=o.xmin==null?0:o.xmin,x1=o.xmax==null?1:o.xmax,y0=o.ymin==null?0:o.ymin,y1=o.ymax==null?1:o.ymax;
+ const X=v=>L+(v-x0)/(x1-x0)*pw,Y=v=>T+ph-(v-y0)/(y1-y0)*ph;
+ let s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" style="max-width:100%;height:auto;border:1px solid var(--hair);background:#fff">';
+ for(let i=0;i<=5;i++){const xv=x0+(x1-x0)*i/5,yv=y0+(y1-y0)*i/5;
+  s+='<line x1="'+X(xv)+'" x2="'+X(xv)+'" y1="'+T+'" y2="'+(T+ph)+'" stroke="#eee"/><line x1="'+L+'" x2="'+(L+pw)+'" y1="'+Y(yv)+'" y2="'+Y(yv)+'" stroke="#eee"/>';
+  s+='<text x="'+X(xv)+'" y="'+(H-22)+'" font-size="10" text-anchor="middle" fill="#555">'+xv.toFixed(x1-x0>2?0:2)+'</text><text x="'+(L-6)+'" y="'+(Y(yv)+3)+'" font-size="10" text-anchor="end" fill="#555">'+yv.toFixed(y1-y0>0.5?1:y1-y0>0.05?2:3)+'</text>';}
+ s+='<text x="'+(L+pw/2)+'" y="'+(H-6)+'" font-size="11" text-anchor="middle">'+esc(o.xlab||'')+'</text><text transform="translate(12,'+(T+ph/2)+') rotate(-90)" font-size="11" text-anchor="middle">'+esc(o.ylab||'')+'</text>';
+ (o.series||[]).forEach(se=>{if(o.points||se.points){se.pts.forEach(p=>{s+='<circle cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="'+(se.r||4)+'" fill="'+se.color+'" opacity=".85"/>';});}
+  else{s+='<polyline fill="none" stroke="'+se.color+'" stroke-width="'+(se.w||2)+'"'+(se.dash?' stroke-dasharray="5 4"':'')+' points="'+se.pts.map(p=>X(p[0])+','+Y(p[1])).join(' ')+'"/>';}});
+ (o.legend||[]).forEach((l,i)=>{s+='<rect x="'+(L+10)+'" y="'+(T+8+i*15)+'" width="10" height="3" fill="'+l.color+'"/><text x="'+(L+25)+'" y="'+(T+13+i*15)+'" font-size="10.5">'+esc(l.name)+'</text>';});
+ return svgBox(s+'</svg>');}
+function ladderChart(items){
+ const W=940,L=420,P=420,rh=22,top=30,H=top+items.length*rh+26,lo=0.45,hi=0.85,X=v=>L+(Math.min(hi,Math.max(lo,v))-lo)/(hi-lo)*P;
+ let s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" style="max-width:100%;height:auto;border:1px solid var(--hair);background:#fff"><text x="'+L+'" y="16" font-size="12" font-weight="700">AUROC (0.5 = chance, dashed)</text>';
+ [0.5,0.6,0.7,0.8].forEach(v=>{s+='<line x1="'+X(v)+'" x2="'+X(v)+'" y1="'+top+'" y2="'+(top+items.length*rh)+'" stroke="'+(v===0.5?'#111':'#e6e6e6')+'"'+(v===0.5?' stroke-dasharray="4 3"':'')+'/><text x="'+X(v)+'" y="'+(H-8)+'" font-size="10" text-anchor="middle">'+v.toFixed(1)+'</text>';});
+ items.forEach((it,i)=>{const y=top+i*rh+rh/2,c=GCOL[it.group]||'#333';
+  s+='<text x="'+(L-8)+'" y="'+(y+4)+'" font-size="11.5" text-anchor="end">'+esc(it.label.length>64?it.label.slice(0,62)+'…':it.label)+'</text><rect x="'+X(0.5)+'" y="'+(y-6)+'" width="'+Math.max(1,X(it.auroc)-X(0.5))+'" height="12" fill="'+c+'"><title>'+esc(it.label)+': '+it.auroc.toFixed(3)+'</title></rect>';
+  if(it.ci)s+='<line x1="'+X(it.ci[0])+'" x2="'+X(it.ci[1])+'" y1="'+y+'" y2="'+y+'" stroke="#111" stroke-width="1.4"/>';
+  s+='<text x="'+(X(it.auroc)+6)+'" y="'+(y+4)+'" font-size="11" font-weight="700">'+it.auroc.toFixed(3)+'</text>';});
+ return svgBox(s+'</svg>');}
+function heatmap(c,labels){
+ const n=c.families.length,cs=15,L=300,T=24,W=L+n*cs+20,H=T+n*cs+10;
+ const col=v=>{if(v==null)return '#f4f4f4';const a=Math.min(1,Math.abs(v));return v>=0?'rgb('+Math.round(255-a*215)+','+Math.round(255-a*160)+',255)':'rgb(255,'+Math.round(255-a*170)+','+Math.round(255-a*210)+')';};
+ let s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" style="max-width:100%;height:auto;border:1px solid var(--hair);background:#fff">';
+ c.families.forEach((f,i)=>{s+='<text x="'+(L-6)+'" y="'+(T+i*cs+11)+'" font-size="9.5" text-anchor="end">'+esc(f.length>46?f.slice(0,44)+'…':f)+'</text><text x="'+(L+i*cs+cs/2)+'" y="'+(T-6)+'" font-size="8" text-anchor="middle">'+(i+1)+'</text>';
+  c.matrix[i].forEach((v,j)=>{s+='<rect x="'+(L+j*cs)+'" y="'+(T+i*cs)+'" width="'+cs+'" height="'+cs+'" fill="'+col(v)+'"><title>'+esc(f)+' × '+esc(c.families[j])+': '+(v==null?'n/a':v)+'</title></rect>';});});
+ return svgBox(s+'</svg>');}
+function statCards(cards){return h('div',{class:'tiles'},cards.map(t=>h('div',{class:'tile'},h('div',{class:'l'},t.label),h('div',{class:'v'},t.fmt==='auc'?f3(t.value):t.fmt==='pct'?pct(t.value):t.fmt==='int'?fmt(t.value):t.fmt==='num'?f3(t.value):String(t.value)),h('div',{class:'s'},(t.ci?'95% '+f3(t.ci[0])+' to '+f3(t.ci[1])+' · ':'')+(t.note||'')))));}
+function evSec(box,t,about){box.append(h('h2',null,t));if(about)box.append(h('div',{class:'small',style:'max-width:920px;margin-bottom:4px'},about));}
+
+async function evidencePanel(main){
+ let E;try{E=await api('/api/evidence');}catch(e){return;}
+ if(!E.parts.run&&!E.parts.scaled_registry)return;
+ const box=h('div',{style:'border:2px solid var(--rule);padding:8px 12px;margin:10px 0;max-width:1000px'});
+ box.append(h('div',{class:'row'},h('b',{style:'font-size:15px'},'What the local tests have read'),h('span',{class:'small'},'exploratory · association, not cause · machine-made labels'),h('button',{class:'primary',onclick:()=>{S.evTab='summary';location.hash='evidence';}},'Open the evidence'),h('button',{onclick:()=>{S.evTab='combine';location.hash='evidence';}},'Combine factors')));
+ box.append(statCards(E.headline.cards.slice(0,6)));
+ if(E.headline.ladder.length)box.append(ladderChart(E.headline.ladder.slice(0,8)));
+ E.headline.sentences.slice(0,3).forEach(t=>box.append(h('div',{class:'small',style:'margin-top:3px'},'· '+t)));
+ const w=[...main.children].find(e=>e.tagName==='H2'&&e.textContent==='Warnings');
+ if(w)main.insertBefore(box,w);else main.append(box);}
+
+async function evidence(main){
+ main.append(h('h2',null,'Evidence'));
+ const E=await api('/api/evidence');
+ if(!E.parts.run&&!E.parts.scaled_registry){main.append(h('div',null,'No test results yet. Open Simulate and press Run the tests, or run the local research scripts.'));return;}
+ const tabs=[['summary','Summary'],['factors','Factors'],['combine','Combine factors'],['docs','Protocol documents'],['simulator','Simulator'],['checks','Checks'],['synthetic','Synthetic protocols'],['gates','Gates and files']];
+ S.evTab=S.evTab||'summary';
+ const bar=h('div',{class:'row'}),body=h('div');
+ if(!$('presx')){document.body.append(h('button',{id:'presx',class:'primary',onclick:()=>document.body.classList.remove('pres')},'Exit presentation mode'));}
+ const pres=h('button',{onclick:()=>document.body.classList.add('pres')},'Presentation mode (hides the menu, larger type)');
+ main.append(h('div',{class:'warn'},h('b',null,'Exploratory. '),'Association in registry and protocol data with machine-made labels; nothing here shows that changing a protocol changes outcomes. The sealed vault and the frozen test split are never read.'),bar,body);
+ const draw=()=>{bar.replaceChildren(...tabs.map(([k,l])=>h('button',{class:k===S.evTab?'primary':'',onclick:()=>{S.evTab=k;draw();}},l)),pres);body.replaceChildren();
+  ({summary:sumTab,factors:facTab,combine:combTab,docs:docTab,simulator:simTab,checks:chkTab,synthetic:synTab,gates:gateTab}[S.evTab])(body,E).catch(e=>body.append(h('div',{class:'warn bad'},'Error: '+e.message)));};
+ draw();}
+
+async function sumTab(box,E){
+ const H=E.headline;
+ box.append(statCards(H.cards));
+ evSec(box,'AUROC across the tests','Every score here is on held-out data. Bars start at chance (0.5). Whiskers are 95% intervals where the test gives one. Different rows use different cohorts (registry-wide, documents dated before the trial start, simulated trials), so compare within a colour, not across.');
+ const lad=ladderChart(H.ladder);box.append(lad,exportBar(lad,'auroc-across-tests',[['test','auroc'],...H.ladder.map(x=>[x.label,x.auroc])]));
+ evSec(box,'What the tests read');
+ H.sentences.forEach(t=>box.append(h('div',{style:'margin:3px 0;max-width:920px'},'· '+t)));
+ if(E.scaled_registry){evSec(box,'What stuck across ten windows (top families)','Mean unique AUROC gain over ten rolling windows, prospective trials. Green names stuck by the rule fixed in advance.');
+  const sm=E.scaled_registry.summary['prospective (headline)'],rows=sm.rows.slice().sort((a,b)=>b.mean_unique-a.mean_unique).slice(0,12);
+  const items=rows.map(r=>({label:r.family+(r.status==='sticks'?'  (sticks)':''),auroc:0.5+r.mean_unique*10,ci:null,group:r.status==='sticks'?'documents':'baseline'}));
+  box.append(tableEl(['Family','Kind','Mean unique gain','Windows positive','Alone AUROC','Status'],rows.map(r=>[r.family,r.kind,'+'+r.mean_unique.toFixed(4),r.sets_positive+' of '+r.sets,f3(r.mean_alone),h('span',{class:'chip '+(r.status==='sticks'?'neg':r.status==='suggestive'?'oth':'unl')},r.status)]),[2,3,4]));
+  box.append(h('div',{class:'row'},h('button',{onclick:()=>{S.evTab='factors';location.hash='evidence';}},'All factors'),h('button',{onclick:()=>{S.evTab='combine';location.hash='evidence';}},'Combine them')));}
+ if(E.scaled_protocol){const v=E.scaled_protocol.variants.strict||Object.values(E.scaled_protocol.variants)[0];
+  evSec(box,'Protocol-document families (documents dated at or before the trial start)','Gain over registry factors, sponsor identity and registry text, ten repeated five-fold partitions.');
+  box.append(tableEl(['Family','Alone AUROC','Gain over baseline (95% interval)','Repeats positive','Status'],v.rows.slice().sort((a,b)=>b.gain_over_baseline-a.gain_over_baseline).slice(0,8).map(r=>[r.family.length>78?r.family.slice(0,76)+'…':r.family,f3(r.alone_auroc),(r.gain_over_baseline>=0?'+':'')+r.gain_over_baseline.toFixed(4)+' ('+r.gain_ci[0].toFixed(4)+' to '+r.gain_ci[1].toFixed(4)+')',r.repeats_positive_gain+' of '+r.repeats,h('span',{class:'chip '+(r.status==='sticks'?'neg':r.status==='suggestive'?'oth':'unl')},r.status)]),[1,2,3]));}
+ evSec(box,'Where each result comes from','Everything above is read from files on this computer. The Gates and files tab lists them with their dates.');}
+
+async function facTab(box,E){
+ if(E.scaled_registry){evSec(box,'Registry factor families over ten windows');scaledSection(box,E.scaled_registry);
+  const sc=E.scaled_registry,grp='prospective (headline)';
+  evSec(box,'Ridge against a small neural network, window by window','Same inputs. A bigger learner did not help.');
+  const wins=sc.sets.map((s,i)=>[i,s]);const ln=lineChart({w:520,xmin:0,xmax:wins.length-1,ymin:0.6,ymax:0.85,xlab:'test window (2008–09 … 2017–18)',ylab:'AUROC',series:[{name:'ridge',color:'#0040ff',pts:wins.map(([i,s])=>[i,s.mlp[grp].ridge])},{name:'network',color:'#b00020',pts:wins.map(([i,s])=>[i,s.mlp[grp].network])}],legend:[{name:'ridge',color:'#0040ff'},{name:'network',color:'#b00020'}]});
+  box.append(ln,exportBar(ln,'ridge-vs-network',[['window','ridge','network'],...wins.map(([i,s])=>[s.window.join('-'),s.mlp[grp].ridge,s.mlp[grp].network])]));
+  evSec(box,'Test volume per window');box.append(tableEl(['Window','Training trials (failures)','Test trials (failures)','Prospective test trials (failures)'],sc.sets.map(s=>[s.window.join('–'),fmt(s.train_n)+' ('+fmt(s.train_failures)+')',fmt(s.test_n)+' ('+fmt(s.test_failures)+')',fmt(s.test_prospective_n)+' ('+fmt(s.test_prospective_failures)+')'])));}
+ if(E.run&&E.run.ledger)ledgerSection(box,E.run.ledger,null);
+ if(E.run&&E.run.effects){const ef=E.run.effects;evSec(box,'Factor effects on recruitment failure','Adjusted odds ratios from one model; stable = the 95% bootstrap interval excludes 1. Evidence level: '+ef.level+'.');
+  box.append(tableEl(['Factor','Odds ratio','95% interval','Stable','Failure rate with','Without','Trials with it'],ef.terms.filter(t=>t.support==null||t.support>=200).slice(0,30).map(t=>[t.term,f3(t.odds_ratio),t.lo==null?'':f3(t.lo)+' to '+f3(t.hi),t.stable==null?'':h('span',{class:'chip '+(t.stable?'neg':'')},t.stable?'stable':'not stable'),t.rate_with==null?'':pct(t.rate_with),t.rate_without==null?'':pct(t.rate_without),t.support==null?'':fmt(t.support)]),[1,4,5,6]));}
+ const cr=await api('/api/evidence/correlation?setting=registry');
+ if(cr&&cr.families){evSec(box,'Which factor families say the same thing','Correlation between families’ held-out scores (blue = move together, red = oppose, grey = constant in the test years). Overlap is why a family can look empty here while informative alone.');
+  const hm=heatmap(cr);box.append(hm,exportBar(hm,'family-correlation',[['family',...cr.families],...cr.families.map((f,i)=>[f,...cr.matrix[i]])]));}}
+
+async function combTab(box,E){
+ const wb=E.workbench;
+ if(!wb.registry&&!wb.protocol){box.append(h('div',null,'The factor combiner needs a workbench file from the local research scripts (workbench_registry.py, workbench_protocol.py).'));return;}
+ let setting=wb.registry?'registry':'protocol',subset='prospective',base=true;const chosen=new Set();
+ const fams=()=>wb[setting].families;
+ const stick=()=>{if(setting==='registry'&&E.scaled_registry)return new Set(E.scaled_registry.summary['prospective (headline)'].rows.filter(r=>r.status==='sticks').map(r=>r.family));
+  if(setting==='protocol'&&E.scaled_protocol){const v=E.scaled_protocol.variants.strict||Object.values(E.scaled_protocol.variants)[0];return new Set(v.rows.filter(r=>r.status==='sticks'&&r.kind!=='control').map(r=>r.family));}return new Set();};
+ evSec(box,'Combine factors at will','Tick any families; they are fitted together on held-out data and scored. Registry: trained on starts to 2014, scored on 2016 to 2018. Documents: documents dated at or before the trial start, five-fold. Each family’s score is out of fold, so the combination is honest.');
+ const ctl=h('div'),list=h('div'),out=h('div',{style:'margin-top:8px'});box.append(ctl,list,out);
+ let timer=null;
+ const schedule=()=>{clearTimeout(timer);timer=setTimeout(run,200);};
+ const setSel=pred=>{chosen.clear();fams().forEach(f=>{if(pred(f))chosen.add(f.name);});drawList();schedule();};
+ function drawCtl(){ctl.replaceChildren(h('div',{class:'row'},'Data',...[['registry','Registry factors'],['protocol','Protocol documents']].filter(([k])=>wb[k]).map(([k,l])=>h('button',{class:k===setting?'primary':'',onclick:()=>{setting=k;chosen.clear();stick().forEach(n=>chosen.add(n));drawCtl();drawList();schedule();}},l)),
+   h('span',{class:'small'},' scored on '),...['prospective','all'].map(k=>h('button',{class:k===subset?'primary':'',onclick:()=>{subset=k;drawCtl();schedule();}},k==='prospective'?'prospective registrations':'all trials')),
+   setting==='protocol'?h('label',{style:'margin-left:10px'},h('input',{type:'checkbox',checked:base?'checked':null,onchange:e=>{base=e.target.checked;schedule();}}),' include the registry baseline'):''),
+  h('div',{class:'row'},'Presets',h('button',{onclick:()=>setSel(f=>stick().has(f.name))},'only what stuck'),h('button',{onclick:()=>setSel(f=>true)},'everything'),h('button',{onclick:()=>setSel(f=>f.kind==='protocol')},'protocol choices'),h('button',{onclick:()=>setSel(f=>f.kind==='who')},'who runs it'),
+   h('button',{onclick:()=>setSel(f=>f.kind!=='hindsight')},'no hindsight'),h('button',{onclick:()=>setSel(f=>['control','joke','incidental'].includes(f.kind))},'silly ones only'),h('button',{onclick:()=>setSel(f=>false)},'clear')));}
+ function drawList(){const byKind={};fams().forEach(f=>{(byKind[f.kind]=byKind[f.kind]||[]).push(f);});
+  list.replaceChildren(...Object.entries(byKind).map(([k,fs])=>h('div',{style:'margin:3px 0'},h('span',{class:'small',style:'display:inline-block;min-width:130px;font-weight:700;color:'+(KCOL[k]||'#333')},k),...fs.map(f=>h('label',{style:'margin-right:14px;white-space:nowrap;display:inline-block'},h('input',{type:'checkbox',checked:chosen.has(f.name)?'checked':null,onchange:e=>{e.target.checked?chosen.add(f.name):chosen.delete(f.name);schedule();}}),' '+(f.name.length>70?f.name.slice(0,68)+'…':f.name))))));}
+ async function run(){
+  if(!chosen.size&&!(setting==='protocol'&&base)){out.replaceChildren(h('div',{class:'small'},'Tick at least one family.'));return;}
+  out.replaceChildren(h('div',{class:'small'},'Fitting…'));
+  let r;try{r=await api('/api/evidence/combine',{setting:setting,families:[...chosen],subset:subset,include_baseline:base});}catch(e){out.replaceChildren(h('div',{class:'warn bad'},e.message));return;}
+  const ref=r.reference,b5=r.at_budget[1];
+  out.replaceChildren(statCards([{label:'AUROC',value:r.auroc,fmt:'auc',ci:r.auroc_ci,note:r.n.toLocaleString()+' trials, '+r.failures+' failures'},{label:'AUPRC',value:r.auprc,fmt:'num',note:'guessing level '+r.base_rate.toFixed(3)},{label:'Precision in the top 5%',value:b5.precision,fmt:'pct',note:b5.lift+'x lift, recall '+pct(b5.recall)},
+   {label:'Calibration error',value:r.ece,fmt:'num',note:'0 = stated risks are true rates'},{label:'All families together',value:ref.all_families_auroc,fmt:'auc',note:'for comparison'},{label:'Best single family',value:ref.best_single_auroc,fmt:'auc',note:ref.best_single_family.slice(0,40)}]));
+  const roc=lineChart({xlab:'false positive rate',ylab:'true positive rate',series:[{name:'combination',color:'#0040ff',pts:r.roc,w:2.5},{name:'chance',color:'#999',dash:true,pts:[[0,0],[1,1]]}],legend:[{name:'ROC of this combination',color:'#0040ff'},{name:'chance',color:'#999'}]});
+  const prm=Math.max(...r.pr.map(p=>p[1]),r.base_rate)*1.1;
+  const prc=lineChart({xlab:'recall',ylab:'precision',ymax:prm,series:[{name:'combination',color:'#b00020',pts:r.pr,w:2.5},{name:'base rate',color:'#999',dash:true,pts:[[0,r.base_rate],[1,r.base_rate]]}],legend:[{name:'precision-recall',color:'#b00020'},{name:'guessing level',color:'#999'}]});
+  const cm=Math.max(...r.calibration.map(c=>Math.max(c.pred,c.obs)))*1.1;
+  const cal=lineChart({xlab:'predicted failure rate (tenths of trials)',ylab:'observed rate',xmax:cm,ymax:cm,points:true,series:[{name:'bins',color:'#0b6b2e',pts:r.calibration.map(c=>[c.pred,c.obs]),r:5},{name:'ideal',color:'#999',dash:true,pts:[[0,0],[cm,cm]],points:false}]});
+  out.append(h('div',{style:'display:flex;flex-wrap:wrap;gap:12px;margin-top:8px'},h('div',null,h('div',{class:'small'},'ROC curve'),roc),h('div',null,h('div',{class:'small'},'Precision against recall'),prc),h('div',null,h('div',{class:'small'},'Calibration'),cal)),
+   exportBar(roc,'combination-roc',[['family','weight','alone AUROC'],...Object.entries(r.weights).map(([k,v])=>[k,v,r.alone[k]])]));
+  out.append(h('h3',null,'Review budget'),tableEl(['If you flag the riskiest','Trials flagged','Precision','Recall','Lift over guessing'],r.at_budget.map(x=>[pct(x.budget,0),fmt(x.flagged),pct(x.precision),pct(x.recall),x.lift+'x']),[1,2,3,4]));
+  out.append(h('h3',null,'Weights in the combination'),tableEl(['Family','Weight','Alone AUROC'],Object.entries(r.weights).map(([k,v])=>[k,v.toFixed(3),r.alone[k]==null?'':f3(r.alone[k])]),[1,2]),h('div',{class:'small',style:'max-width:900px;margin-top:4px'},ref.setting+'. A weight is the family’s share in the combination, not a causal effect. Overlapping families share credit.'));}
+ stick().forEach(n=>chosen.add(n));drawCtl();drawList();run();}
+
+async function docTab(box,E){
+ if(E.scaled_protocol){evSec(box,'Protocol-document source ledger (scaled)');
+  const pl=E.scaled_protocol,vs=Object.keys(pl.variants);let cur=vs[0];const holder=h('div'),bar=h('div',{class:'row'});
+  box.append(h('div',{class:'small',style:'max-width:920px'},pl.reading));
+  const draw=()=>{bar.replaceChildren(...vs.map(k=>h('button',{class:k===cur?'primary':'',onclick:()=>{cur=k;draw();}},k)));
+   const v=pl.variants[cur],rows=v.rows.slice().sort((a,b)=>b.alone_auroc-a.alone_auroc);
+   const fl={alone:v.noise_floor_alone_95th,unique:Math.max(Math.abs(v.random_gain_range[0]),Math.abs(v.random_gain_range[1]))};
+   holder.replaceChildren(h('div',{class:'small'},v.about+' '+fmt(v.n)+' documents, '+fmt(v.failures)+' failures · baseline (registry, sponsor identity, registry text) '+f3(v.baseline_auroc)+' · plus every document family '+f3(v.full_auroc)),ledgerChart(rows,pl.kinds,null,fl),
+    tableEl(['Family','Alone AUROC (95%)','Gain over baseline (95%)','Unique (95%)','Repeats positive','Status'],rows.map(r=>[r.family.length>70?r.family.slice(0,68)+'…':r.family,f3(r.alone_auroc)+' ('+r.alone_ci[0].toFixed(3)+' to '+r.alone_ci[1].toFixed(3)+')',(r.gain_over_baseline>=0?'+':'')+r.gain_over_baseline.toFixed(4)+' ('+r.gain_ci[0].toFixed(4)+' to '+r.gain_ci[1].toFixed(4)+')',(r.unique_gain>=0?'+':'')+r.unique_gain.toFixed(4),r.repeats_positive_gain+' of '+r.repeats,h('span',{class:'chip '+(r.status==='sticks'?'neg':r.status==='suggestive'?'oth':'unl')},r.status)]),[1,2,3,4]));};
+  draw();box.append(bar,holder);}
+ const gt=(t,about,rows,heads)=>{evSec(box,t,about);box.append(tableEl(heads,rows,heads.map((_,i)=>i).slice(1)));};
+ if(E.sponsor_identity){const s=E.sponsor_identity;gt('Does sponsor identity explain the text gain?','Strict cohort of '+fmt(s.n)+' documents, '+s.failures+' failures, five-fold.',Object.entries(s.auroc).map(([k,v])=>[k,f3(v)]),['Stack','AUROC']);
+  box.append(h('div',{class:'small'},'Document text over registry plus sponsor identity: '+(s.text_gain_over_registry_plus_sponsor_identity.gain>=0?'+':'')+s.text_gain_over_registry_plus_sponsor_identity.gain.toFixed(4)+' ('+s.text_gain_over_registry_plus_sponsor_identity.ci.join(' to ')+')'));}
+ if(E.text_kind)gt('Which kind of text carries the gain?','Gain over registry plus sponsor identity. Names removed, or only common, middle or rare vocabulary.',Object.entries(E.text_kind.variants).map(([k,v])=>[k,f3(v.auroc),(v.gain_over_baseline>=0?'+':'')+v.gain_over_baseline.toFixed(4),v.ci.join(' to ')]),['Text variant','AUROC','Gain','95% interval']);
+ if(E.text_amend)gt('Is it amendment history?','Removing version and amendment wording, or splitting title page from body.',Object.entries(E.text_amend.variants).map(([k,v])=>[k,f3(v.auroc),(v.gain_over_baseline>=0?'+':'')+v.gain_over_baseline.toFixed(4),v.ci.join(' to ')]),['Text variant','AUROC','Gain','95% interval']);
+ if(E.topic_baseline){const t=E.topic_baseline;gt('Do the registry’s own topic words absorb it?','Registry title, condition and MeSH words added to the baseline.',Object.entries(t.auroc).map(([k,v])=>[k,f3(v)]),['Stack','AUROC']);
+  box.append(h('div',{class:'small'},'Document text over registry, sponsor identity and registry text: '+(t.document_text_gain_over_registry_plus_sponsor_plus_registry_text.gain>=0?'+':'')+t.document_text_gain_over_registry_plus_sponsor_plus_registry_text.gain.toFixed(4)+' ('+t.document_text_gain_over_registry_plus_sponsor_plus_registry_text.ci.join(' to ')+')'));}}
+
+async function simTab(box,E){
+ const run=E.run;
+ if(run&&run.simulator){const sm=run.simulator;evSec(box,'Recruitment simulator: tuned to published rates (scenario analysis)','A cheap stochastic core, tuned to Kasenda et al. 2014. Not validated against real trials; see the backtest below.');
+  const A=sm.calibration.achieved,T=sm.calibration.anchors,nm={recruitment_stop_rate:'Stopped for poor recruitment',any_stop_rate:'Stopped for any reason',median_fraction_at_recruitment_stop:'Median share of target reached when stopped for recruitment',industry_over_investigator_recruitment_stop:'Industry rate over investigator rate',piloted_recruitment_stop_rate_max:'Piloted trials stopped for recruitment (upper bound)'};
+  box.append(tableEl(['Published rate','Published','Simulator'],Object.keys(T).map(k=>[nm[k],f3(T[k]),f3(A[k])]),[1,2]));
+  box.append(h('div',{class:'warn'},sm.scenario.label),tableEl(['Change (same simulated trials)','Stopped for recruitment','Relative change'],[['None (control)',pct(sm.scenario.control_recruitment_stop_rate),'']].concat(Object.entries(sm.scenario.levers).map(([k,v])=>[k,pct(v.recruitment_stop_rate),(v.relative_change>0?'+':'')+pct(v.relative_change,0)])),[1,2]));}
+ if(E.backtest){const bt=E.backtest,b=bt.backtest_era_B,c=bt.calibration_era_A,eq=bt.extraction_quality_completed_trials['documents dated at or before the start'];
+  evSec(box,'Backtest on real trials (gate G4): '+bt.gate_G4_verdict,'Tuned on trials starting up to 2015 with their real planned size, sites, sponsor type and criteria; asked to predict which 2016 to 2018 trials failed to recruit.');
+  const lad=ladderChart(Object.entries(b.auroc).map(([k,v])=>({label:k,auroc:v,group:k.startsWith('registry factors +')?'model':k.startsWith('registry')?'registry':k.startsWith('simulator')?'simulator':'baseline'})));
+  box.append(lad,exportBar(lad,'simulator-backtest',[['predictor','auroc'],...Object.entries(b.auroc)]));
+  const cal=lineChart({xlab:'simulated stop probability (eighths of trials)',ylab:'observed rate',xmax:Math.max(...b.calibration_simulator.map(x=>x.pred))*1.1,ymax:0.4,points:true,series:[{name:'bins',color:'#b00020',pts:b.calibration_simulator.map(x=>[x.pred,x.obs]),r:5}]});
+  box.append(h('div',{style:'display:flex;flex-wrap:wrap;gap:12px'},h('div',null,h('div',{class:'small'},'Simulator calibration on real 2016–2018 trials'),cal),h('div',{class:'small',style:'max-width:520px'},'Tuned on era A it matches the overall rate ('+pct(c.simulated.rate)+' simulated, '+pct(c.observed.rate)+' observed) but ranks trials wrongly. Planned sample size read from protocol text, on completed trials with a document dated before the start ('+fmt(eq.n)+'): correlation with registered enrolment '+eq.pearson_log10+', median actual over planned '+eq.median_actual_over_planned+'; '+pct(eq.share_within_25pct,0)+' within 25%, '+pct(eq.share_within_factor_2,0)+' within a factor of 2. Recruitment failures reached a median '+pct(bt.attainment_actual_over_planned.recruitment_failures[2],0)+' of the planned size (Kasenda: 41%).')));}}
+
+async function chkTab(box,E){
+ const run=E.run;
+ if(run&&run.negative_controls){const nc=run.negative_controls;evSec(box,'Negative controls','If one fails there is leakage or a bug.');
+  box.append(tableEl(['Control','Result','Expected','Verdict'],[['Outcomes shuffled (8 times)','mean AUROC '+f3(nc.shuffled_labels.dev_auroc_mean)+' (range '+f3(nc.shuffled_labels.dev_auroc_range[0])+' to '+f3(nc.shuffled_labels.dev_auroc_range[1])+'); '+nc.shuffled_labels.terms_flagged_fdr+' terms survived','about 0.5',h('span',{class:'chip neg'},'pass')],['12 random columns',nc.random_columns.fake_flagged_fdr+' of 12 flagged','0 or 1',h('span',{class:'chip '+(nc.random_columns.fake_flagged_fdr<=1?'neg':'pos')},nc.random_columns.fake_flagged_fdr<=1?'pass (edge)':'FAIL')],['Placebo outcome (last digit of the NCT number)','AUROC '+f3(nc.placebo_outcome.dev_auroc),'about 0.5',h('span',{class:'chip neg'},'pass')]]));}
+ if(E.scaled_registry){const sc=E.scaled_registry;evSec(box,'Noise floors','The 95th percentile of 30 random-number families added to the same model. It sits at about zero, which makes “above the floor” easy to meet; the rule also needs positive gain in 8 of 10 windows.');
+  box.append(tableEl(['Subset','Unique gain, 95th percentile of noise','Alone AUROC, 95th percentile of noise','Range of random unique gains'],Object.entries(sc.summary).map(([g,v])=>[g,v.noise_floor_unique_95th.toFixed(5),f3(v.noise_floor_alone_95th),v.random_families_mean_unique_range.join(' to ')])));}
+ if(run&&run.recovery){const rc=run.recovery.by_label_noise;evSec(box,'Can it find effects we plant?',run.recovery.reading);
+  box.append(tableEl(['Label noise','Right direction','Planted effects found','Null factors flagged','Factors sharing a hidden cause flagged','Interactions right','Interactions recalled'],Object.entries(rc).map(([q,v])=>[pct(+q,0),pct(v.sign_correct,0),pct(v.true_effects_found_fdr,0),pct(v.null_factors_flagged_fdr,0),pct(v.prime_mover_factors_flagged_fdr,0),pct(v.pair_precision,0),pct(v.pair_recall,0)]),[1,2,3,4,5,6]));}
+ if(run&&run.whatif){const wi=run.whatif;evSec(box,'Model against a stratified look (level 1)',wi.reading);
+  box.append(tableEl(['Protocol choice','Trials with it','Model: change if removed','Stratified observed change','Same direction'],wi.rows.map(r=>[r.lever,fmt(r.n_with),(r.model_implied_change_if_removed*100).toFixed(2)+' pts',(r.stratified_observed_change_if_removed*100).toFixed(2)+' pts',h('span',{class:'chip '+(r.same_direction?'neg':'pos')},r.same_direction?'yes':'no')]),[1,2,3]));}
+ if(run&&run.heads){evSec(box,'Other ways to fail','One risk per super-label, same split, machine-made labels.');
+  box.append(tableEl(['Way to fail','Failures to learn from','Failures to test on','AUROC','95% interval','AUPRC','Guessing level'],Object.entries(run.heads).map(([k,v])=>v.note?[k,fmt(v.train_positives),fmt(v.test_positives),'',v.note,'','']:[k,fmt(v.train_positives),fmt(v.test_positives),f3(v.auroc),v.auroc_ci.join(' to '),f3(v.auprc),f3(v.guessing_level)]),[1,2,3,5,6]));}}
+
+async function synTab(box,E){
+ const sy=E.synthetic;if(!sy){box.append(h('div',null,'No synthetic-protocol analysis yet.'));return;}
+ evSec(box,'Twelve synthetic protocols (capability check only)');
+ box.append(h('div',{class:'warn'},'Synthetic data written by the same model that analysed them. Four were designed to fail, four to be ordinary, four with risk engineered down. This shows whether the machinery reads the intended differences, not accuracy. Never mixed with real figures, never used in validation.'));
+ const cat={weak:'chip pos',average:'chip oth',strong:'chip neg'},rows=sy.documents.slice().sort((a,b)=>b.stack_risk-a.stack_risk);
+ box.append(tableEl(['Document','Designed as','Design','Registry-factor risk','Stack risk','Checklist items (of 14)','Needed per site per month','Simulator stop probability'],rows.map(d=>[d.id,h('span',{class:cat[d.category]},d.category),d.design,pct(d.registry_factor_risk,1),pct(d.stack_risk,1),d.briel_distinct_items,d.required_per_site_per_month,pct(d.simulator_stop_probability,0)]),[3,4,5,6,7]));
+ const pw=sy.pairwise_share_ordered_as_designed;
+ evSec(box,'Share of document pairs ordered as designed','1.0 = every pair right, 0.5 = chance.');
+ box.append(tableEl(['Score','Weak above strong','Weak above average','Average above strong'],Object.entries(pw).map(([k,v])=>[k,v[0].toFixed(2),h('b',null,v[1].toFixed(2)),v[2].toFixed(2)]),[1,2,3]));
+ if(sy.reading)box.append(h('div',{class:'small',style:'max-width:920px;margin-top:6px'},sy.reading));}
+
+async function gateTab(box,E){
+ evSec(box,'Validation gates','A claim made before its gate is passed is exploratory wherever it appears.');
+ box.append(tableEl(['Gate','Claim it unlocks','Status','Note'],E.gates.map(g=>[g.gate,g.claim,h('span',{class:'chip '+(g.status==='passed'||g.status==='measured'?'neg':g.status==='pilot only'?'oth':'unl')},g.status),g.note])));
+ evSec(box,'How the data were kept honest','The sealed vault (a random tenth of trials by salted hash, plus every 2019 and 2020 start) is excluded from every run on this page and has not been looked at. The frozen test split is excluded from every exploratory run. Time-aware families use only trials that started at least three years earlier. Synthetic protocols are never mixed with real figures.');
+ evSec(box,'Result files this page reads');
+ box.append(tableEl(['File','Size (KB)','Written'],E.files.map(f=>[f.name,fmt(f.kb),new Date(f.modified*1000).toLocaleString()]),[1]));}
+
+{const _ov=overview;overview=async function(main){await _ov(main);try{await evidencePanel(main);}catch(e){}};}
 
 async function plots(main){
  main.append(h('h2',null,'Plots'));
